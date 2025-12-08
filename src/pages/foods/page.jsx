@@ -20,7 +20,7 @@ export const FoodsPage = () => {
   return (
     <div className="flex flex-col items-start justify-start w-full">
       <Title />
-      <Categories/>
+      <Categories />
       <Foods items={foods} />
     </div>
   );
