@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Categories from "./components/categories";
 import { Title } from "./components/title";
 import { foodsSubject } from "@/shared/subjects/foods";
 import { Foods } from "./components/foods";
@@ -19,6 +20,7 @@ export const FoodsPage = () => {
   return (
     <div className="flex flex-col items-start justify-start w-full">
       <Title />
+      <Categories/>
       <Foods items={foods} />
     </div>
   );
