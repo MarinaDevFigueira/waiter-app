@@ -23,7 +23,7 @@ function Category({ icon = "", label = "", selected = false }) {
 
 const Categories = ({ lista = [] }) => {
   return (
-    <ul className="w-72 flex flex-row justify-between items-center ">
+    <ul className="w-full flex flex-row justify-between items-center px-4.5">
       {lista?.map((item) => {
         return (
           <Category
