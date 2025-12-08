@@ -4,7 +4,7 @@ function Category({ icon = "", label = "", selected = false }) {
   return (
     <li
       data-selected={selected}
-      className="group flex justify-between items-center gap-4 mt-5 data-[selected=false]:pointer-events-none data-[selected=false]:select-none"
+      className="group flex justify-between items-center gap-4 data-[selected=false]:pointer-events-none data-[selected=false]:opacity-40"
     >
       <div className="flex justify-center items-center flex-col gap-1.5">
         <a
@@ -13,7 +13,7 @@ function Category({ icon = "", label = "", selected = false }) {
             backgroundImage: `url("${icon}")`,
           }}
         />
-        <span className="font-semibold text-sm group-data-[selected=false]:opacity-90">
+        <span className="font-semibold text-sm group-data-[selected=false]:opacity-30">
           {label}
         </span>
       </div>
