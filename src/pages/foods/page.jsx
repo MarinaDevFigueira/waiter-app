@@ -9,7 +9,7 @@ import { categorySubject } from "@/shared/subjects/categories";
 export const FoodsPage = () => {
   const [foods, setFoods] = useState([]);
   const categories = categoriesMock;
-  const [selectedCategory, selectCategory] = useState(null);
+  const [_selectedCategory, selectCategory] = useState(null);
 
   useEffect(() => {
     const foodSubscription = foodsSubject.subscribe((data) => {

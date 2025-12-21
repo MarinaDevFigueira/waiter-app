@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { SplashScreen } from "@/components/splash-screen/splash-screen";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -8,8 +9,7 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <React.Fragment>
-      {/* <div>Hello "__root"!</div>
-      Hello world from the root route! */}
+      <SplashScreen />
       <div className="w-dvw h-dvh max-w-[393px] p-3 flex flex-col items-center justify-start">
         <Outlet />
       </div>
