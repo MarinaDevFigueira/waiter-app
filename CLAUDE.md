@@ -101,14 +101,23 @@ Unused variables starting with uppercase or underscore are allowed (`varsIgnoreP
 
 ### Colors and Values
 - **NUNCA usar valores hardcoded** (cores, espaçamentos, tamanhos, etc.)
+- **Exceções permitidas:** apenas `width` e `height` podem ser hardcoded (ex: `w-[120px]`, `h-[200px]`)
 - **Prioridade de uso:**
   1. Classes nativas do Tailwind CSS (ex: `bg-red-500`, `p-4`, `w-full`)
   2. Cores/valores do tema em `src/index.css` (ex: `bg-primary`, `text-foreground`)
   3. **Apenas em último caso:** adicionar nova variável em `:root` e `.dark` em `src/index.css`
+- **Para variações condicionais:** usar `data-*` attributes ao invés de ternários:
+  ```jsx
+  // ✅ Correto
+  <Button data-isSuccess={isSuccess} className="data-[isSuccess=true]:bg-white data-[isSuccess=true]:text-primary data-[isSuccess=false]:bg-primary data-[isSuccess=false]:text-white" />
+
+  // ❌ Incorreto
+  <Button className={isSuccess ? "bg-white text-primary" : "bg-primary text-white"} />
+  ```
 - Usar classes do Tailwind CSS:
   ```jsx
   // ✅ Correto
-  className="bg-primary text-white p-4 rounded-md"
+  className="bg-primary text-white p-4 rounded-md w-[120px]"
 
   // ❌ Incorreto
   className="bg-[#D73035] text-[#FFFFFF] p-[16px] rounded-[8px]"
