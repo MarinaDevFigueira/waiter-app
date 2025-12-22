@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { FeedbackScreen } from "@/components/ui/feedback-screen/feedback-screen";
 import { SPLASH_STORAGE_KEY } from "@/shared/constants/splash";
+import FeedbackScreen from "@/components/ui/feedback-screen/feedback-screen";
 
 function getInitialVisibility() {
   if (typeof window === "undefined") return false;

@@ -1,30 +1,7 @@
 import * as React from "react";
-import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { Button } from "../button";
-
-const feedbackScreenVariants = cva(
-  "flex flex-col items-center justify-center text-center gap-6 p-6",
-  {
-    variants: {
-      variant: {
-        default: "bg-background",
-        overlay: "bg-background/95 backdrop-blur-sm",
-        fullscreen: "bg-background min-h-dvh w-full",
-        success: "bg-primary min-h-dvh w-full",
-      },
-      size: {
-        default: "max-w-sm",
-        lg: "max-w-md",
-        full: "w-full h-full",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-);
+import { Button } from "@/components/ui/button/button";
+import feedbackScreenVariants from "./variants";
 
 const FeedbackScreen = React.forwardRef(
   (
@@ -40,10 +17,9 @@ const FeedbackScreen = React.forwardRef(
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     const isSuccess = variant === "success";
-
     return (
       <div
         ref={ref}
@@ -52,7 +28,10 @@ const FeedbackScreen = React.forwardRef(
         {...props}
       >
         {illustration && (
-          <div data-testid="feedback-illustration" className="flex items-center justify-center">
+          <div
+            data-testid="feedback-illustration"
+            className="flex items-center justify-center"
+          >
             {typeof illustration === "string" ? (
               <img
                 src={illustration}
@@ -68,10 +47,8 @@ const FeedbackScreen = React.forwardRef(
         {title && (
           <h1
             data-testid="feedback-title"
-            className={cn(
-              "text-2xl font-bold",
-              isSuccess ? "text-white" : "text-foreground"
-            )}
+            data-isSuccess={isSuccess}
+            className="text-2xl font-bold data-[isSuccess=true]:text-white data-[isSuccess=false]:text-foreground"
           >
             {title}
           </h1>
@@ -80,10 +57,8 @@ const FeedbackScreen = React.forwardRef(
         {description && (
           <p
             data-testid="feedback-description"
-            className={cn(
-              "text-sm",
-              isSuccess ? "text-white/80" : "text-muted-foreground"
-            )}
+            data-isSuccess={isSuccess}
+            className="text-sm data-[isSuccess=true]:text-white/80 data-[isSuccess=false]:text-muted-foreground"
           >
             {description}
           </p>
@@ -94,23 +69,19 @@ const FeedbackScreen = React.forwardRef(
         {action && (
           <Button
             data-testid="feedback-action"
+            data-isSuccess={isSuccess}
             onClick={onAction}
-            className={cn(
-              "mt-4 min-w-[120px]",
-              isSuccess
-                ? "bg-white text-primary hover:bg-white/90"
-                : "bg-primary hover:bg-primary/90 text-white"
-            )}
+            className="mt-4 min-w-[120px] data-[isSuccess=true]:bg-white data-[isSuccess=true]:text-primary data-[isSuccess=true]:hover:bg-white/90 data-[isSuccess=false]:bg-primary data-[isSuccess=false]:hover:bg-primary/90 data-[isSuccess=false]:text-white"
           >
             {action}
           </Button>
         )}
       </div>
     );
-  }
+  },
 );
 
 FeedbackScreen.displayName = "FeedbackScreen";
 
-// eslint-disable-next-line react-refresh/only-export-components
-export { FeedbackScreen, feedbackScreenVariants };
+export default FeedbackScreen;
+export { FeedbackScreen };
