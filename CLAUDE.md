@@ -46,6 +46,21 @@ Use `@/` to import from `src/` directory (configured in vite.config.js).
 ### ESLint Config
 Unused variables starting with uppercase or underscore are allowed (`varsIgnorePattern: '^[A-Z_]'`).
 
+**IMPORTANTE:** NUNCA aplicar bypass/disable de regras ESLint usando `eslint-disable` ou comments. Se uma regra está gerando warnings/errors:
+1. Refatore o código para resolver o problema
+2. Se a regra for inválida, discuta com o time antes de usar disable
+3. Padrão: deixar código limpo sem suppressões
+
+### Attribution
+**IMPORTANTE:** NUNCA adicionar menções de "gerado pelo Claude", "Generated with Claude Code", ou qualquer referência a assistentes de IA em:
+- Commits
+- Pull request descriptions
+- Código comentado
+- Documentação
+- Arquivos do projeto
+
+Manter o código e commits como se fossem desenvolvidos manualmente pelo time.
+
 ## Figma Design
 
 **Link:** https://www.figma.com/design/PFza25fTu8s9WLjrFxk7lq/WAITERAPP--Copy-?node-id=11-195
@@ -65,6 +80,16 @@ Unused variables starting with uppercase or underscore are allowed (`varsIgnoreP
 - **Background:** Branco
 - **Bordas:** Arredondadas (rounded)
 - **Preços:** Formato "R$ XX,00"
+
+## Dependencies and Libraries
+
+### Phosphor Icons
+- **Package:** `@phosphor-icons/react`
+- **Current Icons Used:** `PizzaIcon`, `WineIcon`, `HamburgerIcon`, `StarIcon`
+- **IMPORTANTE:** Sempre verificar `node_modules/@phosphor-icons/react/dist/index.d.ts` antes de sugerir novos ícones
+- **Ícones com sufixo `Icon`** (ex: `PizzaIcon`) são os que existem e funcionam
+- **Ícones SEM sufixo** (ex: `Pizza`, `Wine`) podem estar deprecados ou não existir
+- Priorizar ícones que já existem no projeto ao sugerir
 
 ## Testing
 

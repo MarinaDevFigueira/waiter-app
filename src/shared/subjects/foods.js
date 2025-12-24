@@ -1,4 +1,4 @@
 import { BehaviorSubject } from "rxjs";
-import { pizzasMock } from "../mocks/pizzas";
+import { foodsByCategory } from "../mocks/foods";
 
-export const foodsSubject = new BehaviorSubject(pizzasMock);
+export const foodsSubject = new BehaviorSubject(foodsByCategory.pizzas);

@@ -25,7 +25,7 @@ lint:
 	npm run lint
 
 test:
-	npm run test
+	npm run test --reporter=list
 
 test-ui:
 	npm run test:ui
