@@ -27,7 +27,7 @@ export const FoodsPage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-start justify-start w-full gap-2">
+    <div className="flex flex-col items-start justify-start w-full gap-4">
       <Title />
       <Categories lista={categories} />
       <Foods items={foods} />

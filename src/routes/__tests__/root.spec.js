@@ -12,7 +12,7 @@ test.describe("Root Layout", () => {
     await page.evaluate(() => sessionStorage.setItem("showWelcomeSplash", "false"));
     await page.reload();
 
-    const container = page.locator("div.max-w-\\[393px\\]");
+    const container = page.locator("main");
     await expect(container).toBeVisible();
   });
 
@@ -21,12 +21,11 @@ test.describe("Root Layout", () => {
     await page.evaluate(() => sessionStorage.setItem("showWelcomeSplash", "false"));
     await page.reload();
 
-    const container = page.locator("div.max-w-\\[393px\\]");
-    await expect(container).toHaveClass(/w-dvw/);
-    await expect(container).toHaveClass(/h-dvh/);
-    await expect(container).toHaveClass(/p-3/);
+    const container = page.locator("main");
+    await expect(container).toHaveClass(/w-full/);
+    await expect(container).toHaveClass(/flex-1/);
+    await expect(container).toHaveClass(/overflow-y-auto/);
     await expect(container).toHaveClass(/flex/);
-    await expect(container).toHaveClass(/flex-col/);
   });
 
   test("renders outlet content (home page)", async ({ page }) => {
@@ -35,7 +34,7 @@ test.describe("Root Layout", () => {
     await page.reload();
 
     // Verifica se o conteúdo da página inicial é renderizado
-    const pageContent = page.locator("div.max-w-\\[393px\\]");
+    const pageContent = page.locator("main");
     await expect(pageContent).toBeVisible();
   });
 });
