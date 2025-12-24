@@ -47,8 +47,8 @@ test.describe("Categories Component", () => {
   test("pizza category has orange background color class", async ({ page }) => {
     const pizzaItem = page.locator("li[data-category='pizzas']");
     const style = await pizzaItem.evaluate((el) => {
-      const div = el.querySelector("div:nth-child(2)");
-      return div.className;
+      const container = el.querySelector("div > div");
+      return container.className;
     });
     expect(style).toContain("bg-orange-100");
   });
@@ -56,8 +56,8 @@ test.describe("Categories Component", () => {
   test("drinks category has blue background color class", async ({ page }) => {
     const drinksItem = page.locator("li[data-category='drinks']");
     const style = await drinksItem.evaluate((el) => {
-      const div = el.querySelector("div:nth-child(2)");
-      return div.className;
+      const container = el.querySelector("div > div");
+      return container.className;
     });
     expect(style).toContain("bg-blue-100");
   });
@@ -65,8 +65,8 @@ test.describe("Categories Component", () => {
   test("snacks category has amber background color class", async ({ page }) => {
     const snacksItem = page.locator("li[data-category='snacks']");
     const style = await snacksItem.evaluate((el) => {
-      const div = el.querySelector("div:nth-child(2)");
-      return div.className;
+      const container = el.querySelector("div > div");
+      return container.className;
     });
     expect(style).toContain("bg-amber-100");
   });
@@ -74,8 +74,8 @@ test.describe("Categories Component", () => {
   test("promotions category has pink background color class", async ({ page }) => {
     const promotionsItem = page.locator("li[data-category='promotions']");
     const style = await promotionsItem.evaluate((el) => {
-      const div = el.querySelector("div:nth-child(2)");
-      return div.className;
+      const container = el.querySelector("div > div");
+      return container.className;
     });
     expect(style).toContain("bg-pink-100");
   });
@@ -115,9 +115,15 @@ test.describe("Categories Component", () => {
   });
 
   test("all categories use list item elements", async ({ page }) => {
-    const categories = page.locator("li[data-category]");
-    const count = await categories.count();
-    expect(count).toBe(4);
+    const pizzaItem = page.locator("li[data-category='pizzas']");
+    const drinksItem = page.locator("li[data-category='drinks']");
+    const snacksItem = page.locator("li[data-category='snacks']");
+    const promotionsItem = page.locator("li[data-category='promotions']");
+
+    await expect(pizzaItem).toBeVisible();
+    await expect(drinksItem).toBeVisible();
+    await expect(snacksItem).toBeVisible();
+    await expect(promotionsItem).toBeVisible();
   });
 
   test("each category item contains icon and label", async ({ page }) => {
@@ -132,8 +138,11 @@ test.describe("Categories Component", () => {
   test("icons are sized correctly on mobile", async ({ page }) => {
     const pizzaItem = page.locator("li[data-category='pizzas']");
     const style = await pizzaItem.evaluate((el) => {
-      const div = el.querySelector("div:nth-child(2)");
-      return div.className;
+      const divs = el.querySelectorAll("div");
+      if (divs.length >= 2) {
+        return divs[1].className;
+      }
+      return "";
     });
 
     expect(style).toContain("w-8");
@@ -143,8 +152,11 @@ test.describe("Categories Component", () => {
   test("icons are responsive sized", async ({ page }) => {
     const pizzaItem = page.locator("li[data-category='pizzas']");
     const style = await pizzaItem.evaluate((el) => {
-      const div = el.querySelector("div:nth-child(2)");
-      return div.className;
+      const divs = el.querySelectorAll("div");
+      if (divs.length >= 2) {
+        return divs[1].className;
+      }
+      return "";
     });
 
     expect(style).toContain("sm:w-10");
@@ -154,8 +166,11 @@ test.describe("Categories Component", () => {
   test("icon containers are circular", async ({ page }) => {
     const pizzaItem = page.locator("li[data-category='pizzas']");
     const style = await pizzaItem.evaluate((el) => {
-      const div = el.querySelector("div:nth-child(2)");
-      return div.className;
+      const divs = el.querySelectorAll("div");
+      if (divs.length >= 2) {
+        return divs[1].className;
+      }
+      return "";
     });
 
     expect(style).toContain("rounded-full");
@@ -164,8 +179,11 @@ test.describe("Categories Component", () => {
   test("icon containers use flex centering", async ({ page }) => {
     const pizzaItem = page.locator("li[data-category='pizzas']");
     const style = await pizzaItem.evaluate((el) => {
-      const div = el.querySelector("div:nth-child(2)");
-      return div.className;
+      const divs = el.querySelectorAll("div");
+      if (divs.length >= 2) {
+        return divs[1].className;
+      }
+      return "";
     });
 
     expect(style).toContain("flex");
@@ -176,8 +194,11 @@ test.describe("Categories Component", () => {
   test("icon containers have shadow", async ({ page }) => {
     const pizzaItem = page.locator("li[data-category='pizzas']");
     const style = await pizzaItem.evaluate((el) => {
-      const div = el.querySelector("div:nth-child(2)");
-      return div.className;
+      const divs = el.querySelectorAll("div");
+      if (divs.length >= 2) {
+        return divs[1].className;
+      }
+      return "";
     });
 
     expect(style).toContain("shadow-xs");
@@ -186,8 +207,11 @@ test.describe("Categories Component", () => {
   test("icon containers have padding", async ({ page }) => {
     const pizzaItem = page.locator("li[data-category='pizzas']");
     const style = await pizzaItem.evaluate((el) => {
-      const div = el.querySelector("div:nth-child(2)");
-      return div.className;
+      const divs = el.querySelectorAll("div");
+      if (divs.length >= 2) {
+        return divs[1].className;
+      }
+      return "";
     });
 
     expect(style).toContain("p-1.5");
@@ -195,9 +219,15 @@ test.describe("Categories Component", () => {
   });
 
   test("all SVG icons are rendered", async ({ page }) => {
-    const icons = page.locator("li[data-category] svg");
-    const count = await icons.count();
-    expect(count).toBe(4);
+    const pizzaIcon = page.locator("li[data-category='pizzas'] svg");
+    const drinksIcon = page.locator("li[data-category='drinks'] svg");
+    const snacksIcon = page.locator("li[data-category='snacks'] svg");
+    const promotionsIcon = page.locator("li[data-category='promotions'] svg");
+
+    await expect(pizzaIcon).toBeVisible();
+    await expect(drinksIcon).toBeVisible();
+    await expect(snacksIcon).toBeVisible();
+    await expect(promotionsIcon).toBeVisible();
   });
 
   test("category labels have responsive text sizing", async ({ page }) => {
