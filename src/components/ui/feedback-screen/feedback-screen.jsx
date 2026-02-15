@@ -20,6 +20,8 @@ const FeedbackScreen = React.forwardRef(
     ref,
   ) => {
     const isSuccess = variant === "success";
+    const buttonVariant = isSuccess ? "outline" : "default";
+
     return (
       <div
         ref={ref}
@@ -69,9 +71,9 @@ const FeedbackScreen = React.forwardRef(
         {action && (
           <Button
             data-testid="feedback-action"
-            data-isSuccess={isSuccess}
             onClick={onAction}
-            className="mt-4 min-w-[120px] data-[isSuccess=true]:bg-white data-[isSuccess=true]:text-primary data-[isSuccess=true]:hover:bg-white/90 data-[isSuccess=false]:bg-primary data-[isSuccess=false]:hover:bg-primary/90 data-[isSuccess=false]:text-white"
+            variant={buttonVariant}
+            className="mt-4 min-w-[120px]"
           >
             {action}
           </Button>

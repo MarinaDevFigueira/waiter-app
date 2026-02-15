@@ -1,10 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { loginAsMesa } from "../../../../components/__tests__/helpers";
 
 test.describe("Categories Component", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.evaluate(() => sessionStorage.setItem("showWelcomeSplash", "false"));
-    await page.reload();
+    await loginAsMesa(page);
   });
 
   test("renders all four category items", async ({ page }) => {

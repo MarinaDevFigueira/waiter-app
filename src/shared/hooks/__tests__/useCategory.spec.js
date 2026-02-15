@@ -1,10 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { loginAsMesa } from "../../../components/__tests__/helpers";
 
 test.describe("useCategory Hook", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.evaluate(() => sessionStorage.setItem("showWelcomeSplash", "false"));
-    await page.reload();
+    await loginAsMesa(page);
   });
 
   test("should return initial category as pizzas", async ({ page }) => {
@@ -198,8 +197,6 @@ test.describe("useCategory Hook", () => {
   });
 
   test("should update food list when category changes", async ({ page }) => {
-    const foodsContainer = page.locator("div").filter({ has: page.locator("text=/Pizza|Bebida|Lanche|Promoção/") });
-
     // Start with pizzas
     const pizzasCategory = page.locator("li[data-category='pizzas']");
     const pizzasSelected = await pizzasCategory.getAttribute("data-selected");
