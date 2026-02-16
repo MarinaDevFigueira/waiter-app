@@ -16,7 +16,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardReportsRouteImport } from './routes/dashboard/reports'
-import { Route as DashboardPedidosRouteImport } from './routes/dashboard/pedidos'
+import { Route as DashboardOrdersRouteImport } from './routes/dashboard/orders'
 import { Route as DashboardProductsRouteRouteImport } from './routes/dashboard/products/route'
 
 const LoginRoute = LoginRouteImport.update({
@@ -54,9 +54,9 @@ const DashboardReportsRoute = DashboardReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardPedidosRoute = DashboardPedidosRouteImport.update({
-  id: '/pedidos',
-  path: '/pedidos',
+const DashboardOrdersRoute = DashboardOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardProductsRouteRoute = DashboardProductsRouteRouteImport.update({
@@ -70,7 +70,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/dashboard/products': typeof DashboardProductsRouteRoute
-  '/dashboard/pedidos': typeof DashboardPedidosRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
@@ -80,7 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard/products': typeof DashboardProductsRouteRoute
-  '/dashboard/pedidos': typeof DashboardPedidosRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
@@ -92,7 +92,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/dashboard/products': typeof DashboardProductsRouteRoute
-  '/dashboard/pedidos': typeof DashboardPedidosRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
@@ -105,7 +105,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/dashboard/products'
-    | '/dashboard/pedidos'
+    | '/dashboard/orders'
     | '/dashboard/reports'
     | '/dashboard/settings'
     | '/dashboard/users'
@@ -115,7 +115,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard/products'
-    | '/dashboard/pedidos'
+    | '/dashboard/orders'
     | '/dashboard/reports'
     | '/dashboard/settings'
     | '/dashboard/users'
@@ -126,7 +126,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/dashboard/products'
-    | '/dashboard/pedidos'
+    | '/dashboard/orders'
     | '/dashboard/reports'
     | '/dashboard/settings'
     | '/dashboard/users'
@@ -190,11 +190,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardReportsRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/pedidos': {
-      id: '/dashboard/pedidos'
-      path: '/pedidos'
-      fullPath: '/dashboard/pedidos'
-      preLoaderRoute: typeof DashboardPedidosRouteImport
+    '/dashboard/orders': {
+      id: '/dashboard/orders'
+      path: '/orders'
+      fullPath: '/dashboard/orders'
+      preLoaderRoute: typeof DashboardOrdersRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/products': {
@@ -209,7 +209,7 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteRouteChildren {
   DashboardProductsRouteRoute: typeof DashboardProductsRouteRoute
-  DashboardPedidosRoute: typeof DashboardPedidosRoute
+  DashboardOrdersRoute: typeof DashboardOrdersRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
@@ -218,7 +218,7 @@ interface DashboardRouteRouteChildren {
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardProductsRouteRoute: DashboardProductsRouteRoute,
-  DashboardPedidosRoute: DashboardPedidosRoute,
+  DashboardOrdersRoute: DashboardOrdersRoute,
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardUsersRoute: DashboardUsersRoute,

@@ -1,4 +1,4 @@
-import { OrderCard } from "@/pages/kitchen/orders/components/order-card/order-card";
+import { OrderCard } from "@/pages/orders/components/order-card/order-card";
 import { KitchenEmptyState } from "@/components/empty-states/kitchen-empty-state";
 import {
   HoverCard,

@@ -14,7 +14,7 @@ test.describe("OrderCard Component", () => {
 
     await page.waitForURL("/dashboard");
 
-    await page.goto("/dashboard/pedidos");
+    await page.goto("/dashboard/orders");
     await page.waitForLoadState("domcontentloaded");
 
     await page.waitForSelector('[data-testid="kitchen-orders-grid"]', { state: 'visible', timeout: 15000 });
