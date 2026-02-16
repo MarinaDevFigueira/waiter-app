@@ -1,11 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { categorySubject } from "@/shared/subjects/categories";
+import { categoryObservable } from "@/shared/subjects/categories";
 
 export const useCategory = () => {
-  const [selectedCategory, setSelectedCategory] = useState("pizzas");
+  const [selectedCategory, setSelectedCategory] = useState(categoryObservable.getValue());
 
   useEffect(() => {
-    const subscription = categorySubject.subscribe((category) => {
+    const subscription = categoryObservable.subscribe((category) => {
       setSelectedCategory(category);
     });
 
@@ -13,7 +13,7 @@ export const useCategory = () => {
   }, []);
 
   const changeCategory = useCallback((category) => {
-    categorySubject.next(category);
+    categoryObservable.setCategory(category);
   }, []);
 
   return {

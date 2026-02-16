@@ -1,26 +1,19 @@
 import { useEffect, useState } from "react";
-import { switchMap } from "rxjs";
-import { categorySubject } from "@/shared/subjects/categories";
-import { foodsSubject } from "@/shared/subjects/foods";
+import { categoryObservable } from "@/shared/subjects/categories";
+import { foodsObservable } from "@/shared/subjects/foods";
 import { foodsByCategory } from "@/shared/mocks/foods";
 
 export const useFoodsFilter = () => {
-  const [filteredFoods, setFilteredFoods] = useState([]);
-  const [currentCategory, setCurrentCategory] = useState("pizzas");
+  const [filteredFoods, setFilteredFoods] = useState(foodsObservable.getValue());
+  const [currentCategory, setCurrentCategory] = useState(categoryObservable.getValue());
 
   useEffect(() => {
-    const subscription = categorySubject
-      .pipe(
-        switchMap((category) => {
-          setCurrentCategory(category);
-          const foods = foodsByCategory[category] || [];
-          foodsSubject.next(foods);
-          return foodsSubject;
-        })
-      )
-      .subscribe((foods) => {
-        setFilteredFoods(foods);
-      });
+    const subscription = categoryObservable.subscribe((category) => {
+      setCurrentCategory(category);
+      const foods = foodsByCategory[category] || [];
+      foodsObservable.setFoods(foods);
+      setFilteredFoods(foods);
+    });
 
     return () => subscription.unsubscribe();
   }, []);

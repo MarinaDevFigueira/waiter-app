@@ -7,9 +7,10 @@ test.describe("DashboardLayout Component", () => {
   });
 
   test("renders sidebar with logo", async ({ page }) => {
-    const logo = page.locator("h1.font-title");
+    const logo = page.getByTestId("logo");
     await expect(logo).toBeVisible();
-    await expect(logo).toContainText("Waiter");
+
+    await expect(logo).toContainText("WaiterApp");
   });
 
   test("renders navigation menu items", async ({ page }) => {
@@ -32,7 +33,7 @@ test.describe("DashboardLayout Component", () => {
 
   test("sidebar can be minimized and expanded", async ({ page }) => {
     const toggleButton = page.getByTestId("toggle-sidebar");
-    const logo = page.locator("h1.font-title");
+    const logo = page.getByTestId("logo");
 
     await expect(logo).toBeVisible();
 

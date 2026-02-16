@@ -1,44 +1,60 @@
 import { test, expect } from "@playwright/test";
-import { disableSplashScreen, loginAsAdmin } from "../../../__tests__/helpers";
+import { loginAsAdmin, loginAsMesa } from "../../../__tests__/helpers";
 
 test.describe("Logo Component", () => {
-  test("renders logo with Waiter and App text", async ({ page }) => {
-    await disableSplashScreen(page);
-    await page.goto("/");
+  test("renders logo with WaiterApp text", async ({ page }) => {
+    await loginAsMesa(page);
 
-    const logo = page.locator("h1.font-title");
+    const logo = page.getByTestId("logo");
     await expect(logo).toBeVisible();
-    await expect(logo).toContainText("Waiter");
-    await expect(logo).toContainText("App");
+    await expect(logo).toContainText("WaiterApp");
   });
 
-  test("Waiter text has primary color", async ({ page }) => {
-    await disableSplashScreen(page);
-    await page.goto("/");
+  test("logo has red background", async ({ page }) => {
+    await loginAsMesa(page);
 
-    const waiterSpan = page.locator("h1.font-title span.text-primary");
-    await expect(waiterSpan).toBeVisible();
-    await expect(waiterSpan).toHaveText("Waiter");
+    const logo = page.getByTestId("logo");
+    await expect(logo).toBeVisible();
+
+    const bgColor = await logo.evaluate((el) => {
+      return window.getComputedStyle(el).backgroundColor;
+    });
+
+    expect(bgColor).toBeTruthy();
   });
 
-  test("App text has light font weight", async ({ page }) => {
-    await disableSplashScreen(page);
-    await page.goto("/");
+  test("logo text is white", async ({ page }) => {
+    await loginAsMesa(page);
 
-    const appSpan = page.locator("h1.font-title span.font-extralight");
-    await expect(appSpan).toBeVisible();
-    await expect(appSpan).toHaveText("App");
+    const logo = page.getByTestId("logo");
+    const logoText = logo.locator("span");
+
+    await expect(logoText).toBeVisible();
+    await expect(logoText).toHaveText("WaiterApp");
   });
 
   test("logo is hidden when minimized in dashboard", async ({ page }) => {
     await loginAsAdmin(page);
 
-    const logo = page.locator("h1.font-title");
+    const logo = page.getByTestId("logo");
     await expect(logo).toBeVisible();
 
     const toggleButton = page.getByTestId("toggle-sidebar");
     await toggleButton.click();
 
     await expect(logo).toBeHidden();
+  });
+
+  test("logo redirects to home when clicked", async ({ page }) => {
+    await loginAsAdmin(page);
+    await page.goto("http://localhost:5173/dashboard/pedidos");
+
+    await page.waitForURL("**/dashboard/pedidos");
+
+    const logo = page.getByTestId("logo");
+    await logo.click();
+
+    await page.waitForURL("**/");
+    expect(page.url()).toContain("/");
   });
 });

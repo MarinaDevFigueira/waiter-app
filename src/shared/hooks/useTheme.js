@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import { themeSubject, setTheme, toggleTheme } from "@/shared/subjects/theme";
+import { themeObservable } from "@/shared/subjects/theme";
 
 export function useTheme() {
-  const [theme, setThemeState] = useState(themeSubject.getValue());
+  const [theme, setThemeState] = useState(themeObservable.getValue());
 
   useEffect(() => {
-    const subscription = themeSubject.subscribe(setThemeState);
+    const subscription = themeObservable.subscribe(setThemeState);
     return () => subscription.unsubscribe();
   }, []);
 
   return {
     theme,
-    setTheme,
-    toggleTheme,
+    setTheme: themeObservable.setTheme,
+    toggleTheme: themeObservable.toggleTheme,
   };
 }

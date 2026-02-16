@@ -9,6 +9,7 @@ import {
   PackageIcon,
   CaretLeftIcon,
   CaretRightIcon,
+  CookingPotIcon,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import { Logo } from "@/components/ui/logo/logo";
@@ -46,6 +47,7 @@ export function DashboardLayout({ children }) {
   const menuItems = useMemo(() => {
     const baseItems = [
       { icon: HouseIcon, label: "Dashboard", path: "/dashboard" },
+      { icon: CookingPotIcon, label: "Pedidos", path: "/dashboard/pedidos" },
       { icon: ChartBarIcon, label: "Relatórios", path: "/dashboard/reports" },
       { icon: PackageIcon, label: "Produtos", path: "/dashboard/products" },
     ];
@@ -88,6 +90,7 @@ export function DashboardLayout({ children }) {
 
     const labelMap = {
       dashboard: "Dashboard",
+      pedidos: "Pedidos",
       users: "Usuários",
       reports: "Relatórios",
       settings: "Configurações",
@@ -108,7 +111,7 @@ export function DashboardLayout({ children }) {
     <div className="w-screen h-screen flex bg-background">
       <aside
         data-minimized={isMinimized}
-        className="hidden md:flex flex-col bg-background border-r border-border data-[minimized=false]:w-64 data-[minimized=true]:w-16 transition-all duration-300"
+        className="hidden md:flex flex-col bg-background border-r border-border data-[minimized=false]:w-64 data-[minimized=true]:w-16 transition-all duration-300 shadow-lg"
       >
         <div className="flex items-center justify-center h-14 sm:h-16 px-4 sm:px-6 md:px-8 border-b border-border relative">
           <Logo
@@ -183,7 +186,7 @@ export function DashboardLayout({ children }) {
       </aside>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="w-full bg-background border-b border-border h-14 sm:h-16 px-4 sm:px-6 md:px-8 flex items-center">
+        <header className="w-full bg-background border-b border-border h-14 sm:h-16 px-4 sm:px-6 md:px-8 flex items-center shadow-sm">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Link
@@ -196,7 +199,7 @@ export function DashboardLayout({ children }) {
                 <div key={crumb.path} className="flex items-center gap-2">
                   <span>/</span>
                   {crumb.isLast ? (
-                    <span className="text-foreground font-medium">
+                    <span className="text-muted-foreground font-medium select-none">
                       {crumb.label}
                     </span>
                   ) : (
@@ -214,7 +217,7 @@ export function DashboardLayout({ children }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-secondary/50">
           <div className="w-full h-full max-w-7xl mx-auto px-2 md:px-6 py-4">
             {children}
           </div>
