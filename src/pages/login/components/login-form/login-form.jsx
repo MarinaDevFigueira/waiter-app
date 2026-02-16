@@ -15,14 +15,16 @@ import {
   CardTitle,
 } from "@/components/ui/card/card";
 import { authService } from "@/services/auth/auth.service";
-
-const loginSchema = z.object({
-  username: z.string().min(1, { error: "Usuário é obrigatório" }),
-  password: z.string().min(1, { error: "Senha é obrigatória" }),
-});
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const loginSchema = z.object({
+    username: z.string().min(1, { message: t("login.form.usernameRequired") }),
+    password: z.string().min(1, { message: t("login.form.passwordRequired") }),
+  });
 
   const {
     register,
@@ -79,7 +81,9 @@ export function LoginForm() {
   ) : null;
 
   const isLoading = loginMutation.isPending;
-  const submitButtonText = isLoading ? "Entrando..." : "Entrar";
+  const submitButtonText = isLoading
+    ? t("login.form.submittingButton")
+    : t("login.form.submitButton");
 
   return (
     <Card className="w-full max-w-md">
@@ -91,21 +95,23 @@ export function LoginForm() {
           </h1>
         </div>
         <CardTitle className="text-xl text-center">
-          Acesse sua conta
+          {t("login.pageTitle")}
         </CardTitle>
         <CardDescription className="text-center">
-          Entre com suas credenciais para continuar
+          {t("login.pageSubtitle")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label htmlFor="username" className="block mb-2">Usuário</Label>
+            <Label htmlFor="username" className="block mb-2">
+              {t("login.form.usernameLabel")}
+            </Label>
             <Input
               {...register("username")}
               id="username"
               type="text"
-              placeholder="seu usuário"
+              placeholder={t("login.form.usernamePlaceholder")}
               required
               disabled={isLoading}
               data-testid="login-username-input"
@@ -113,7 +119,9 @@ export function LoginForm() {
             {usernameErrorElement}
           </div>
           <div>
-            <Label htmlFor="password" className="block mb-2">Senha</Label>
+            <Label htmlFor="password" className="block mb-2">
+              {t("login.form.passwordLabel")}
+            </Label>
             <Input
               {...register("password")}
               id="password"

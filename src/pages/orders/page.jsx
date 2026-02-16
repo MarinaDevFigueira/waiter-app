@@ -3,9 +3,11 @@ import { useKitchenOrders } from "@/shared/hooks/useKitchenOrders";
 import { kitchenOrdersObservable } from "@/shared/subjects/kitchen-orders.subject";
 import { SearchBar } from "@/pages/orders/components/search-bar/search-bar";
 import { OrdersGrid } from "@/pages/orders/components/orders-grid/orders-grid";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function KitchenOrdersPage() {
   const { orders, searchQuery, setSearchQuery } = useKitchenOrders();
+  const { t } = useTranslation();
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -24,27 +26,27 @@ export function KitchenOrdersPage() {
   };
 
   const statusOptions = [
-    { value: "pending", label: "Pendente" },
-    { value: "preparing", label: "Preparando" },
-    { value: "ready", label: "Pronto" },
+    { value: "pending", label: t("common.status.pending") },
+    { value: "preparing", label: t("common.status.preparing") },
+    { value: "ready", label: t("common.status.ready") },
   ];
 
   const getStatusLabel = (status) => {
     const statusMap = {
-      pending: "Pendente",
-      preparing: "Preparando",
-      ready: "Pronto",
+      pending: t("common.status.pending"),
+      preparing: t("common.status.preparing"),
+      ready: t("common.status.ready"),
     };
-    return statusMap[status] || "Pendente";
+    return statusMap[status] || t("common.status.pending");
   };
 
   const pageHeader = (
     <div className="text-center">
       <h1 className="text-3xl font-bold tracking-tight" data-testid="kitchen-orders-title">
-        Pedidos da Cozinha
+        {t("orders.kitchen.pageTitle")}
       </h1>
       <p className="text-muted-foreground" data-testid="kitchen-orders-subtitle">
-        Gerencie os pedidos em preparação
+        {t("orders.kitchen.pageSubtitle")}
       </p>
     </div>
   );
@@ -57,7 +59,7 @@ export function KitchenOrdersPage() {
         <SearchBar onSearch={handleSearch} />
       </div>
 
-      <div className="w-full flex-1 overflow-y-auto">
+      <div className="w-full flex-1">
         <OrdersGrid
           orders={orders}
           searchQuery={searchQuery}

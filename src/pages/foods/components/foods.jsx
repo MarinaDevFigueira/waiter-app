@@ -1,4 +1,5 @@
 import { PlusCircle } from "lucide-react";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export const FoodOption = ({
   name = "Nome do prato",
@@ -8,6 +9,7 @@ export const FoodOption = ({
   onAddClick = () => {},
   ...props
 }) => {
+  const { t } = useTranslation();
   return (
     <div
       className="w-full flex items-start justify-start gap-3 sm:gap-4 min-h-20 sm:h-24"
@@ -30,7 +32,7 @@ export const FoodOption = ({
           <button
             onClick={onAddClick}
             className="hover:opacity-80 transition-opacity p-1"
-            aria-label={`Adicionar ${name} ao pedido`}
+            aria-label={t("foods.actions.addToOrder", { name })}
           >
             <PlusCircle
               color="oklch(0.577 0.245 27.325)"

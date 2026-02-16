@@ -1,0 +1,135 @@
+{
+  "common": {
+    "buttons": {
+      "search": "Buscar",
+      "clear": "Limpar",
+      "apply": "Aplicar Filtros",
+      "back": "Voltar",
+      "logout": "Sair",
+      "goToHome": "Voltar para a página inicial",
+      "goToDashboard": "Ir para Dashboard"
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "deleted": "Excluído",
+      "pending": "Pendente",
+      "preparing": "Preparando",
+      "ready": "Pronto"
+    },
+    "sort": {
+      "ascending": "Ordenar crescente",
+      "descending": "Ordenar decrescente",
+      "removeSort": "Remover ordenação"
+    },
+    "validation": {
+      "required": "Campo obrigatório",
+      "searchRequired": "Digite algo para buscar"
+    },
+    "errors": {
+      "loadError": "Erro ao carregar",
+      "notFound": "Não encontrado"
+    },
+    "placeholders": {
+      "search": "Buscar..."
+    }
+  },
+  "login": {
+    "pageTitle": "Acesse sua conta",
+    "pageSubtitle": "Entre com suas credenciais para continuar",
+    "form": {
+      "usernameLabel": "Usuário",
+      "usernamePlaceholder": "seu usuário",
+      "passwordLabel": "Senha",
+      "usernameRequired": "Usuário é obrigatório",
+      "passwordRequired": "Senha é obrigatória",
+      "submitButton": "Entrar",
+      "submittingButton": "Entrando..."
+    }
+  },
+  "foods": {
+    "welcome": "Bem vindo(a) ao",
+    "categories": {
+      "pizzas": "Pizzas",
+      "drinks": "Bebidas",
+      "snacks": "Lanches",
+      "promotions": "Promoções"
+    },
+    "actions": {
+      "addToOrder": "Adicionar {{name}} ao pedido"
+    }
+  },
+  "products": {
+    "pageTitle": "Produtos",
+    "pageSubtitle": "Gerencie o catálogo de produtos do restaurante",
+    "errors": {
+      "loadProducts": "Erro ao carregar produtos:"
+    },
+    "emptyState": {
+      "title": "Nenhum produto cadastrado"
+    },
+    "table": {
+      "columns": {
+        "name": "Nome",
+        "category": "Categoria",
+        "price": "Preço",
+        "stock": "Estoque",
+        "status": "Status",
+        "createdAt": "Criado em",
+        "updatedAt": "Atualizado em"
+      }
+    },
+    "filters": {
+      "title": "Filtros",
+      "modalTitle": "Filtros de Produtos",
+      "modalSubtitle": "Refine sua busca aplicando filtros personalizados",
+      "searchPlaceholder": "Buscar produtos...",
+      "fields": {
+        "category": "Categoria",
+        "priceRange": "Faixa de Preço",
+        "minPrice": "Mínimo",
+        "maxPrice": "Máximo",
+        "status": "Status"
+      }
+    }
+  },
+  "orders": {
+    "kitchen": {
+      "pageTitle": "Pedidos da Cozinha",
+      "pageSubtitle": "Gerencie os pedidos em preparação",
+      "searchPlaceholder": "Buscar por mesa ou item...",
+      "emptyState": {
+        "noOrders": "Nenhum pedido ativo",
+        "noOrdersDescription": "Não há pedidos pendentes ou em preparo no momento",
+        "noResults": "Nenhum pedido encontrado",
+        "noResultsDescription": "Não encontramos pedidos com \"{{query}}\"",
+        "searchHint": "Tente buscar por mesa ou nome do item"
+      }
+    }
+  },
+  "dashboard": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "orders": "Pedidos",
+      "reports": "Relatórios",
+      "products": "Produtos",
+      "users": "Usuários",
+      "settings": "Configurações"
+    },
+    "breadcrumbs": {
+      "dashboard": "Dashboard",
+      "orders": "Pedidos",
+      "users": "Usuários",
+      "reports": "Relatórios",
+      "settings": "Configurações",
+      "products": "Produtos",
+      "edit": "Editar",
+      "new": "Novo"
+    }
+  },
+  "notFound": {
+    "errorCode": "404",
+    "title": "Página não encontrada",
+    "description": "A página que você está procurando não existe ou foi removida."
+  }
+}

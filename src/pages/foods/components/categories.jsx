@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import { useCategory } from "@/shared/hooks/useCategory";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 function Category({
   icon: IconComponent,
@@ -8,6 +9,16 @@ function Category({
   value = "",
 }) {
   const { changeCategory } = useCategory();
+  const { t } = useTranslation();
+
+  const categoryLabels = {
+    pizzas: t("foods.categories.pizzas"),
+    drinks: t("foods.categories.drinks"),
+    snacks: t("foods.categories.snacks"),
+    promotions: t("foods.categories.promotions"),
+  };
+
+  const translatedLabel = categoryLabels[value] || label;
 
   const handleSelect = useCallback(() => {
     changeCategory(value);
@@ -35,7 +46,7 @@ function Category({
           {iconElement}
         </div>
         <span className="font-semibold text-xs sm:text-sm group-data-[selected=false]:opacity-30 text-center max-w-[50px] sm:max-w-none">
-          {label}
+          {translatedLabel}
         </span>
       </div>
     </li>

@@ -4,12 +4,14 @@ import { z } from "zod";
 import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
-
-const searchSchema = z.object({
-  query: z.string().min(1, { error: "Digite algo para buscar" }),
-});
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function SearchBar({ onSearch }) {
+  const { t } = useTranslation();
+
+  const searchSchema = z.object({
+    query: z.string().min(1, { message: t("common.validation.searchRequired") }),
+  });
   const {
     register,
     handleSubmit,
@@ -38,7 +40,7 @@ export function SearchBar({ onSearch }) {
         <Input
           {...register("query")}
           type="text"
-          placeholder="Buscar por mesa ou item..."
+          placeholder={t("orders.kitchen.searchPlaceholder")}
           className="w-full shadow-sm"
           data-testid="kitchen-search-input"
         />

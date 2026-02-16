@@ -14,15 +14,18 @@ import {
 import { Button } from "@/components/ui/button/button";
 import { Logo } from "@/components/ui/logo/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
+import { LanguageSelector } from "@/components/ui/language-selector/language-selector";
 import { authService } from "@/services/auth/auth.service";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { UserProfileEnum } from "@/shared/constants/user-profile";
 import { StorageKeys } from "@/shared/constants/storage-keys";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function DashboardLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
+  const { t } = useTranslation();
   const [isMinimized, setIsMinimized] = useState(() => {
     const stored = localStorage.getItem(StorageKeys.SIDEBAR_MINIMIZED);
     return stored === "true";
@@ -46,17 +49,17 @@ export function DashboardLayout({ children }) {
 
   const menuItems = useMemo(() => {
     const baseItems = [
-      { icon: HouseIcon, label: "Dashboard", path: "/dashboard" },
-      { icon: CookingPotIcon, label: "Pedidos", path: "/dashboard/orders" },
-      { icon: ChartBarIcon, label: "Relatórios", path: "/dashboard/reports" },
-      { icon: PackageIcon, label: "Produtos", path: "/dashboard/products" },
+      { icon: HouseIcon, label: t("dashboard.navigation.dashboard"), path: "/dashboard" },
+      { icon: CookingPotIcon, label: t("dashboard.navigation.orders"), path: "/dashboard/orders" },
+      { icon: ChartBarIcon, label: t("dashboard.navigation.reports"), path: "/dashboard/reports" },
+      { icon: PackageIcon, label: t("dashboard.navigation.products"), path: "/dashboard/products" },
     ];
 
     const adminOnlyItems = [
-      { icon: UsersIcon, label: "Usuários", path: "/dashboard/users" },
+      { icon: UsersIcon, label: t("dashboard.navigation.users"), path: "/dashboard/users" },
       {
         icon: GearIcon,
-        label: "Configurações",
+        label: t("dashboard.navigation.settings"),
         path: "/dashboard/settings",
       },
     ];
@@ -67,7 +70,7 @@ export function DashboardLayout({ children }) {
     }
 
     return baseItems;
-  }, [isAdmin]);
+  }, [isAdmin, t]);
 
   const pathname = location.pathname;
   const normalizedPathname = pathname.endsWith("/") && pathname !== "/"
@@ -89,14 +92,14 @@ export function DashboardLayout({ children }) {
     }
 
     const labelMap = {
-      dashboard: "Dashboard",
-      orders: "Pedidos",
-      users: "Usuários",
-      reports: "Relatórios",
-      settings: "Configurações",
-      products: "Produtos",
-      edit: "Editar",
-      new: "Novo",
+      dashboard: t("dashboard.breadcrumbs.dashboard"),
+      orders: t("dashboard.breadcrumbs.orders"),
+      users: t("dashboard.breadcrumbs.users"),
+      reports: t("dashboard.breadcrumbs.reports"),
+      settings: t("dashboard.breadcrumbs.settings"),
+      products: t("dashboard.breadcrumbs.products"),
+      edit: t("dashboard.breadcrumbs.edit"),
+      new: t("dashboard.breadcrumbs.new"),
     };
 
     return segments.map((segment, index) => {
@@ -105,7 +108,7 @@ export function DashboardLayout({ children }) {
       const isLast = index === segments.length - 1;
       return { label, path, isLast };
     });
-  }, [normalizedPathname]);
+  }, [normalizedPathname, t]);
 
   return (
     <div className="w-screen h-screen flex bg-background">
@@ -179,7 +182,7 @@ export function DashboardLayout({ children }) {
               data-minimized={isMinimized}
               className="data-[minimized=true]:hidden ml-2"
             >
-              Sair
+              {t("common.buttons.logout")}
             </span>
           </Button>
         </div>
@@ -193,7 +196,7 @@ export function DashboardLayout({ children }) {
                 to="/dashboard"
                 className="hover:text-foreground transition-colors"
               >
-                Dashboard
+                {t("dashboard.navigation.dashboard")}
               </Link>
               {breadcrumbs.map((crumb) => (
                 <div key={crumb.path} className="flex items-center gap-2">
@@ -213,7 +216,10 @@ export function DashboardLayout({ children }) {
                 </div>
               ))}
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <LanguageSelector />
+              <ThemeToggle />
+            </div>
           </div>
         </header>
 

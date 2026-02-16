@@ -1,0 +1,135 @@
+{
+  "common": {
+    "buttons": {
+      "search": "Search",
+      "clear": "Clear",
+      "apply": "Apply Filters",
+      "back": "Back",
+      "logout": "Logout",
+      "goToHome": "Back to home page",
+      "goToDashboard": "Go to Dashboard"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "deleted": "Deleted",
+      "pending": "Pending",
+      "preparing": "Preparing",
+      "ready": "Ready"
+    },
+    "sort": {
+      "ascending": "Sort ascending",
+      "descending": "Sort descending",
+      "removeSort": "Remove sorting"
+    },
+    "validation": {
+      "required": "Required field",
+      "searchRequired": "Enter something to search"
+    },
+    "errors": {
+      "loadError": "Error loading",
+      "notFound": "Not found"
+    },
+    "placeholders": {
+      "search": "Search..."
+    }
+  },
+  "login": {
+    "pageTitle": "Access your account",
+    "pageSubtitle": "Enter your credentials to continue",
+    "form": {
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "your username",
+      "passwordLabel": "Password",
+      "usernameRequired": "Username is required",
+      "passwordRequired": "Password is required",
+      "submitButton": "Sign in",
+      "submittingButton": "Signing in..."
+    }
+  },
+  "foods": {
+    "welcome": "Welcome to",
+    "categories": {
+      "pizzas": "Pizzas",
+      "drinks": "Drinks",
+      "snacks": "Snacks",
+      "promotions": "Promotions"
+    },
+    "actions": {
+      "addToOrder": "Add {{name}} to order"
+    }
+  },
+  "products": {
+    "pageTitle": "Products",
+    "pageSubtitle": "Manage the restaurant's product catalog",
+    "errors": {
+      "loadProducts": "Error loading products:"
+    },
+    "emptyState": {
+      "title": "No products registered"
+    },
+    "table": {
+      "columns": {
+        "name": "Name",
+        "category": "Category",
+        "price": "Price",
+        "stock": "Stock",
+        "status": "Status",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
+      }
+    },
+    "filters": {
+      "title": "Filters",
+      "modalTitle": "Product Filters",
+      "modalSubtitle": "Refine your search by applying custom filters",
+      "searchPlaceholder": "Search products...",
+      "fields": {
+        "category": "Category",
+        "priceRange": "Price Range",
+        "minPrice": "Minimum",
+        "maxPrice": "Maximum",
+        "status": "Status"
+      }
+    }
+  },
+  "orders": {
+    "kitchen": {
+      "pageTitle": "Kitchen Orders",
+      "pageSubtitle": "Manage orders in preparation",
+      "searchPlaceholder": "Search by table or item...",
+      "emptyState": {
+        "noOrders": "No active orders",
+        "noOrdersDescription": "There are no pending or preparing orders at the moment",
+        "noResults": "No orders found",
+        "noResultsDescription": "We couldn't find orders with \"{{query}}\"",
+        "searchHint": "Try searching by table or item name"
+      }
+    }
+  },
+  "dashboard": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "orders": "Orders",
+      "reports": "Reports",
+      "products": "Products",
+      "users": "Users",
+      "settings": "Settings"
+    },
+    "breadcrumbs": {
+      "dashboard": "Dashboard",
+      "orders": "Orders",
+      "users": "Users",
+      "reports": "Reports",
+      "settings": "Settings",
+      "products": "Products",
+      "edit": "Edit",
+      "new": "New"
+    }
+  },
+  "notFound": {
+    "errorCode": "404",
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has been removed."
+  }
+}
