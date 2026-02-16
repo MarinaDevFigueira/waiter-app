@@ -2,6 +2,7 @@ import { ProductsTable } from "@/pages/products/components/products-table";
 import { ProductsTableSkeleton } from "@/pages/products/components/products-table-skeleton";
 import { ProductsFilters } from "@/pages/products/components/products-filters";
 import { useProducts } from "@/shared/hooks/useProducts";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function ProductsPage() {
   const {
@@ -12,12 +13,15 @@ export function ProductsPage() {
     queryParams,
     updateSorting,
   } = useProducts();
+  const { t } = useTranslation();
 
   const pageHeader = (
     <div>
-      <h1 className="text-3xl font-bold tracking-tight">Produtos</h1>
+      <h1 className="text-3xl font-bold tracking-tight">
+        {t("products.pageTitle")}
+      </h1>
       <p className="text-muted-foreground">
-        Gerencie o catálogo de produtos do restaurante
+        {t("products.pageSubtitle")}
       </p>
     </div>
   );
@@ -30,14 +34,16 @@ export function ProductsPage() {
   const errorContent = (
     <div className="rounded-lg border border-destructive bg-destructive/10 p-4">
       <p className="text-sm text-destructive">
-        Erro ao carregar produtos: {errorMessage}
+        {t("products.errors.loadProducts")} {errorMessage}
       </p>
     </div>
   );
 
   const emptyContent = (
     <div className="rounded-lg border border-border bg-card p-8 text-center">
-      <p className="text-muted-foreground">Nenhum produto cadastrado</p>
+      <p className="text-muted-foreground">
+        {t("products.emptyState.title")}
+      </p>
     </div>
   );
 

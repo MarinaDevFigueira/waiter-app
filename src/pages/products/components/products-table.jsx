@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -7,8 +7,10 @@ import {
   getSortedRowModel,
   flexRender,
 } from "@tanstack/react-table";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function ProductsTable({ products, sorting, onSortingChange }) {
+  const { t } = useTranslation();
   const hasSortingConfig = Boolean(sorting?.orderBy);
   const tableSorting = useMemo(() => {
     if (!hasSortingConfig) return [];
@@ -35,18 +37,18 @@ export function ProductsTable({ products, sorting, onSortingChange }) {
     onSortingChange(sortField, sortDirection);
   };
 
-  const formatCurrency = (value) => {
+  const formatCurrency = useCallback((value) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
     }).format(value);
-  };
+  }, []);
 
-  const formatDate = (date) => {
+  const formatDate = useCallback((date) => {
     return format(new Date(date), "dd/MM/yyyy HH:mm", { locale: ptBR });
-  };
+  }, []);
 
-  const getStatusBadge = (product) => {
+  const getStatusBadge = useCallback((product) => {
     const isDeleted = product.deletedAt !== null;
     const isActive = product.ativo;
 
@@ -54,7 +56,7 @@ export function ProductsTable({ products, sorting, onSortingChange }) {
     if (hasDeleted) {
       return (
         <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-destructive/10 text-destructive">
-          Excluído
+          {t("common.status.deleted")}
         </span>
       );
     }
@@ -63,30 +65,30 @@ export function ProductsTable({ products, sorting, onSortingChange }) {
     if (hasActive) {
       return (
         <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-500/10 text-green-600">
-          Ativo
+          {t("common.status.active")}
         </span>
       );
     }
 
     return (
       <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground">
-        Inativo
+        {t("common.status.inactive")}
       </span>
     );
-  };
+  }, [t]);
 
-  const getStatusValue = (product) => {
+  const getStatusValue = useCallback((product) => {
     if (product.deletedAt !== null) return "excluído";
     if (product.ativo) return "ativo";
     return "inativo";
-  };
+  }, []);
 
   const columns = useMemo(
     () => {
       return [
       {
         accessorKey: "nome",
-        header: "Nome",
+        header: t("products.table.columns.name"),
         cell: (info) => {
           const product = info.row.original;
           return (
@@ -101,19 +103,19 @@ export function ProductsTable({ products, sorting, onSortingChange }) {
       },
       {
         accessorKey: "categoria",
-        header: "Categoria",
+        header: t("products.table.columns.category"),
         cell: (info) => (
           <span className="capitalize">{info.getValue()}</span>
         ),
       },
       {
         accessorKey: "preco",
-        header: "Preço",
+        header: t("products.table.columns.price"),
         cell: (info) => formatCurrency(info.getValue()),
       },
       {
         accessorKey: "estoque",
-        header: "Estoque",
+        header: t("products.table.columns.stock"),
         cell: (info) => {
           const product = info.row.original;
           return (
@@ -125,14 +127,14 @@ export function ProductsTable({ products, sorting, onSortingChange }) {
       },
       {
         id: "status",
-        header: "Status",
+        header: t("products.table.columns.status"),
         accessorFn: (row) => getStatusValue(row),
         cell: (info) => getStatusBadge(info.row.original),
         enableSorting: false,
       },
       {
         accessorKey: "createdAt",
-        header: "Criado em",
+        header: t("products.table.columns.createdAt"),
         cell: (info) => {
           const product = info.row.original;
           return (
@@ -145,7 +147,7 @@ export function ProductsTable({ products, sorting, onSortingChange }) {
       },
       {
         accessorKey: "updatedAt",
-        header: "Atualizado em",
+        header: t("products.table.columns.updatedAt"),
         cell: (info) => {
           const product = info.row.original;
           return (
@@ -158,7 +160,7 @@ export function ProductsTable({ products, sorting, onSortingChange }) {
       },
     ];
     },
-    [],
+    [t, getStatusBadge, getStatusValue, formatCurrency, formatDate],
   );
 
   const table = useReactTable({
@@ -193,10 +195,10 @@ export function ProductsTable({ products, sorting, onSortingChange }) {
                       title={
                         canSort
                           ? header.column.getNextSortingOrder() === "asc"
-                            ? "Ordenar crescente"
+                            ? t("common.sort.ascending")
                             : header.column.getNextSortingOrder() === "desc"
-                              ? "Ordenar decrescente"
-                              : "Remover ordenação"
+                              ? t("common.sort.descending")
+                              : t("common.sort.removeSort")
                           : undefined
                       }
                     >

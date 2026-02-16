@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { loginAsKitchen } from "@/components/__tests__/helpers";
+import { loginAsKitchen as _loginAsKitchen } from "@/components/__tests__/helpers";
 
 test.describe("OrderCard Component", () => {
   test.beforeEach(async ({ page }) => {

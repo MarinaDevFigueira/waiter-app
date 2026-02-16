@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button/button";
 import { Logo } from "@/components/ui/logo/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
+import { LanguageSelector } from "@/components/ui/language-selector/language-selector";
 import { authService } from "@/services/auth/auth.service";
 import { useAuth } from "@/shared/hooks/useAuth";
 
@@ -31,6 +32,7 @@ export function AppLayout({ children }) {
                 </span>
               </div>
             )}
+            <LanguageSelector />
             <ThemeToggle />
             <Button
               variant="ghost"

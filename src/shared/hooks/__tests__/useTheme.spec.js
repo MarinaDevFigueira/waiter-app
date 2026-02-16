@@ -11,7 +11,7 @@ test.describe("useTheme Hook", () => {
     const themeToggle = page.locator("button").filter({ has: page.locator("svg") }).nth(1);
 
     const htmlElement = page.locator("html");
-    const initialClass = await htmlElement.getAttribute("class");
+    const _initialClass = await htmlElement.getAttribute("class");
 
     await themeToggle.click();
     await page.waitForTimeout(500);
@@ -51,7 +51,7 @@ test.describe("useTheme Hook", () => {
     const themeToggle = page.locator("button").filter({ has: page.locator("svg") }).nth(1);
     const htmlElement = page.locator("html");
 
-    const beforeToggle = await htmlElement.getAttribute("class");
+    const _beforeToggle = await htmlElement.getAttribute("class");
 
     await themeToggle.click();
     await page.waitForTimeout(500);

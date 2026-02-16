@@ -10,26 +10,28 @@ import { Dialog } from "@/components/ui/dialog/dialog";
 import { Checkbox } from "@/components/ui/checkbox/checkbox";
 import { MultiSelect } from "@/components/ui/multi-select/multi-select";
 import { productsFiltersObservable } from "@/shared/subjects/products-filters.subject";
-
-const CATEGORIES = [
-  { value: "pizzas", label: "Pizzas" },
-  { value: "bebidas", label: "Bebidas" },
-  { value: "lanches", label: "Lanches" },
-];
-
-const STATUS_OPTIONS = [
-  { value: "ativo", label: "Ativo" },
-  { value: "inativo", label: "Inativo" },
-];
-
-const filterFormSchema = z.object({
-  categoria: z.array(z.string()).optional(),
-  precoMin: z.number().nullable().optional(),
-  precoMax: z.number().nullable().optional(),
-  status: z.array(z.enum(["ativo", "inativo"])).optional(),
-});
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function ProductsFilters() {
+  const { t } = useTranslation();
+
+  const CATEGORIES = [
+    { value: "pizzas", label: t("foods.categories.pizzas") },
+    { value: "bebidas", label: t("foods.categories.drinks") },
+    { value: "lanches", label: t("foods.categories.snacks") },
+  ];
+
+  const STATUS_OPTIONS = [
+    { value: "ativo", label: t("common.status.active") },
+    { value: "inativo", label: t("common.status.inactive") },
+  ];
+
+  const filterFormSchema = z.object({
+    categoria: z.array(z.string()).optional(),
+    precoMin: z.number().nullable().optional(),
+    precoMax: z.number().nullable().optional(),
+    status: z.array(z.enum(["ativo", "inativo"])).optional(),
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [activeFilterCount, setActiveFilterCount] = useState(0);
@@ -126,7 +128,7 @@ export function ProductsFilters() {
         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
         <Input
           type="text"
-          placeholder="Buscar produtos..."
+          placeholder={t("products.filters.searchPlaceholder")}
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           onKeyDown={handleSearchKeyDown}
@@ -137,7 +139,7 @@ export function ProductsFilters() {
           onClick={handleSearch}
           className="absolute right-1 top-1/2 -translate-y-1/2"
         >
-          Buscar
+          {t("common.buttons.search")}
         </Button>
       </div>
 
@@ -145,7 +147,7 @@ export function ProductsFilters() {
         <Dialog.Trigger asChild>
           <Button variant="outline" className="relative">
             <SlidersHorizontalIcon className="size-4" />
-            Filtros
+            {t("products.filters.title")}
             {hasActiveFilters && (
               <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
                 {activeFilterCount}
@@ -156,15 +158,17 @@ export function ProductsFilters() {
 
         <Dialog.Content>
           <Dialog.Header>
-            <Dialog.Title>Filtros de Produtos</Dialog.Title>
+            <Dialog.Title>{t("products.filters.modalTitle")}</Dialog.Title>
             <Dialog.Description>
-              Refine sua busca aplicando filtros personalizados
+              {t("products.filters.modalSubtitle")}
             </Dialog.Description>
           </Dialog.Header>
 
           <form onSubmit={handleSubmit(handleApplyFilters)} className="space-y-6 p-6">
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Categoria</Label>
+              <Label className="text-sm font-medium">
+                {t("products.filters.fields.category")}
+              </Label>
               <MultiSelect
                 options={CATEGORIES}
                 value={categoriaValue || []}
@@ -174,11 +178,13 @@ export function ProductsFilters() {
             </div>
 
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Faixa de Preço</Label>
+              <Label className="text-sm font-medium">
+                {t("products.filters.fields.priceRange")}
+              </Label>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="precoMin" className="text-xs text-muted-foreground">
-                    Mínimo
+                    {t("products.filters.fields.minPrice")}
                   </Label>
                   <Input
                     id="precoMin"
@@ -190,7 +196,7 @@ export function ProductsFilters() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="precoMax" className="text-xs text-muted-foreground">
-                    Máximo
+                    {t("products.filters.fields.maxPrice")}
                   </Label>
                   <Input
                     id="precoMax"
@@ -204,7 +210,9 @@ export function ProductsFilters() {
             </div>
 
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Status</Label>
+              <Label className="text-sm font-medium">
+                {t("products.filters.fields.status")}
+              </Label>
               <div className="flex gap-4">
                 {STATUS_OPTIONS.map((option) => {
                   const isChecked = statusValue?.includes(option.value);
@@ -227,10 +235,10 @@ export function ProductsFilters() {
 
           <Dialog.Footer>
             <Button type="button" variant="outline" onClick={handleClearFilters}>
-              Limpar
+              {t("common.buttons.clear")}
             </Button>
             <Button type="submit" onClick={handleSubmit(handleApplyFilters)}>
-              Aplicar Filtros
+              {t("common.buttons.apply")}
             </Button>
           </Dialog.Footer>
 

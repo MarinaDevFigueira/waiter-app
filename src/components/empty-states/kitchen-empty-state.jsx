@@ -1,6 +1,8 @@
 import { CookingPotIcon } from "@phosphor-icons/react";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function KitchenEmptyState({ searchQuery }) {
+  const { t } = useTranslation();
   const isSearching = searchQuery && searchQuery.trim().length > 0;
 
   return (
@@ -14,18 +16,22 @@ export function KitchenEmptyState({ searchQuery }) {
 
       <div className="text-center space-y-2 max-w-sm">
         <h3 className="text-lg font-semibold text-foreground">
-          {isSearching ? "Nenhum pedido encontrado" : "Nenhum pedido ativo"}
+          {isSearching
+            ? t("orders.kitchen.emptyState.noResults")
+            : t("orders.kitchen.emptyState.noOrders")}
         </h3>
         <p className="text-sm text-muted-foreground">
           {isSearching
-            ? `Não encontramos pedidos com "${searchQuery}"`
-            : "Não há pedidos pendentes ou em preparo no momento"}
+            ? t("orders.kitchen.emptyState.noResultsDescription", {
+                query: searchQuery,
+              })
+            : t("orders.kitchen.emptyState.noOrdersDescription")}
         </p>
       </div>
 
       {isSearching && (
         <p className="text-xs text-muted-foreground">
-          Tente buscar por mesa ou nome do item
+          {t("orders.kitchen.emptyState.searchHint")}
         </p>
       )}
     </div>

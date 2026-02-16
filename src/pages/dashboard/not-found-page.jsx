@@ -2,10 +2,12 @@ import { useMemo } from "react";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import { ArrowLeftIcon, HouseIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function DashboardNotFoundPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const pathname = location.pathname;
   const parentPath = useMemo(() => {
@@ -31,12 +33,14 @@ export function DashboardNotFoundPage() {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-6">
       <div className="flex flex-col items-center gap-2">
-        <h1 className="text-6xl font-bold text-muted-foreground">404</h1>
+        <h1 className="text-6xl font-bold text-muted-foreground">
+          {t("notFound.errorCode")}
+        </h1>
         <h2 className="text-2xl font-semibold text-foreground">
-          Página não encontrada
+          {t("notFound.title")}
         </h2>
         <p className="text-muted-foreground text-center max-w-md">
-          A página que você está procurando não existe ou foi removida.
+          {t("notFound.description")}
         </p>
       </div>
 
@@ -47,11 +51,11 @@ export function DashboardNotFoundPage() {
           data-testid="go-back-button"
         >
           <ArrowLeftIcon className="mr-2" />
-          Voltar
+          {t("common.buttons.back")}
         </Button>
         <Button onClick={handleGoHome} data-testid="go-home-button">
           <HouseIcon className="mr-2" />
-          Ir para Dashboard
+          {t("common.buttons.goToDashboard")}
         </Button>
       </div>
     </div>
