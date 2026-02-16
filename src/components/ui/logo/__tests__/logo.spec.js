@@ -47,9 +47,9 @@ test.describe("Logo Component", () => {
 
   test("logo redirects to home when clicked", async ({ page }) => {
     await loginAsAdmin(page);
-    await page.goto("http://localhost:5173/dashboard/pedidos");
+    await page.goto("http://localhost:5173/dashboard/orders");
 
-    await page.waitForURL("**/dashboard/pedidos");
+    await page.waitForURL("**/dashboard/orders");
 
     const logo = page.getByTestId("logo");
     await logo.click();

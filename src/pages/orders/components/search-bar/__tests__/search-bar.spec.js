@@ -1,10 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { loginAsAdmin } from "../../../../../../components/__tests__/helpers";
+import { loginAsAdmin } from "@/components/__tests__/helpers";
 
 test.describe("SearchBar Component", () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
-    await page.goto("/dashboard/pedidos");
+    await page.goto("/dashboard/orders");
     await page.waitForTimeout(1000);
   });
 

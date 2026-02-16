@@ -47,7 +47,7 @@ export function DashboardLayout({ children }) {
   const menuItems = useMemo(() => {
     const baseItems = [
       { icon: HouseIcon, label: "Dashboard", path: "/dashboard" },
-      { icon: CookingPotIcon, label: "Pedidos", path: "/dashboard/pedidos" },
+      { icon: CookingPotIcon, label: "Pedidos", path: "/dashboard/orders" },
       { icon: ChartBarIcon, label: "Relatórios", path: "/dashboard/reports" },
       { icon: PackageIcon, label: "Produtos", path: "/dashboard/products" },
     ];
@@ -90,7 +90,7 @@ export function DashboardLayout({ children }) {
 
     const labelMap = {
       dashboard: "Dashboard",
-      pedidos: "Pedidos",
+      orders: "Pedidos",
       users: "Usuários",
       reports: "Relatórios",
       settings: "Configurações",

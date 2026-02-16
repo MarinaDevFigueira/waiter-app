@@ -14,7 +14,7 @@ test.describe("KitchenOrdersPage", () => {
 
     await page.waitForURL("/dashboard");
 
-    await page.goto("/dashboard/pedidos");
+    await page.goto("/dashboard/orders");
     await page.waitForLoadState("domcontentloaded");
 
     await page.waitForSelector('[data-testid="kitchen-orders-grid"]', { state: 'visible', timeout: 15000 });
@@ -23,6 +23,18 @@ test.describe("KitchenOrdersPage", () => {
   test("renders kitchen orders page", async ({ page }) => {
     const grid = page.getByTestId("kitchen-orders-grid");
     await expect(grid).toBeVisible();
+  });
+
+  test("displays page title", async ({ page }) => {
+    const title = page.getByTestId("kitchen-orders-title");
+    await expect(title).toBeVisible();
+    await expect(title).toHaveText("Pedidos da Cozinha");
+  });
+
+  test("displays page subtitle", async ({ page }) => {
+    const subtitle = page.getByTestId("kitchen-orders-subtitle");
+    await expect(subtitle).toBeVisible();
+    await expect(subtitle).toHaveText("Gerencie os pedidos em preparação");
   });
 
   test("displays search bar", async ({ page }) => {
