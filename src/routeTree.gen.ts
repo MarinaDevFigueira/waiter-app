@@ -16,7 +16,8 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardReportsRouteImport } from './routes/dashboard/reports'
-import { Route as DashboardProductsRouteImport } from './routes/dashboard/products'
+import { Route as DashboardPedidosRouteImport } from './routes/dashboard/pedidos'
+import { Route as DashboardProductsRouteRouteImport } from './routes/dashboard/products/route'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -53,7 +54,12 @@ const DashboardReportsRoute = DashboardReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardProductsRoute = DashboardProductsRouteImport.update({
+const DashboardPedidosRoute = DashboardPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardProductsRouteRoute = DashboardProductsRouteRouteImport.update({
   id: '/products',
   path: '/products',
   getParentRoute: () => DashboardRouteRoute,
@@ -63,7 +69,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/products': typeof DashboardProductsRouteRoute
+  '/dashboard/pedidos': typeof DashboardPedidosRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
@@ -72,7 +79,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/products': typeof DashboardProductsRouteRoute
+  '/dashboard/pedidos': typeof DashboardPedidosRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
@@ -83,7 +91,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/dashboard/products': typeof DashboardProductsRoute
+  '/dashboard/products': typeof DashboardProductsRouteRoute
+  '/dashboard/pedidos': typeof DashboardPedidosRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/dashboard/products'
+    | '/dashboard/pedidos'
     | '/dashboard/reports'
     | '/dashboard/settings'
     | '/dashboard/users'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard/products'
+    | '/dashboard/pedidos'
     | '/dashboard/reports'
     | '/dashboard/settings'
     | '/dashboard/users'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/dashboard/products'
+    | '/dashboard/pedidos'
     | '/dashboard/reports'
     | '/dashboard/settings'
     | '/dashboard/users'
@@ -178,18 +190,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardReportsRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/pedidos': {
+      id: '/dashboard/pedidos'
+      path: '/pedidos'
+      fullPath: '/dashboard/pedidos'
+      preLoaderRoute: typeof DashboardPedidosRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/products': {
       id: '/dashboard/products'
       path: '/products'
       fullPath: '/dashboard/products'
-      preLoaderRoute: typeof DashboardProductsRouteImport
+      preLoaderRoute: typeof DashboardProductsRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
   }
 }
 
 interface DashboardRouteRouteChildren {
-  DashboardProductsRoute: typeof DashboardProductsRoute
+  DashboardProductsRouteRoute: typeof DashboardProductsRouteRoute
+  DashboardPedidosRoute: typeof DashboardPedidosRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
@@ -197,7 +217,8 @@ interface DashboardRouteRouteChildren {
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
-  DashboardProductsRoute: DashboardProductsRoute,
+  DashboardProductsRouteRoute: DashboardProductsRouteRoute,
+  DashboardPedidosRoute: DashboardPedidosRoute,
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardUsersRoute: DashboardUsersRoute,

@@ -12,27 +12,26 @@ const getStoredAuth = () => {
 
 const initialAuth = getStoredAuth();
 
-export const authSubject = new BehaviorSubject(initialAuth);
+const authSubject = new BehaviorSubject(initialAuth);
 
-export const setAuth = (authData) => {
-  const hasAuthData = authData !== null;
-  if (hasAuthData) {
-    sessionStorage.setItem(StorageKeys.AUTH, JSON.stringify(authData));
-  } else {
+export const authObservable = {
+  subscribe: (callback) => authSubject.subscribe(callback),
+  getValue: () => authSubject.getValue(),
+  setAuth: (authData) => {
+    const hasAuthData = authData !== null;
+    if (hasAuthData) {
+      sessionStorage.setItem(StorageKeys.AUTH, JSON.stringify(authData));
+    } else {
+      sessionStorage.removeItem(StorageKeys.AUTH);
+    }
+    authSubject.next(authData);
+  },
+  clearAuth: () => {
     sessionStorage.removeItem(StorageKeys.AUTH);
-  }
-  authSubject.next(authData);
-};
-
-export const clearAuth = () => {
-  setAuth(null);
-};
-
-export const getAuth = () => {
-  return authSubject.getValue();
-};
-
-export const isAuthenticated = () => {
-  const auth = getAuth();
-  return auth !== null;
+    authSubject.next(null);
+  },
+  isAuthenticated: () => {
+    const auth = authSubject.getValue();
+    return auth !== null;
+  },
 };

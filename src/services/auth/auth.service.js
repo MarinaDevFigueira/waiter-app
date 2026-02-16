@@ -1,5 +1,5 @@
 import { mockUsers } from "@/shared/mocks/users";
-import { setAuth, clearAuth } from "@/shared/subjects/auth";
+import { authObservable } from "@/shared/subjects/auth";
 
 class AuthService {
   async login(username, password) {
@@ -18,7 +18,7 @@ class AuthService {
             token: `mock-token-${user.username}-${Date.now()}`,
           };
 
-          setAuth(authData);
+          authObservable.setAuth(authData);
 
           resolve({ data: authData });
         } else {
@@ -31,7 +31,7 @@ class AuthService {
   async logout() {
     return new Promise((resolve) => {
       setTimeout(() => {
-        clearAuth();
+        authObservable.clearAuth();
         resolve({ data: { success: true } });
       }, 300);
     });

@@ -8,8 +8,8 @@ const getSystemTheme = () => {
 
 const getStoredTheme = () => {
   const stored = sessionStorage.getItem(StorageKeys.THEME);
-  const isStoredValid = stored === "light" || stored === "dark";
-  if (isStoredValid) {
+  const isValidTheme = stored === "light" || stored === "dark";
+  if (isValidTheme) {
     return stored;
   }
   return null;
@@ -17,7 +17,8 @@ const getStoredTheme = () => {
 
 const getInitialTheme = () => {
   const storedTheme = getStoredTheme();
-  if (storedTheme !== null) {
+  const hasStoredTheme = storedTheme !== null;
+  if (hasStoredTheme) {
     return storedTheme;
   }
   return getSystemTheme();
@@ -35,25 +36,23 @@ const applyTheme = (theme) => {
 const initialTheme = getInitialTheme();
 applyTheme(initialTheme);
 
-export const themeSubject = new BehaviorSubject(initialTheme);
+const themeSubject = new BehaviorSubject(initialTheme);
 
-export const setTheme = (theme) => {
-  const isValidTheme = theme === "light" || theme === "dark";
-  if (!isValidTheme) {
-    return;
-  }
-
-  sessionStorage.setItem(StorageKeys.THEME, theme);
-  applyTheme(theme);
-  themeSubject.next(theme);
-};
-
-export const getTheme = () => {
-  return themeSubject.getValue();
-};
-
-export const toggleTheme = () => {
-  const currentTheme = getTheme();
-  const newTheme = currentTheme === "dark" ? "light" : "dark";
-  setTheme(newTheme);
+export const themeObservable = {
+  subscribe: (callback) => themeSubject.subscribe(callback),
+  getValue: () => themeSubject.getValue(),
+  setTheme: (theme) => {
+    const isValidTheme = theme === "light" || theme === "dark";
+    if (!isValidTheme) {
+      return;
+    }
+    sessionStorage.setItem(StorageKeys.THEME, theme);
+    applyTheme(theme);
+    themeSubject.next(theme);
+  },
+  toggleTheme: () => {
+    const currentTheme = themeSubject.getValue();
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+    themeObservable.setTheme(newTheme);
+  },
 };

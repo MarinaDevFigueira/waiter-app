@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { authSubject } from "@/shared/subjects/auth";
+import { authObservable } from "@/shared/subjects/auth";
 
 export function useAuth() {
-  const [auth, setAuthState] = useState(authSubject.getValue());
+  const [auth, setAuthState] = useState(authObservable.getValue());
 
   useEffect(() => {
-    const subscription = authSubject.subscribe(setAuthState);
+    const subscription = authObservable.subscribe(setAuthState);
     return () => subscription.unsubscribe();
   }, []);
 

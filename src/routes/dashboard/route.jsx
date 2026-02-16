@@ -7,7 +7,11 @@ import { UserProfileEnum } from "@/shared/constants/user-profile";
 export const Route = createFileRoute("/dashboard")({
   component: () => (
     <ProtectedRoute
-      allowedProfiles={[UserProfileEnum.ADMIN, UserProfileEnum.ATTENDANT]}
+      allowedProfiles={[
+        UserProfileEnum.ADMIN,
+        UserProfileEnum.ATTENDANT,
+        UserProfileEnum.COZINHA,
+      ]}
     >
       <DashboardLayout>
         <Outlet />

@@ -49,8 +49,8 @@ const FeedbackScreen = React.forwardRef(
         {title && (
           <h1
             data-testid="feedback-title"
-            data-isSuccess={isSuccess}
-            className="text-2xl font-bold data-[isSuccess=true]:text-white data-[isSuccess=false]:text-foreground"
+            data-issuccess={isSuccess}
+            className="text-2xl font-bold data-[issuccess=true]:text-white data-[issuccess=false]:text-foreground"
           >
             {title}
           </h1>
@@ -59,8 +59,8 @@ const FeedbackScreen = React.forwardRef(
         {description && (
           <p
             data-testid="feedback-description"
-            data-isSuccess={isSuccess}
-            className="text-sm data-[isSuccess=true]:text-white/80 data-[isSuccess=false]:text-muted-foreground"
+            data-issuccess={isSuccess}
+            className="text-sm data-[issuccess=true]:text-white/80 data-[issuccess=false]:text-muted-foreground"
           >
             {description}
           </p>
