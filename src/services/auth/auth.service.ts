@@ -1,6 +1,9 @@
-import { mockUsers } from "@/shared/mocks/users";
+import { api } from "@/services/api";
 import { authObservable } from "@/shared/subjects/auth";
+import { StorageKeys } from "@/shared/constants/storage-keys";
+import { UserProfileEnum } from "@/shared/constants/user-profile";
 import type { AuthData } from "@/shared/subjects/auth";
+import type { UserProfile } from "@/shared/constants/user-profile";
 
 type LoginSuccess = { data: AuthData };
 type LoginError = { error: string };
@@ -10,48 +13,81 @@ type LogoutResult = { data: { success: true } };
 
 type GetCurrentUserResult = { data: AuthData } | { error: string };
 
+interface LoginApiResponse {
+  user: {
+    id: string;
+    name: string;
+    email: string | null;
+    role: string;
+  };
+  accessToken: string;
+  refreshToken: string;
+}
+
+const roleToProfile: Record<string, UserProfile> = {
+  admin: UserProfileEnum.ADMIN,
+  table: UserProfileEnum.MESA,
+  kitchen: UserProfileEnum.COZINHA,
+  customer: UserProfileEnum.DELIVERY,
+};
+
 class AuthService {
   async login(username: string, password: string): Promise<LoginResult> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const user = mockUsers.find(
-          (u) => u.username === username && u.password === password
-        );
+    try {
+      const result = await api.post<LoginApiResponse>("/auth/login", {
+        credential: username,
+        password,
+      });
 
-        const userFound = user !== undefined;
-        if (userFound && user) {
-          const authData: AuthData = {
-            username: user.username,
-            name: user.name,
-            profile: user.profile,
-          };
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
 
-          authObservable.setAuth(authData);
+      const { user, accessToken, refreshToken } = result.data;
 
-          resolve({ data: authData });
-        } else {
-          resolve({ error: "Usuário ou senha inválidos" });
-        }
-      }, 500);
-    });
+      sessionStorage.setItem(StorageKeys.ACCESS_TOKEN, accessToken);
+      sessionStorage.setItem(StorageKeys.REFRESH_TOKEN, refreshToken);
+
+      const profile = roleToProfile[user.role] ?? UserProfileEnum.ATTENDANT;
+
+      const authData: AuthData = {
+        username: user.email ?? username,
+        name: user.name,
+        profile,
+      };
+
+      authObservable.setAuth(authData);
+
+      return { data: authData };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao fazer login";
+      return { error: errorMessage };
+    }
   }
 
   async logout(): Promise<LogoutResult> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        authObservable.clearAuth();
-        resolve({ data: { success: true } });
-      }, 300);
-    });
+    try {
+      authObservable.clearAuth();
+      return { data: { success: true } };
+    } catch (error) {
+      authObservable.clearAuth();
+      return { data: { success: true } };
+    }
   }
 
   getCurrentUser(): GetCurrentUserResult {
-    const auth = sessionStorage.getItem("auth");
-    const hasAuth = auth !== null;
-    if (hasAuth && auth) {
-      return { data: JSON.parse(auth) as AuthData };
+    try {
+      const auth = sessionStorage.getItem(StorageKeys.AUTH);
+      const hasAuth = auth !== null;
+      if (hasAuth && auth) {
+        return { data: JSON.parse(auth) as AuthData };
+      }
+      return { error: "Usuário não autenticado" };
+    } catch (error) {
+      return { error: "Erro ao obter usuário atual" };
     }
-    return { error: "Usuário não autenticado" };
   }
 }
 

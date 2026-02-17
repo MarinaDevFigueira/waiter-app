@@ -36,6 +36,8 @@ export const authObservable = {
   },
   clearAuth: (): void => {
     sessionStorage.removeItem(StorageKeys.AUTH);
+    sessionStorage.removeItem(StorageKeys.ACCESS_TOKEN);
+    sessionStorage.removeItem(StorageKeys.REFRESH_TOKEN);
     authSubject.next(null);
   },
   isAuthenticated: (): boolean => {

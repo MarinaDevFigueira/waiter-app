@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { logger } from "@/lib/logger";
 import { productsService } from "@/services/products/products.service";
 import { productsFiltersObservable, type ProductFilters } from "@/shared/subjects/products-filters.subject";
 import type { Product } from "@/shared/schemas/product.schema";
@@ -70,7 +71,9 @@ export function useProducts(): UseProductsReturn {
       const hasError = Boolean(result.error);
 
       if (hasError) {
+        const error = new Error(result.error);
         toast.error(result.error);
+        logger.error("Erro ao buscar produtos", error);
         return null;
       }
 
