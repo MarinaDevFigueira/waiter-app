@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { format } from "date-fns";
-import { useKitchenOrders } from "@/shared/hooks/useKitchenOrders";
+import { useOrders } from "@/shared/hooks/useOrders";
 import { usePagination } from "@/shared/hooks/usePagination";
 import { SearchBar } from "@/pages/orders/kitchen-orders/components/search-bar/search-bar";
 import { OrdersGrid } from "@/pages/orders/kitchen-orders/components/orders-grid/orders-grid";
@@ -19,7 +19,7 @@ function formatTime(timestamp: Date) {
 }
 
 export function KitchenOrdersPage({ canSwitchOrdersView }: KitchenOrdersPageProps) {
-  const { orders, searchQuery, setSearchQuery, updateOrderStatus } = useKitchenOrders();
+  const { orders, queryParams, setQueryParams, updateOrderStatus } = useOrders();
   const { t } = useTranslation();
 
   const [page, setPage] = useState(1);
@@ -49,9 +49,9 @@ export function KitchenOrdersPage({ canSwitchOrdersView }: KitchenOrdersPageProp
   });
 
   const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
+    setQueryParams((prev) => ({ ...prev, search: query }));
     setPage(1);
-  }, [setSearchQuery]);
+  }, [setQueryParams]);
 
   const handleStatusChange = useCallback((orderId: string, newStatus: OrderStatus) => {
     updateOrderStatus(orderId, newStatus);
@@ -90,7 +90,7 @@ export function KitchenOrdersPage({ canSwitchOrdersView }: KitchenOrdersPageProp
       <div className="w-full flex-1 min-h-0">
         <OrdersGrid
           orders={pagedOrders}
-          searchQuery={searchQuery}
+          searchQuery={queryParams.search}
           formatDate={formatDate}
           formatTime={formatTime}
           handleStatusChange={handleStatusChange}

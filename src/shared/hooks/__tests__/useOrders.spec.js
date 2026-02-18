@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { loginAsAdmin } from "../../../components/__tests__/helpers";
 
-test.describe("useKitchenOrders Hook", () => {
+test.describe("useOrders Hook", () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
     await page.goto("/dashboard/orders");

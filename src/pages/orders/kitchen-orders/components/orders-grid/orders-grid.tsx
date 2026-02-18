@@ -36,7 +36,7 @@ export function OrdersGrid({
                 className="font-semibold text-sm uppercase tracking-wide"
                 data-testid="order-table-name"
               >
-                {order.table}
+                {order.userName}
               </h3>
               <span className="text-xs text-muted-foreground">
                 {formatDate(order.createdAt)}

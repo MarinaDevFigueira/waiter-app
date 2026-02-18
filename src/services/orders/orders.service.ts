@@ -15,7 +15,7 @@ type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 function mapApiOrderToOrder(raw: ApiOrder): Order {
   return {
     id: raw.id,
-    table: raw.tableNumber,
+    userName: raw.userName,
     status: raw.status,
     timestamp: new Date(raw.timestamp),
     items: raw.items.map((item) => ({
@@ -33,10 +33,13 @@ function mapApiOrderToOrder(raw: ApiOrder): Order {
 }
 
 export const ordersService = {
-  async getAll(filters: { status?: string } = {}): Promise<ServiceResult<Order[]>> {
+  async getAll(filters: { status?: string; search?: string; orderBy?: string; direction?: string } = {}): Promise<ServiceResult<Order[]>> {
     try {
       const params = new URLSearchParams();
       if (filters.status) params.set("status", filters.status);
+      if (filters.search) params.set("search", filters.search);
+      if (filters.orderBy) params.set("orderBy", filters.orderBy);
+      if (filters.direction) params.set("direction", filters.direction);
 
       const query = params.toString();
       const path = query ? `/orders?${query}` : "/orders";

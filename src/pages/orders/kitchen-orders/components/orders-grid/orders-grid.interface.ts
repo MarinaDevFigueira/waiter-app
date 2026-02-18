@@ -8,7 +8,7 @@ interface OrderItem {
 
 interface Order {
   id: string;
-  table: string;
+  userName: string;
   items: OrderItem[];
   status: OrderStatus;
   createdAt: Date;

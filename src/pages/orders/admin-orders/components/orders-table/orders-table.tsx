@@ -1,21 +1,35 @@
-import { useState, useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   useReactTable,
   getCoreRowModel,
-  getSortedRowModel,
   flexRender,
   type ColumnDef,
-  type SortingState,
 } from "@tanstack/react-table";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
-import type { OrdersTableProps, OrdersTableHeaderProps, OrdersTableBodyProps } from "@/pages/orders/admin-orders/components/orders-table/orders-table.interface";
+import { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
+import { SortDirection } from "@/shared/enums/sort-direction.enum";
+import type {
+  OrdersTableProps,
+  OrdersTableHeaderProps,
+  OrdersTableBodyProps,
+  OrdersTableRootProps,
+  OrdersTableSortState,
+} from "@/pages/orders/admin-orders/components/orders-table/orders-table.interface";
 
-const SORT_INDICATORS: Record<string, string> = {
-  asc: "▲",
-  desc: "▼",
+const COLUMN_TO_ORDER_BY: Partial<Record<string, OrdersOrderByEnum>> = {
+  userName: OrdersOrderByEnum.USER_ID,
+  status: OrdersOrderByEnum.STATUS,
+  timestamp: OrdersOrderByEnum.TIMESTAMP,
+  createdAt: OrdersOrderByEnum.CREATED_AT,
+  updatedAt: OrdersOrderByEnum.UPDATED_AT,
+};
+
+const SORT_INDICATORS: Record<SortDirection, string> = {
+  [SortDirection.ASC]: "▲",
+  [SortDirection.DESC]: "▼",
 };
 
 const DEFAULT_SORT_INDICATOR = "⬍";
@@ -33,17 +47,28 @@ function formatCurrency(value: number): string {
   }).format(value);
 }
 
-function OrdersTableHeader({ headerGroups, getSortTitle }: OrdersTableHeaderProps) {
+function Root({ children }: OrdersTableRootProps) {
+  return (
+    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden h-full flex flex-col">
+      <div className="overflow-auto flex-1">
+        <table className="w-full">{children}</table>
+      </div>
+    </div>
+  );
+}
+
+function Header({ headerGroups, sortState, getSortTitle, onColumnSort }: OrdersTableHeaderProps) {
   return (
     <thead className="bg-muted/50 border-b border-border">
       {headerGroups.map((headerGroup) => (
         <tr key={headerGroup.id}>
           {headerGroup.headers.map((header) => {
             const canSort = header.column.getCanSort();
-            const isSorted = header.column.getIsSorted();
-            const nextSortOrder = header.column.getNextSortingOrder();
-            const sortIndicator = isSorted ? SORT_INDICATORS[isSorted] : DEFAULT_SORT_INDICATOR;
-            const sortTitle = getSortTitle(canSort, nextSortOrder);
+            const columnId = header.column.id;
+            const isCurrentSortColumn = canSort && COLUMN_TO_ORDER_BY[columnId] === sortState.orderBy;
+            const sortIndicator = isCurrentSortColumn ? SORT_INDICATORS[sortState.direction] : DEFAULT_SORT_INDICATOR;
+            const sortTitle = getSortTitle(canSort, columnId);
+            const handleClick = canSort ? () => onColumnSort(columnId) : undefined;
             const headerClassName = canSort
               ? "px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none"
               : "px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider";
@@ -52,7 +77,7 @@ function OrdersTableHeader({ headerGroups, getSortTitle }: OrdersTableHeaderProp
               <th
                 key={header.id}
                 className={headerClassName}
-                onClick={header.column.getToggleSortingHandler()}
+                onClick={handleClick}
                 title={sortTitle}
               >
                 <div className="flex items-center gap-2">
@@ -72,7 +97,7 @@ function OrdersTableHeader({ headerGroups, getSortTitle }: OrdersTableHeaderProp
   );
 }
 
-function OrdersTableBody({ rows }: OrdersTableBodyProps) {
+function Body({ rows }: OrdersTableBodyProps) {
   return (
     <tbody className="divide-y divide-border">
       {rows.map((row) => (
@@ -88,9 +113,8 @@ function OrdersTableBody({ rows }: OrdersTableBodyProps) {
   );
 }
 
-export function OrdersTable({ orders }: OrdersTableProps) {
+export function OrdersTable({ orders, sortState, onSortChange }: OrdersTableProps) {
   const { t } = useTranslation();
-  const [sorting, setSorting] = useState<SortingState>([]);
 
   const formatDate = useCallback((date: Date) => {
     return format(new Date(date), "dd/MM/yyyy HH:mm", { locale: ptBR });
@@ -102,30 +126,44 @@ export function OrdersTable({ orders }: OrdersTableProps) {
   );
 
   const getSortTitle = useCallback(
-    (canSort: boolean, nextSortOrder: string | false): string | undefined => {
-      const isSortable = canSort;
-      if (!isSortable) return undefined;
+    (canSort: boolean, columnId: string): string | undefined => {
+      if (!canSort) return undefined;
+      const orderBy = COLUMN_TO_ORDER_BY[columnId];
+      if (!orderBy) return undefined;
 
-      const SORT_TITLES: Record<string, string> = {
-        asc: t("common.sort.ascending"),
-        desc: t("common.sort.descending"),
-        default: t("common.sort.removeSort"),
-      };
-
-      const sortKey = nextSortOrder || "default";
-      return SORT_TITLES[sortKey];
+      const isActive = orderBy === sortState.orderBy;
+      if (!isActive) return t("common.sort.ascending");
+      return sortState.direction === SortDirection.ASC
+        ? t("common.sort.descending")
+        : t("common.sort.ascending");
     },
-    [t],
+    [t, sortState],
+  );
+
+  const onColumnSort = useCallback(
+    (columnId: string) => {
+      const orderBy = COLUMN_TO_ORDER_BY[columnId];
+      if (!orderBy) return;
+
+      const isActive = orderBy === sortState.orderBy;
+      const nextDirection = isActive && sortState.direction === SortDirection.ASC
+        ? SortDirection.DESC
+        : SortDirection.ASC;
+
+      const nextSort: OrdersTableSortState = { orderBy, direction: nextDirection };
+      onSortChange(nextSort);
+    },
+    [sortState, onSortChange],
   );
 
   const columns = useMemo<ColumnDef<Order>[]>(
     () => [
       {
-        accessorKey: "table",
-        header: t("orders.admin.table.columns.table"),
+        accessorKey: "userName",
+        header: t("orders.admin.table.columns.userName"),
         cell: (info) => {
-          const tableNumber = info.getValue() as string;
-          return <span className="font-medium text-foreground">{tableNumber}</span>;
+          const userName = info.getValue() as string;
+          return <span className="font-medium text-foreground">{userName}</span>;
         },
       },
       {
@@ -143,7 +181,6 @@ export function OrdersTable({ orders }: OrdersTableProps) {
             </span>
           );
         },
-        enableSorting: false,
       },
       {
         id: "items",
@@ -215,22 +252,25 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     data: orders,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
-    state: { sorting },
+    manualSorting: true,
   });
 
   const headerGroups = table.getHeaderGroups();
   const rows = table.getRowModel().rows;
 
   return (
-    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden h-full flex flex-col">
-      <div className="overflow-auto flex-1">
-        <table className="w-full">
-          <OrdersTableHeader headerGroups={headerGroups} getSortTitle={getSortTitle} />
-          <OrdersTableBody rows={rows} />
-        </table>
-      </div>
-    </div>
+    <Root>
+      <Header
+        headerGroups={headerGroups}
+        sortState={sortState}
+        getSortTitle={getSortTitle}
+        onColumnSort={onColumnSort}
+      />
+      <Body rows={rows} />
+    </Root>
   );
 }
+
+OrdersTable.Root = Root;
+OrdersTable.Header = Header;
+OrdersTable.Body = Body;

@@ -115,7 +115,7 @@
       },
       "table": {
         "columns": {
-          "table": "Mesa",
+          "userName": "Usuário",
           "status": "Status",
           "items": "Itens",
           "total": "Total",

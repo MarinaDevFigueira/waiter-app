@@ -1,15 +1,27 @@
 import { useState, useMemo, useCallback } from "react";
-import { useKitchenOrders } from "@/shared/hooks/useKitchenOrders";
+import { useOrders } from "@/shared/hooks/useOrders";
 import { usePagination } from "@/shared/hooks/usePagination";
 import { OrdersTable } from "@/pages/orders/admin-orders/components/orders-table/orders-table";
 import { OrdersTableSkeleton } from "@/pages/orders/admin-orders/components/orders-table/orders-table-skeleton";
 import { OrdersViewToggle } from "@/pages/orders/kitchen-orders/components/orders-view-toggle/orders-view-toggle";
 import { Pagination } from "@/components/ui/pagination/pagination";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
+import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type { AdminOrdersPageProps } from "@/pages/orders/admin-orders/page.interface";
+import type { OrdersTableSortState } from "@/pages/orders/admin-orders/components/orders-table/orders-table.interface";
 
 export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
-  const { orders, isLoading } = useKitchenOrders();
+  const { orders, isLoading, setQueryParams } = useOrders();
+  const [sortState, setSortState] = useState<OrdersTableSortState>({
+    orderBy: OrdersOrderByEnum.CREATED_AT,
+    direction: SortDirection.DESC,
+  });
+
+  const handleSortChange = useCallback((sort: OrdersTableSortState) => {
+    setSortState(sort);
+    setQueryParams((prev) => ({ ...prev, orderBy: sort.orderBy, direction: sort.direction }));
+  }, [setQueryParams]);
   const { t } = useTranslation();
 
   const [page, setPage] = useState(1);
@@ -104,7 +116,7 @@ export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
       return (
         <div className="flex-1 min-h-0 flex flex-col gap-3">
           <div className="flex-1 min-h-0">
-            <OrdersTable orders={pagedOrders} />
+            <OrdersTable orders={pagedOrders} sortState={sortState} onSortChange={handleSortChange} />
           </div>
           {paginationBar}
         </div>

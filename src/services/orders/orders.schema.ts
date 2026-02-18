@@ -9,7 +9,7 @@ export const apiOrderItemSchema = z.object({
 
 export const apiOrderSchema = z.object({
   id: z.string(),
-  tableNumber: z.string(),
+  userName: z.string(),
   status: z.enum(["pending", "preparing", "ready"]),
   timestamp: z.string(),
   items: z.array(apiOrderItemSchema),
@@ -22,7 +22,6 @@ export const apiOrderListSchema = z.object({
 });
 
 export const createOrderRequestSchema = z.object({
-  tableNumber: z.string().min(1),
   items: z
     .array(
       z.object({
