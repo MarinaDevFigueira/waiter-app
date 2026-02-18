@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 import { format } from "date-fns";
 import { useOrders } from "@/shared/hooks/useOrders";
 import { usePagination } from "@/shared/hooks/usePagination";
@@ -19,21 +19,8 @@ function formatTime(timestamp: Date) {
 }
 
 export function KitchenOrdersPage({ canSwitchOrdersView }: KitchenOrdersPageProps) {
-  const { orders, queryParams, setQueryParams, updateOrderStatus } = useOrders();
+  const { orders, queryParams, total, page, size, totalPages, hasNextPage, hasPreviousPage, setQueryParams, updateOrderStatus } = useOrders();
   const { t } = useTranslation();
-
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
-
-  const total = orders.length;
-  const totalPages = Math.max(1, Math.ceil(total / size));
-  const hasNextPage = page < totalPages;
-  const hasPreviousPage = page > 1;
-
-  const pagedOrders = useMemo(() => {
-    const start = (page - 1) * size;
-    return orders.slice(start, start + size);
-  }, [orders, page, size]);
 
   const pagination = usePagination({
     page,
@@ -43,14 +30,12 @@ export function KitchenOrdersPage({ canSwitchOrdersView }: KitchenOrdersPageProp
     hasNextPage,
     hasPreviousPage,
     onPageChange: useCallback((newPage: number, newSize: number) => {
-      setPage(newPage);
-      setSize(newSize);
-    }, []),
+      setQueryParams((prev) => ({ ...prev, page: newPage, size: newSize }));
+    }, [setQueryParams]),
   });
 
   const handleSearch = useCallback((query: string) => {
-    setQueryParams((prev) => ({ ...prev, search: query }));
-    setPage(1);
+    setQueryParams((prev) => ({ ...prev, search: query, page: 1 }));
   }, [setQueryParams]);
 
   const handleStatusChange = useCallback((orderId: string, newStatus: OrderStatus) => {
@@ -89,7 +74,7 @@ export function KitchenOrdersPage({ canSwitchOrdersView }: KitchenOrdersPageProp
 
       <div className="w-full flex-1 min-h-0">
         <OrdersGrid
-          orders={pagedOrders}
+          orders={orders}
           searchQuery={queryParams.search}
           formatDate={formatDate}
           formatTime={formatTime}

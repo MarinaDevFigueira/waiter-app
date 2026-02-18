@@ -12,7 +12,7 @@ import type { AdminOrdersPageProps } from "@/pages/orders/admin-orders/page.inte
 import type { OrdersTableSortState } from "@/pages/orders/admin-orders/components/orders-table/orders-table.interface";
 
 export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
-  const { orders, isLoading, setQueryParams } = useOrders();
+  const { orders, isLoading, total, page, size, totalPages, hasNextPage, hasPreviousPage, setQueryParams } = useOrders();
   const [sortState, setSortState] = useState<OrdersTableSortState>({
     orderBy: OrdersOrderByEnum.CREATED_AT,
     direction: SortDirection.DESC,
@@ -20,22 +20,9 @@ export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
 
   const handleSortChange = useCallback((sort: OrdersTableSortState) => {
     setSortState(sort);
-    setQueryParams((prev) => ({ ...prev, orderBy: sort.orderBy, direction: sort.direction }));
+    setQueryParams((prev) => ({ ...prev, orderBy: sort.orderBy, direction: sort.direction, page: 1 }));
   }, [setQueryParams]);
   const { t } = useTranslation();
-
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
-
-  const total = orders.length;
-  const totalPages = Math.max(1, Math.ceil(total / size));
-  const hasNextPage = page < totalPages;
-  const hasPreviousPage = page > 1;
-
-  const pagedOrders = useMemo(() => {
-    const start = (page - 1) * size;
-    return orders.slice(start, start + size);
-  }, [orders, page, size]);
 
   const pagination = usePagination({
     page,
@@ -45,9 +32,8 @@ export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
     hasNextPage,
     hasPreviousPage,
     onPageChange: useCallback((newPage: number, newSize: number) => {
-      setPage(newPage);
-      setSize(newSize);
-    }, []),
+      setQueryParams((prev) => ({ ...prev, page: newPage, size: newSize }));
+    }, [setQueryParams]),
   });
 
   const isLoadingData = isLoading;
@@ -116,7 +102,7 @@ export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
       return (
         <div className="flex-1 min-h-0 flex flex-col gap-3">
           <div className="flex-1 min-h-0">
-            <OrdersTable orders={pagedOrders} sortState={sortState} onSortChange={handleSortChange} />
+            <OrdersTable orders={orders} sortState={sortState} onSortChange={handleSortChange} />
           </div>
           {paginationBar}
         </div>
@@ -124,7 +110,7 @@ export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
     }
 
     return null;
-  }, [showSkeleton, showEmpty, showTable, t, pagedOrders, paginationBar]);
+  }, [showSkeleton, showEmpty, showTable, t, orders, paginationBar]);
 
   return (
     <div className="flex flex-col h-full gap-6">
