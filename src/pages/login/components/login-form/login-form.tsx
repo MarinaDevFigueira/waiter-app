@@ -14,6 +14,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card/card";
+import { toast } from "react-toastify";
+import { logger } from "@/lib/logger";
 import { authService } from "@/services/auth/auth.service";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 
@@ -46,7 +48,10 @@ export function LoginForm() {
 
       const hasError = result.error !== undefined;
       if (hasError) {
-        throw new Error(result.error);
+        const error = new Error(result.error);
+        toast.error(result.error);
+        logger.error("Falha no login", error);
+        throw error;
       }
 
       return result;

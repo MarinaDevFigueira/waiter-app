@@ -209,8 +209,8 @@ export function ProductsTable({ products, sorting, onSortingChange }: ProductsTa
   });
 
   return (
-    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
+    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden h-full flex flex-col">
+      <div className="overflow-auto flex-1">
         <table className="w-full">
           <thead className="bg-muted/50 border-b border-border">
             {table.getHeaderGroups().map((headerGroup) => (

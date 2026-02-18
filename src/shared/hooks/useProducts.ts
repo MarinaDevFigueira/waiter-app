@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { logger } from "@/lib/logger";
 import { productsService } from "@/services/products/products.service";
 import { productsFiltersObservable, type ProductFilters } from "@/shared/subjects/products-filters.subject";
 import type { Product } from "@/shared/schemas/product.schema";
@@ -48,16 +49,16 @@ export function useProducts(): UseProductsReturn {
     size: 10,
     orderBy: "nome",
     direction: "ASC",
-    filters: {},
+    filters: productsFiltersObservable.getValue(),
   });
 
   useEffect(() => {
     const subscription = productsFiltersObservable.subscribe((filters) => {
-      setQueryParams((prev) => ({
-        ...prev,
-        page: 1,
-        filters,
-      }));
+      setQueryParams((prev) => {
+        const filtersUnchanged = JSON.stringify(prev.filters) === JSON.stringify(filters);
+        if (filtersUnchanged) return prev;
+        return { ...prev, page: 1, filters };
+      });
     });
 
     return () => subscription.unsubscribe();
@@ -70,7 +71,9 @@ export function useProducts(): UseProductsReturn {
       const hasError = Boolean(result.error);
 
       if (hasError) {
+        const error = new Error(result.error);
         toast.error(result.error);
+        logger.error("Erro ao buscar produtos", error);
         return null;
       }
 

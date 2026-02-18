@@ -1,104 +1,46 @@
-import { mockProducts } from "@/shared/mocks/products";
+import { api } from "@/services/api";
 import type { Product } from "@/shared/schemas/product.schema";
+import { baseEntityDefaults } from "@/shared/schemas/base-entity.schema";
 import {
   productQueryParamsSchema,
-  paginatedProductsSchema,
+  apiProductSchema,
+  apiProductListSchema,
 } from "./products.schema";
-import type { PaginatedProducts } from "./products.schema";
+import type { PaginatedProducts, ApiProduct } from "./products.schema";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
-type Filters = {
-  search?: string;
-  categoria?: string[];
-  precoMin?: number | null;
-  precoMax?: number | null;
-  somenteEmEstoque?: boolean;
-  estoqueMin?: number | null;
-  status?: Array<"ativo" | "inativo">;
-  dataInicio?: Date | null;
-  dataFim?: Date | null;
-};
-
-function applyMockFilters(
-  items: Product[],
-  filters: Filters
-): ServiceResult<Product[]> {
-  try {
-    let filtered = [...items];
-
-    const hasSearch = Boolean(filters.search);
-    const hasCategories = filters.categoria && filters.categoria.length > 0;
-    const hasMinPrice =
-      filters.precoMin !== null && filters.precoMin !== undefined;
-    const hasMaxPrice =
-      filters.precoMax !== null && filters.precoMax !== undefined;
-    const filterOnlyInStock = Boolean(filters.somenteEmEstoque);
-    const hasMinStock =
-      filters.estoqueMin !== null && filters.estoqueMin !== undefined;
-    const hasStatusFilter = filters.status && filters.status.length > 0;
-    const hasStartDate = Boolean(filters.dataInicio);
-    const hasEndDate = Boolean(filters.dataFim);
-
-    if (hasSearch && filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.nome.toLowerCase().includes(searchLower) ||
-          p.descricao?.toLowerCase().includes(searchLower)
-      );
-    }
-
-    if (hasCategories && filters.categoria) {
-      filtered = filtered.filter((p) =>
-        filters.categoria!.includes(p.categoria)
-      );
-    }
-
-    if (hasMinPrice && filters.precoMin != null) {
-      filtered = filtered.filter((p) => p.preco >= filters.precoMin!);
-    }
-
-    if (hasMaxPrice && filters.precoMax != null) {
-      filtered = filtered.filter((p) => p.preco <= filters.precoMax!);
-    }
-
-    if (filterOnlyInStock) {
-      filtered = filtered.filter((p) => p.estoque > 0);
-    }
-
-    if (hasMinStock && filters.estoqueMin != null) {
-      filtered = filtered.filter((p) => p.estoque >= filters.estoqueMin!);
-    }
-
-    if (hasStatusFilter && filters.status) {
-      filtered = filtered.filter((p) => {
-        const status = p.ativo ? "ativo" : "inativo";
-        return filters.status!.includes(status);
-      });
-    }
-
-    if (hasStartDate && filters.dataInicio) {
-      filtered = filtered.filter(
-        (p) => p.createdAt >= filters.dataInicio!.toISOString()
-      );
-    }
-
-    if (hasEndDate && filters.dataFim) {
-      filtered = filtered.filter(
-        (p) => p.createdAt <= filters.dataFim!.toISOString()
-      );
-    }
-
-    return { data: filtered };
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Erro ao aplicar filtros";
-    return { error: errorMessage };
-  }
+function mapApiProductToProduct(raw: ApiProduct): Product {
+  return {
+    ...baseEntityDefaults,
+    id: raw.id,
+    nome: raw.name,
+    descricao: raw.description ?? undefined,
+    categoria: raw.category,
+    preco: raw.price,
+    estoque: raw.stock,
+    unidade: raw.unit,
+    imagemUrl: raw.imageUrl ?? undefined,
+    ativo: raw.active,
+    createdAt: new Date(raw.createdAt),
+    updatedAt: new Date(raw.updatedAt),
+    createdBy: "api",
+    updatedBy: "api",
+    deletedAt: null,
+    deletedBy: null,
+  };
 }
+
+const orderByMap: Record<string, string> = {
+  nome: "name",
+  preco: "price",
+  estoque: "stock",
+  categoria: "category",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+};
 
 export const productsService = {
   async getAll(
@@ -114,49 +56,50 @@ export const productsService = {
 
       const { page, size, orderBy, direction, filters = {} } = validated.data;
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const params = new URLSearchParams();
+      params.set("page", String(page));
+      params.set("size", String(size));
+      params.set("orderBy", orderByMap[orderBy] ?? orderBy);
+      params.set("direction", direction);
 
-      const filterResult = applyMockFilters(mockProducts, filters);
-      const filteringFailed = "error" in filterResult;
-
-      if (filteringFailed) {
-        return { error: (filterResult as ServiceError).error };
+      if (filters.search) params.set("search", filters.search);
+      if (filters.categoria?.length) {
+        params.set("category", filters.categoria.join(","));
+      }
+      if (filters.precoMin != null) params.set("priceMin", String(filters.precoMin));
+      if (filters.precoMax != null) params.set("priceMax", String(filters.precoMax));
+      if (filters.somenteEmEstoque) params.set("inStock", "true");
+      if (filters.estoqueMin != null) params.set("stockMin", String(filters.estoqueMin));
+      if (filters.status?.length) {
+        const activeValues = filters.status.map((s) => (s === "ativo" ? "true" : "false"));
+        params.set("active", activeValues.join(","));
       }
 
-      let items = (filterResult as ServiceSuccess<Product[]>).data;
+      const result = await api.get<unknown>(`/products?${params.toString()}`);
 
-      items.sort((a, b) => {
-        const aVal = a[orderBy as keyof Product];
-        const bVal = b[orderBy as keyof Product];
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
 
-        let comparison = 0;
-        if (aVal < bVal) comparison = -1;
-        if (aVal > bVal) comparison = 1;
+      const parsed = apiProductListSchema.safeParse(result.data);
+      if (!parsed.success) {
+        return { error: "Resposta inválida do servidor" };
+      }
 
-        return direction === "ASC" ? comparison : -comparison;
-      });
+      const items = parsed.data.items.map(mapApiProductToProduct);
 
-      const start = (page - 1) * size;
-      const paginatedItems = items.slice(start, start + size);
-
-      const response = {
-        items: paginatedItems,
-        total: items.length,
-        page,
-        size,
-        totalPages: Math.ceil(items.length / size),
-        hasNextPage: page < Math.ceil(items.length / size),
-        hasPreviousPage: page > 1,
+      return {
+        data: {
+          items,
+          total: parsed.data.total,
+          page: parsed.data.page,
+          size: parsed.data.size,
+          totalPages: parsed.data.totalPages,
+          hasNextPage: parsed.data.hasNextPage,
+          hasPreviousPage: parsed.data.hasPreviousPage,
+        },
       };
-
-      const paginationValidation = paginatedProductsSchema.safeParse(response);
-      const paginationValidationFailed = !paginationValidation.success;
-
-      if (paginationValidationFailed) {
-        return { error: "Erro ao validar resposta paginada" };
-      }
-
-      return { data: paginationValidation.data };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar produtos";
@@ -166,16 +109,19 @@ export const productsService = {
 
   async getById(productId: string): Promise<ServiceResult<Product>> {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      const result = await api.get<unknown>(`/products/${productId}`);
 
-      const product = mockProducts.find((p) => p.id === productId);
-      const productNotFound = !product;
-
-      if (productNotFound) {
-        return { error: "Produto não encontrado" };
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
       }
 
-      return { data: product! };
+      const parsed = apiProductSchema.safeParse(result.data);
+      if (!parsed.success) {
+        return { error: "Resposta inválida do servidor" };
+      }
+
+      return { data: mapApiProductToProduct(parsed.data) };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar produto";
@@ -183,15 +129,32 @@ export const productsService = {
     }
   },
 
-  async create(
-    data: Omit<Product, "id">
-  ): Promise<ServiceResult<Product>> {
+  async create(data: Omit<Product, "id">): Promise<ServiceResult<Product>> {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const body = {
+        name: data.nome,
+        description: data.descricao,
+        category: data.categoria,
+        price: data.preco,
+        stock: data.estoque,
+        unit: data.unidade,
+        imageUrl: data.imagemUrl,
+        active: data.ativo,
+      };
 
-      const newProduct = { id: String(Date.now()), ...data } as Product;
+      const result = await api.post<unknown>("/products", body);
 
-      return { data: newProduct };
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      const parsed = apiProductSchema.safeParse(result.data);
+      if (!parsed.success) {
+        return { error: "Resposta inválida do servidor" };
+      }
+
+      return { data: mapApiProductToProduct(parsed.data) };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao criar produto";
@@ -204,11 +167,29 @@ export const productsService = {
     data: Partial<Omit<Product, "id">>
   ): Promise<ServiceResult<Product>> {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const body: Record<string, unknown> = {};
+      if (data.nome !== undefined) body.name = data.nome;
+      if (data.descricao !== undefined) body.description = data.descricao;
+      if (data.categoria !== undefined) body.category = data.categoria;
+      if (data.preco !== undefined) body.price = data.preco;
+      if (data.estoque !== undefined) body.stock = data.estoque;
+      if (data.unidade !== undefined) body.unit = data.unidade;
+      if (data.imagemUrl !== undefined) body.imageUrl = data.imagemUrl;
+      if (data.ativo !== undefined) body.active = data.ativo;
 
-      const updatedProduct = { id: productId, ...data } as Product;
+      const result = await api.put<unknown>(`/products/${productId}`, body);
 
-      return { data: updatedProduct };
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      const parsed = apiProductSchema.safeParse(result.data);
+      if (!parsed.success) {
+        return { error: "Resposta inválida do servidor" };
+      }
+
+      return { data: mapApiProductToProduct(parsed.data) };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar produto";
@@ -220,11 +201,14 @@ export const productsService = {
     productId: string
   ): Promise<ServiceResult<{ success: boolean; id: string }>> {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const result = await api.delete<unknown>(`/products/${productId}`);
 
-      const result = { success: true, id: productId };
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
 
-      return { data: result };
+      return { data: { success: true, id: productId } };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao deletar produto";

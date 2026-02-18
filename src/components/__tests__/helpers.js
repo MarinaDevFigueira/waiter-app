@@ -13,10 +13,10 @@ export async function disableSplashScreen(page) {
 }
 
 /**
- * Helper to login as a specific user
+ * Helper to login as a specific user via the real API
  * Automatically handles splash screen
  */
-export async function loginAs(page, username, password, waitForUrl = "/") {
+export async function loginAs(page, username, password, waitForUrl = "/dashboard") {
   await disableSplashScreen(page);
   await page.goto("/");
 
@@ -24,7 +24,7 @@ export async function loginAs(page, username, password, waitForUrl = "/") {
   await page.getByTestId("login-password-input").fill(password);
   await page.getByTestId("login-submit-button").click();
 
-  await page.waitForURL(waitForUrl);
+  await page.waitForURL(waitForUrl, { timeout: 15000 });
 }
 
 /**
@@ -59,5 +59,26 @@ export async function loginAsDelivery(page) {
  * Login as kitchen user (sees KitchenPage)
  */
 export async function loginAsKitchen(page) {
-  await loginAs(page, "chefecozin", "123", "/");
+  await loginAs(page, "chefecozin", "123", "/dashboard");
+}
+
+/**
+ * Clears auth session storage (simulates logout state)
+ */
+export async function clearAuthSession(page) {
+  await page.addInitScript(() => {
+    window.sessionStorage.removeItem("auth");
+    window.sessionStorage.removeItem("access_token");
+    window.sessionStorage.removeItem("refresh_token");
+  });
+}
+
+/**
+ * Wait for API response with a given URL pattern
+ */
+export async function waitForApiRequest(page, urlPattern) {
+  return page.waitForResponse(
+    (response) => response.url().includes(urlPattern) && response.status() === 200,
+    { timeout: 15000 }
+  );
 }
