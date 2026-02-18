@@ -4,7 +4,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastProvider } from "./components/toast-provider/toast-provider";
 import { routeTree } from "./routeTree.gen";
-import { DefaultNotFound } from "./components/default-not-found";
+import { DefaultNotFound } from "./components/default-not-found/default-not-found";
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 

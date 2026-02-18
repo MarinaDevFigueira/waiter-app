@@ -1,8 +1,8 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { FoodsPage } from "@/pages/foods/page";
-import { KitchenPage } from "@/pages/kitchen/kitchen-page";
+import { KitchenPage } from "@/pages/kitchen/page";
 import { LoginPage } from "@/pages/login/page";
-import { AppLayout } from "@/components/layouts/app-layout";
+import { AppLayout } from "@/components/layouts/app-layout/app-layout";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { UserProfileEnum } from "@/shared/constants/user-profile";
 

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { loginAsMesa } from "../../__tests__/helpers";
+import { loginAsMesa } from "../../../__tests__/helpers";
 
 test.describe("AppLayout Component", () => {
   test("renders children content when authenticated", async ({ page }) => {
