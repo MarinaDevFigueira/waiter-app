@@ -1,0 +1,6 @@
+{
+  // Cloudflare Pages configuration
+  // https://developers.cloudflare.com/pages/
+  "name": "waiter-app",
+  "pages_build_output_dir": "./dist"
+}
