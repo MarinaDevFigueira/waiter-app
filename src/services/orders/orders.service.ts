@@ -53,7 +53,7 @@ export const ordersService = {
         return { error: "Resposta inválida do servidor" };
       }
 
-      return { data: parsed.data.map(mapApiOrderToOrder) };
+      return { data: parsed.data.items.map(mapApiOrderToOrder) };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar pedidos";

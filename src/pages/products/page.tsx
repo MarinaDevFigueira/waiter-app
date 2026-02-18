@@ -1,19 +1,38 @@
 import { ProductsTable } from "@/pages/products/components/products-table";
 import { ProductsTableSkeleton } from "@/pages/products/components/products-table-skeleton";
 import { ProductsFilters } from "@/pages/products/components/products-filters";
+import { Pagination } from "@/components/ui/pagination/pagination";
 import { useProducts } from "@/shared/hooks/useProducts";
+import { usePagination } from "@/shared/hooks/usePagination";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function ProductsPage() {
   const {
     products,
+    total,
+    page,
+    size,
+    totalPages,
+    hasNextPage,
+    hasPreviousPage,
     isLoading,
     isError,
     error,
     queryParams,
     updateSorting,
+    updatePagination,
   } = useProducts();
   const { t } = useTranslation();
+
+  const pagination = usePagination({
+    page,
+    size,
+    total,
+    totalPages,
+    hasNextPage,
+    hasPreviousPage,
+    onPageChange: updatePagination,
+  });
 
   const pageHeader = (
     <div>
@@ -52,21 +71,56 @@ export function ProductsPage() {
     direction: queryParams.direction,
   };
 
+  const showTable = !hasError && !isLoadingData && !hasNoProducts;
+  const showSkeleton = !hasError && isLoadingData;
+  const showEmpty = !hasError && !isLoadingData && hasNoProducts;
+
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-full gap-6">
       {pageHeader}
 
       <ProductsFilters />
 
       {hasError && errorContent}
-      {!hasError && isLoadingData && <ProductsTableSkeleton />}
-      {!hasError && !isLoadingData && hasNoProducts && emptyContent}
-      {!hasError && !isLoadingData && !hasNoProducts && (
-        <ProductsTable
-          products={products}
-          sorting={sortingState}
-          onSortingChange={updateSorting}
-        />
+
+      {showSkeleton && <ProductsTableSkeleton />}
+
+      {showEmpty && emptyContent}
+
+      {showTable && (
+        <div className="flex-1 min-h-0 flex flex-col gap-3">
+          <div className="flex-1 min-h-0">
+            <ProductsTable
+              products={products}
+              sorting={sortingState}
+              onSortingChange={updateSorting}
+            />
+          </div>
+
+          <Pagination>
+            <div className="flex items-center gap-4">
+              <Pagination.Info
+                startItem={pagination.startItem}
+                endItem={pagination.endItem}
+                total={pagination.total}
+              />
+              <Pagination.SizeSelect
+                size={pagination.size}
+                setPageSize={pagination.setPageSize}
+              />
+            </div>
+            <Pagination.Controls
+              page={pagination.page}
+              totalPages={pagination.totalPages}
+              hasNextPage={pagination.hasNextPage}
+              hasPreviousPage={pagination.hasPreviousPage}
+              pageRange={pagination.pageRange}
+              nextPage={pagination.nextPage}
+              prevPage={pagination.prevPage}
+              goToPage={pagination.goToPage}
+            />
+          </Pagination>
+        </div>
       )}
     </div>
   );

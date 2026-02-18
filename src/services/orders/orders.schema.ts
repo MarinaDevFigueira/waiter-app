@@ -17,7 +17,9 @@ export const apiOrderSchema = z.object({
   updatedAt: z.string(),
 });
 
-export const apiOrderListSchema = z.array(apiOrderSchema);
+export const apiOrderListSchema = z.object({
+  items: z.array(apiOrderSchema),
+});
 
 export const createOrderRequestSchema = z.object({
   tableNumber: z.string().min(1),
