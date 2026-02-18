@@ -1,6 +1,5 @@
 import { format } from "date-fns";
 import { useKitchenOrders } from "@/shared/hooks/useKitchenOrders";
-import { kitchenOrdersObservable } from "@/shared/subjects/kitchen-orders.subject";
 import { SearchBar } from "@/pages/orders/components/search-bar/search-bar";
 import { OrdersGrid } from "@/pages/orders/components/orders-grid/orders-grid";
 import { useTranslation } from "@/shared/hooks/useTranslation";
@@ -8,7 +7,7 @@ import { useTranslation } from "@/shared/hooks/useTranslation";
 type OrderStatus = "pending" | "preparing" | "ready";
 
 export function KitchenOrdersPage() {
-  const { orders, searchQuery, setSearchQuery } = useKitchenOrders();
+  const { orders, searchQuery, setSearchQuery, updateOrderStatus } = useKitchenOrders();
   const { t } = useTranslation();
 
   const handleSearch = (query: string) => {
@@ -24,7 +23,7 @@ export function KitchenOrdersPage() {
   };
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    kitchenOrdersObservable.updateOrderStatus(orderId, newStatus);
+    updateOrderStatus(orderId, newStatus);
   };
 
   const statusOptions = [

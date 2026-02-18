@@ -49,16 +49,16 @@ export function useProducts(): UseProductsReturn {
     size: 10,
     orderBy: "nome",
     direction: "ASC",
-    filters: {},
+    filters: productsFiltersObservable.getValue(),
   });
 
   useEffect(() => {
     const subscription = productsFiltersObservable.subscribe((filters) => {
-      setQueryParams((prev) => ({
-        ...prev,
-        page: 1,
-        filters,
-      }));
+      setQueryParams((prev) => {
+        const filtersUnchanged = JSON.stringify(prev.filters) === JSON.stringify(filters);
+        if (filtersUnchanged) return prev;
+        return { ...prev, page: 1, filters };
+      });
     });
 
     return () => subscription.unsubscribe();
