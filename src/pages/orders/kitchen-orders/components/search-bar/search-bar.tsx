@@ -5,10 +5,7 @@ import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
 import { useTranslation } from "@/shared/hooks/useTranslation";
-
-interface SearchBarProps {
-  onSearch: (query: string) => void;
-}
+import type { SearchBarProps } from "@/pages/orders/kitchen-orders/components/search-bar/search-bar.interface";
 
 export function SearchBar({ onSearch }: SearchBarProps) {
   const { t } = useTranslation();

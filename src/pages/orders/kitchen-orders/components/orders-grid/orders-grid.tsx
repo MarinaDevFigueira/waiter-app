@@ -1,41 +1,11 @@
-import { OrderCard } from "@/pages/orders/components/order-card/order-card";
+import { OrderCard } from "@/pages/orders/kitchen-orders/components/order-card/order-card";
 import { KitchenEmptyState } from "@/components/empty-states/kitchen-empty-state";
 import {
   HoverCard,
   HoverCardTrigger,
   HoverCardContent,
 } from "@/components/ui/hover-card/hover-card";
-
-type OrderStatus = "pending" | "preparing" | "ready";
-
-interface OrderItem {
-  name: string;
-  quantity: number;
-  preco: number;
-}
-
-interface Order {
-  id: string;
-  table: string;
-  items: OrderItem[];
-  status: OrderStatus;
-  createdAt: Date;
-}
-
-interface StatusOption {
-  value: OrderStatus;
-  label: string;
-}
-
-interface OrdersGridProps {
-  orders: Order[];
-  searchQuery: string;
-  formatDate: (timestamp: Date) => string;
-  formatTime: (timestamp: Date) => string;
-  handleStatusChange: (orderId: string, newStatus: OrderStatus) => void;
-  statusOptions: StatusOption[];
-  getStatusLabel: (status: OrderStatus) => string;
-}
+import type { OrdersGridProps } from "@/pages/orders/kitchen-orders/components/orders-grid/orders-grid.interface";
 
 export function OrdersGrid({
   orders,
@@ -53,6 +23,7 @@ export function OrdersGrid({
   }
 
   return (
+    <div className="overflow-auto h-full">
     <div
       className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 auto-rows-max py-4"
       data-testid="kitchen-orders-grid"
@@ -125,6 +96,7 @@ export function OrdersGrid({
           </OrderCard.Footer>
         </OrderCard>
       ))}
+    </div>
     </div>
   );
 }

@@ -105,6 +105,25 @@
         "noResultsDescription": "We couldn't find orders with \"{{query}}\"",
         "searchHint": "Try searching by table or item name"
       }
+    },
+    "admin": {
+      "pageTitle": "Orders",
+      "pageSubtitle": "View and manage all orders",
+      "emptyState": {
+        "noOrders": "No orders found",
+        "noOrdersDescription": "There are no orders registered at the moment"
+      },
+      "table": {
+        "columns": {
+          "table": "Table",
+          "status": "Status",
+          "items": "Items",
+          "total": "Total",
+          "timestamp": "Time",
+          "createdAt": "Created at"
+        },
+        "itemsTotal": "items"
+      }
     }
   },
   "dashboard": {

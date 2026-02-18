@@ -1,23 +1,5 @@
 import { cn } from "@/lib/utils";
-import React from "react";
-
-interface OrderCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
-  orderId: string;
-  status: string;
-  className?: string;
-}
-
-interface OrderCardSubProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
-  className?: string;
-}
-
-interface OrderCardItemProps extends React.HTMLAttributes<HTMLDivElement> {
-  name: string;
-  quantity: number;
-  className?: string;
-}
+import type { OrderCardProps, OrderCardSubProps, OrderCardItemProps } from "@/pages/orders/kitchen-orders/components/order-card/order-card.interface";
 
 export function OrderCard({ children, className, orderId, status, ...props }: OrderCardProps) {
   return (

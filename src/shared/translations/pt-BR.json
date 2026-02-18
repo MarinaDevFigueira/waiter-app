@@ -105,6 +105,25 @@
         "noResultsDescription": "Não encontramos pedidos com \"{{query}}\"",
         "searchHint": "Tente buscar por mesa ou nome do item"
       }
+    },
+    "admin": {
+      "pageTitle": "Pedidos",
+      "pageSubtitle": "Visualize e gerencie todos os pedidos",
+      "emptyState": {
+        "noOrders": "Nenhum pedido encontrado",
+        "noOrdersDescription": "Não há pedidos registrados no momento"
+      },
+      "table": {
+        "columns": {
+          "table": "Mesa",
+          "status": "Status",
+          "items": "Itens",
+          "total": "Total",
+          "timestamp": "Horário",
+          "createdAt": "Criado em"
+        },
+        "itemsTotal": "itens"
+      }
     }
   },
   "dashboard": {
