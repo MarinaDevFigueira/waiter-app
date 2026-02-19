@@ -1,5 +1,5 @@
 import { api } from "@/services/api";
-import type { Product } from "@/shared/schemas/product.schema";
+import type { Product, ProductForm } from "@/shared/schemas/product.schema";
 import { baseEntityDefaults } from "@/shared/schemas/base-entity.schema";
 import {
   productQueryParamsSchema,
@@ -16,14 +16,14 @@ function mapApiProductToProduct(raw: ApiProduct): Product {
   return {
     ...baseEntityDefaults,
     id: raw.id,
-    nome: raw.name,
-    descricao: raw.description ?? undefined,
-    categoria: raw.category,
-    preco: raw.price,
-    estoque: raw.stock,
-    unidade: raw.unit,
-    imagemUrl: raw.imageUrl ?? undefined,
-    ativo: raw.active,
+    name: raw.name,
+    description: raw.description ?? undefined,
+    category: raw.category,
+    price: raw.price,
+    stock: raw.stock,
+    unit: raw.unit,
+    imageUrl: raw.imageUrl ?? undefined,
+    active: raw.active,
     createdAt: new Date(raw.createdAt),
     updatedAt: new Date(raw.updatedAt),
     createdBy: "api",
@@ -34,10 +34,10 @@ function mapApiProductToProduct(raw: ApiProduct): Product {
 }
 
 const orderByMap: Record<string, string> = {
-  nome: "name",
-  preco: "price",
-  estoque: "stock",
-  categoria: "category",
+  name: "name",
+  price: "price",
+  stock: "stock",
+  category: "category",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
 };
@@ -129,32 +129,23 @@ export const productsService = {
     }
   },
 
-  async create(data: Omit<Product, "id">): Promise<ServiceResult<Product>> {
+  async create(data: ProductForm): Promise<ServiceResult<void>> {
     try {
-      const body = {
-        name: data.nome,
-        description: data.descricao,
-        category: data.categoria,
-        price: data.preco,
-        stock: data.estoque,
-        unit: data.unidade,
-        imageUrl: data.imagemUrl,
-        active: data.ativo,
-      };
+      const hasDescription = Boolean(data.description);
+      const hasImageUrl = Boolean(data.imageUrl);
 
-      const result = await api.post<unknown>("/products", body);
+      const payload: ProductForm = { ...data };
+      if (!hasDescription) delete payload.description;
+      if (!hasImageUrl) delete payload.imageUrl;
+
+      const result = await api.post<unknown>("/products", payload);
 
       const hasError = "error" in result;
       if (hasError) {
         return { error: result.error };
       }
 
-      const parsed = apiProductSchema.safeParse(result.data);
-      if (!parsed.success) {
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiProductToProduct(parsed.data) };
+      return { data: undefined };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao criar produto";
@@ -164,32 +155,24 @@ export const productsService = {
 
   async update(
     productId: string,
-    data: Partial<Omit<Product, "id">>
-  ): Promise<ServiceResult<Product>> {
+    data: ProductForm
+  ): Promise<ServiceResult<void>> {
     try {
-      const body: Record<string, unknown> = {};
-      if (data.nome !== undefined) body.name = data.nome;
-      if (data.descricao !== undefined) body.description = data.descricao;
-      if (data.categoria !== undefined) body.category = data.categoria;
-      if (data.preco !== undefined) body.price = data.preco;
-      if (data.estoque !== undefined) body.stock = data.estoque;
-      if (data.unidade !== undefined) body.unit = data.unidade;
-      if (data.imagemUrl !== undefined) body.imageUrl = data.imagemUrl;
-      if (data.ativo !== undefined) body.active = data.ativo;
+      const hasDescription = Boolean(data.description);
+      const hasImageUrl = Boolean(data.imageUrl);
 
-      const result = await api.put<unknown>(`/products/${productId}`, body);
+      const payload: ProductForm = { ...data };
+      if (!hasDescription) delete payload.description;
+      if (!hasImageUrl) delete payload.imageUrl;
+
+      const result = await api.put<unknown>(`/products/${productId}`, payload);
 
       const hasError = "error" in result;
       if (hasError) {
         return { error: result.error };
       }
 
-      const parsed = apiProductSchema.safeParse(result.data);
-      if (!parsed.success) {
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiProductToProduct(parsed.data) };
+      return { data: undefined };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar produto";

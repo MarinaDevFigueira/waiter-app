@@ -10,27 +10,12 @@ import {
   SortingState,
   Updater,
 } from "@tanstack/react-table";
+import { PencilLineIcon } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button/button";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import type { Product } from "@/shared/schemas/product.schema";
 
-type ProductUnit = "un" | "kg" | "g" | "l" | "ml";
 type SortDirection = "ASC" | "DESC";
-
-interface Product {
-  id: string;
-  nome: string;
-  descricao?: string;
-  categoria: string;
-  preco: number;
-  estoque: number;
-  unidade: ProductUnit;
-  ativo: boolean;
-  createdAt: Date;
-  createdBy: string;
-  updatedAt: Date;
-  updatedBy: string;
-  deletedAt: Date | null;
-  deletedBy: string | null;
-}
 
 interface SortingConfig {
   orderBy: string;
@@ -41,9 +26,10 @@ interface ProductsTableProps {
   products: Product[];
   sorting: SortingConfig;
   onSortingChange: (orderBy: string, direction: SortDirection) => void;
+  onEdit: (product: Product) => void;
 }
 
-export function ProductsTable({ products, sorting, onSortingChange }: ProductsTableProps) {
+export function ProductsTable({ products, sorting, onSortingChange, onEdit }: ProductsTableProps) {
   const { t } = useTranslation();
   const hasSortingConfig = Boolean(sorting?.orderBy);
   const tableSorting: SortingState = useMemo(() => {
@@ -60,7 +46,7 @@ export function ProductsTable({ products, sorting, onSortingChange }: ProductsTa
     const isClearingSorting = newSorting.length === 0;
 
     if (isClearingSorting) {
-      onSortingChange("nome", "ASC");
+      onSortingChange("name", "ASC");
       return;
     }
 
@@ -84,7 +70,7 @@ export function ProductsTable({ products, sorting, onSortingChange }: ProductsTa
 
   const getStatusBadge = useCallback((product: Product) => {
     const isDeleted = product.deletedAt !== null;
-    const isActive = product.ativo;
+    const isActive = product.active;
 
     const hasDeleted = isDeleted;
     if (hasDeleted) {
@@ -113,7 +99,7 @@ export function ProductsTable({ products, sorting, onSortingChange }: ProductsTa
 
   const getStatusValue = useCallback((product: Product) => {
     if (product.deletedAt !== null) return "excluído";
-    if (product.ativo) return "ativo";
+    if (product.active) return "ativo";
     return "inativo";
   }, []);
 
@@ -121,40 +107,40 @@ export function ProductsTable({ products, sorting, onSortingChange }: ProductsTa
     () => {
       return [
       {
-        accessorKey: "nome",
+        accessorKey: "name",
         header: t("products.table.columns.name"),
         cell: (info) => {
           const product = info.row.original;
           return (
             <div>
-              <div className="font-medium text-foreground">{product.nome}</div>
+              <div className="font-medium text-foreground">{product.name}</div>
               <div className="text-muted-foreground text-xs line-clamp-1">
-                {product.descricao}
+                {product.description}
               </div>
             </div>
           );
         },
       },
       {
-        accessorKey: "categoria",
+        accessorKey: "category",
         header: t("products.table.columns.category"),
         cell: (info) => (
           <span className="capitalize">{info.getValue() as string}</span>
         ),
       },
       {
-        accessorKey: "preco",
+        accessorKey: "price",
         header: t("products.table.columns.price"),
         cell: (info) => formatCurrency(info.getValue() as number),
       },
       {
-        accessorKey: "estoque",
+        accessorKey: "stock",
         header: t("products.table.columns.stock"),
         cell: (info) => {
           const product = info.row.original;
           return (
             <span>
-              {product.estoque} {product.unidade}
+              {product.stock} {product.unit}
             </span>
           );
         },
@@ -192,9 +178,27 @@ export function ProductsTable({ products, sorting, onSortingChange }: ProductsTa
           );
         },
       },
+      {
+        id: "actions",
+        header: "",
+        enableSorting: false,
+        cell: (info) => {
+          const product = info.row.original;
+          return (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => onEdit(product)}
+              data-testid={`edit-product-${product.id}`}
+            >
+              <PencilLineIcon size={16} />
+            </Button>
+          );
+        },
+      },
     ];
     },
-    [t, getStatusBadge, getStatusValue, formatCurrency, formatDate],
+    [t, getStatusBadge, getStatusValue, formatCurrency, formatDate, onEdit],
   );
 
   const table = useReactTable({

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SPLASH_STORAGE_KEY } from "@/shared/constants/splash";
 import FeedbackScreen from "@/components/ui/feedback-screen/feedback-screen";
+
+const SPLASH_DURATION_MS = 1500;
 
 function getInitialVisibility(): boolean {
   if (typeof window === "undefined") return false;
@@ -19,6 +21,14 @@ export function SplashScreen({ onDismiss }: SplashScreenProps): JSX.Element | nu
     setIsVisible(false);
     onDismiss?.();
   };
+
+  useEffect(() => {
+    const shouldAutoDismiss = isVisible;
+    if (!shouldAutoDismiss) return;
+
+    const timer = setTimeout(handleDismiss, SPLASH_DURATION_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (!isVisible) return null;
 

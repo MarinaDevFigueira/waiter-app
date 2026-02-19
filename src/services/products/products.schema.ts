@@ -5,8 +5,8 @@ export const productQueryParamsSchema = z.object({
   page: z.number().int().positive().default(1),
   size: z.number().int().positive().max(100).default(10),
   orderBy: z
-    .enum(["nome", "preco", "estoque", "categoria", "createdAt", "updatedAt"])
-    .default("nome"),
+    .enum(["name", "price", "stock", "category", "createdAt", "updatedAt"])
+    .default("name"),
   direction: z.enum(["ASC", "DESC"]).default("ASC"),
   filters: z
     .object({

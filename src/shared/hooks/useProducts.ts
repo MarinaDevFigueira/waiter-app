@@ -47,7 +47,7 @@ export function useProducts(): UseProductsReturn {
   const [queryParams, setQueryParams] = useState<QueryParams>({
     page: 1,
     size: 10,
-    orderBy: "nome",
+    orderBy: "name",
     direction: "ASC",
     filters: productsFiltersObservable.getValue(),
   });
