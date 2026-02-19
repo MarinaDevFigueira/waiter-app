@@ -1,12 +1,12 @@
 import { api } from "@/services/api";
-import type { Product, ProductForm } from "@/shared/schemas/product.schema";
+import { type Product, type ProductForm } from "@/shared/schemas/product.schema";
 import { baseEntityDefaults } from "@/shared/schemas/base-entity.schema";
+import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
 import {
-  productQueryParamsSchema,
-  apiProductSchema,
   apiProductListSchema,
+  apiProductSchema,
 } from "./products.schema";
-import type { PaginatedProducts, ApiProduct } from "./products.schema";
+import type { PaginatedProducts, ApiProduct, ProductQueryParams } from "./products.schema";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
@@ -21,7 +21,7 @@ function mapApiProductToProduct(raw: ApiProduct): Product {
     category: raw.category,
     price: raw.price,
     stock: raw.stock,
-    unit: raw.unit,
+    unit: raw.unit as Product["unit"],
     imageUrl: raw.imageUrl ?? undefined,
     active: raw.active,
     createdAt: new Date(raw.createdAt),
@@ -33,45 +33,30 @@ function mapApiProductToProduct(raw: ApiProduct): Product {
   };
 }
 
-const orderByMap: Record<string, string> = {
-  name: "name",
-  price: "price",
-  stock: "stock",
-  category: "category",
-  createdAt: "createdAt",
-  updatedAt: "updatedAt",
-};
 
 export const productsService = {
   async getAll(
-    queryParams: Record<string, unknown> = {}
+    queryParams: ProductQueryParams
   ): Promise<ServiceResult<PaginatedProducts>> {
     try {
-      const validated = productQueryParamsSchema.safeParse(queryParams);
-      const validationFailed = !validated.success;
-
-      if (validationFailed) {
-        return { error: "Parâmetros inválidos" };
-      }
-
-      const { page, size, orderBy, direction, filters = {} } = validated.data;
+      const { page, size, orderBy, direction, filters = {} } = queryParams;
 
       const params = new URLSearchParams();
       params.set("page", String(page));
       params.set("size", String(size));
-      params.set("orderBy", orderByMap[orderBy] ?? orderBy);
+      params.set("orderBy", orderBy);
       params.set("direction", direction);
 
       if (filters.search) params.set("search", filters.search);
       if (filters.categoria?.length) {
         params.set("category", filters.categoria.join(","));
       }
-      if (filters.precoMin != null) params.set("priceMin", String(filters.precoMin));
-      if (filters.precoMax != null) params.set("priceMax", String(filters.precoMax));
+      if (filters.precoMin !== undefined) params.set("priceMin", String(filters.precoMin));
+      if (filters.precoMax !== undefined) params.set("priceMax", String(filters.precoMax));
       if (filters.somenteEmEstoque) params.set("inStock", "true");
-      if (filters.estoqueMin != null) params.set("stockMin", String(filters.estoqueMin));
+      if (filters.estoqueMin !== undefined) params.set("stockMin", String(filters.estoqueMin));
       if (filters.status?.length) {
-        const activeValues = filters.status.map((s) => (s === "ativo" ? "true" : "false"));
+        const activeValues = filters.status.map((s) => (s === ProductStatusEnum.ACTIVE ? "true" : "false"));
         params.set("active", activeValues.join(","));
       }
 
@@ -84,6 +69,7 @@ export const productsService = {
 
       const parsed = apiProductListSchema.safeParse(result.data);
       if (!parsed.success) {
+        console.error(parsed.error)
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -100,7 +86,7 @@ export const productsService = {
           hasPreviousPage: parsed.data.hasPreviousPage,
         },
       };
-    } catch (error) {
+    } catch (error: any) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar produtos";
       return { error: errorMessage };
@@ -122,7 +108,7 @@ export const productsService = {
       }
 
       return { data: mapApiProductToProduct(parsed.data) };
-    } catch (error) {
+    } catch (error: any) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar produto";
       return { error: errorMessage };

@@ -8,7 +8,14 @@ import { DefaultNotFound } from "./components/default-not-found/default-not-foun
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false
+    }
+  }
+});
 
 const router = createRouter({
   routeTree,

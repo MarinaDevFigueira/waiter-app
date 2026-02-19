@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 export const baseEntitySchema = z.object({
-  createdAt: z.date(),
+  createdAt: z.coerce.date(),
   createdBy: z.string(),
-  updatedAt: z.date(),
+  updatedAt: z.coerce.date(),
   updatedBy: z.string(),
-  deletedAt: z.date().nullable(),
+  deletedAt: z.coerce.date().nullable(),
   deletedBy: z.string().nullable(),
 });
 

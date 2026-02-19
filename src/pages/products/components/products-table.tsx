@@ -13,19 +13,19 @@ import {
 import { PencilLineIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
+import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type { Product } from "@/shared/schemas/product.schema";
 
-type SortDirection = "ASC" | "DESC";
-
 interface SortingConfig {
-  orderBy: string;
+  orderBy: ProductsOrderByEnum;
   direction: SortDirection;
 }
 
 interface ProductsTableProps {
   products: Product[];
   sorting: SortingConfig;
-  onSortingChange: (orderBy: string, direction: SortDirection) => void;
+  onSortingChange: (orderBy: ProductsOrderByEnum, direction: SortDirection) => void;
   onEdit: (product: Product) => void;
 }
 
@@ -35,7 +35,7 @@ export function ProductsTable({ products, sorting, onSortingChange, onEdit }: Pr
   const tableSorting: SortingState = useMemo(() => {
     if (!hasSortingConfig) return [];
 
-    const sortDescending = sorting.direction === "DESC";
+    const sortDescending = sorting.direction === SortDirection.DESC;
     return [{ id: sorting.orderBy, desc: sortDescending }];
   }, [hasSortingConfig, sorting]);
 
@@ -46,13 +46,13 @@ export function ProductsTable({ products, sorting, onSortingChange, onEdit }: Pr
     const isClearingSorting = newSorting.length === 0;
 
     if (isClearingSorting) {
-      onSortingChange("name", "ASC");
+      onSortingChange(ProductsOrderByEnum.NAME, SortDirection.ASC);
       return;
     }
 
     const sortConfig = newSorting[0];
-    const sortField = sortConfig.id;
-    const sortDirection: SortDirection = sortConfig.desc ? "DESC" : "ASC";
+    const sortField = sortConfig.id as ProductsOrderByEnum;
+    const sortDirection = sortConfig.desc ? SortDirection.DESC : SortDirection.ASC;
 
     onSortingChange(sortField, sortDirection);
   };

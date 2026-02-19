@@ -10,15 +10,16 @@ import { Dialog } from "@/components/ui/dialog/dialog";
 import { Checkbox } from "@/components/ui/checkbox/checkbox";
 import { MultiSelect } from "@/components/ui/multi-select/multi-select";
 import { productsFiltersObservable } from "@/shared/subjects/products-filters.subject";
+import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 
-type StatusValue = "ativo" | "inativo";
+const PRODUCT_STATUS_VALUES = Object.values(ProductStatusEnum) as [ProductStatusEnum, ...ProductStatusEnum[]];
 
 const filterFormSchema = z.object({
   categoria: z.array(z.string()).optional(),
-  precoMin: z.number().nullable().optional(),
-  precoMax: z.number().nullable().optional(),
-  status: z.array(z.enum(["ativo", "inativo"])).optional(),
+  precoMin: z.number().optional(),
+  precoMax: z.number().optional(),
+  status: z.array(z.enum(PRODUCT_STATUS_VALUES)).optional(),
 });
 
 type FilterFormValues = z.infer<typeof filterFormSchema>;
@@ -32,9 +33,9 @@ export function ProductsFilters() {
     { value: "lanches", label: t("foods.categories.snacks") },
   ];
 
-  const STATUS_OPTIONS: { value: StatusValue; label: string }[] = [
-    { value: "ativo", label: t("common.status.active") },
-    { value: "inativo", label: t("common.status.inactive") },
+  const STATUS_OPTIONS: { value: ProductStatusEnum; label: string }[] = [
+    { value: ProductStatusEnum.ACTIVE, label: t("common.status.active") },
+    { value: ProductStatusEnum.INACTIVE, label: t("common.status.inactive") },
   ];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,7 +50,7 @@ export function ProductsFilters() {
       categoria: currentFilters.categoria || [],
       precoMin: currentFilters.precoMin,
       precoMax: currentFilters.precoMax,
-      status: currentFilters.status || ["ativo", "inativo"],
+      status: currentFilters.status || [ProductStatusEnum.ACTIVE, ProductStatusEnum.INACTIVE],
     },
   });
 
@@ -61,8 +62,8 @@ export function ProductsFilters() {
     setSearchValue(currentFilters.search || "");
 
     const hasCategories = currentFilters.categoria && currentFilters.categoria.length > 0;
-    const hasMinPrice = currentFilters.precoMin !== null && currentFilters.precoMin !== undefined;
-    const hasMaxPrice = currentFilters.precoMax !== null && currentFilters.precoMax !== undefined;
+    const hasMinPrice = currentFilters.precoMin !== undefined;
+    const hasMaxPrice = currentFilters.precoMax !== undefined;
     const hasCustomStatus = currentFilters.status && currentFilters.status.length !== 2;
 
     const filtersArray = [hasCategories, hasMinPrice, hasMaxPrice, hasCustomStatus];
@@ -90,7 +91,7 @@ export function ProductsFilters() {
       categoria: data.categoria || [],
       precoMin: data.precoMin,
       precoMax: data.precoMax,
-      status: data.status || ["ativo", "inativo"],
+      status: data.status || [ProductStatusEnum.ACTIVE, ProductStatusEnum.INACTIVE],
     };
 
     productsFiltersObservable.setFilters(updatedFilters);
@@ -102,9 +103,7 @@ export function ProductsFilters() {
     setSearchValue("");
     reset({
       categoria: [],
-      precoMin: null,
-      precoMax: null,
-      status: ["ativo", "inativo"],
+      status: [ProductStatusEnum.ACTIVE, ProductStatusEnum.INACTIVE],
     });
     setActiveFilterCount(0);
     setIsModalOpen(false);
@@ -114,7 +113,7 @@ export function ProductsFilters() {
     setValue("categoria", newValue);
   }, [setValue]);
 
-  const handleStatusToggle = useCallback((statusOption: StatusValue) => {
+  const handleStatusToggle = useCallback((statusOption: ProductStatusEnum) => {
     const currentStatus = statusValue || [];
     const isSelected = currentStatus.includes(statusOption);
 

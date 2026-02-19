@@ -106,7 +106,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
       price: 0,
       stock: 0,
       unit: "un",
-      imageUrl: "",
+      imageUrl: undefined,
       active: true,
     },
   });

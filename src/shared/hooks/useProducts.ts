@@ -4,13 +4,15 @@ import { toast } from "react-toastify";
 import { logger } from "@/lib/logger";
 import { productsService } from "@/services/products/products.service";
 import { productsFiltersObservable, type ProductFilters } from "@/shared/subjects/products-filters.subject";
+import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
+import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type { Product } from "@/shared/schemas/product.schema";
 
 interface QueryParams {
   page: number;
   size: number;
-  orderBy: string;
-  direction: string;
+  orderBy: ProductsOrderByEnum;
+  direction: SortDirection;
   filters: Partial<ProductFilters>;
 }
 
@@ -39,7 +41,7 @@ interface UseProductsReturn {
   setQueryParams: React.Dispatch<React.SetStateAction<QueryParams>>;
   updateFilters: (newFilters: ProductFilters) => void;
   resetFilters: () => void;
-  updateSorting: (orderBy: string, direction: string) => void;
+  updateSorting: (orderBy: ProductsOrderByEnum, direction: SortDirection) => void;
   updatePagination: (page: number, size: number) => void;
 }
 
@@ -47,8 +49,8 @@ export function useProducts(): UseProductsReturn {
   const [queryParams, setQueryParams] = useState<QueryParams>({
     page: 1,
     size: 10,
-    orderBy: "name",
-    direction: "ASC",
+    orderBy: ProductsOrderByEnum.NAME,
+    direction: SortDirection.ASC,
     filters: productsFiltersObservable.getValue(),
   });
 
@@ -90,7 +92,7 @@ export function useProducts(): UseProductsReturn {
     productsFiltersObservable.resetFilters();
   };
 
-  const updateSorting = (orderBy: string, direction: string): void => {
+  const updateSorting = (orderBy: ProductsOrderByEnum, direction: SortDirection): void => {
     setQueryParams((prev) => ({
       ...prev,
       orderBy,
