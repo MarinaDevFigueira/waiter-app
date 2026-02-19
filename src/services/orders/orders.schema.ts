@@ -9,7 +9,7 @@ export const apiOrderItemSchema = z.object({
 
 export const apiOrderSchema = z.object({
   id: z.string(),
-  tableNumber: z.string(),
+  userName: z.string(),
   status: z.enum(["pending", "preparing", "ready"]),
   timestamp: z.string(),
   items: z.array(apiOrderItemSchema),
@@ -21,8 +21,17 @@ export const apiOrderListSchema = z.object({
   items: z.array(apiOrderSchema),
 });
 
+export const apiOrderPaginatedListSchema = z.object({
+  items: z.array(apiOrderSchema),
+  total: z.number(),
+  page: z.number(),
+  size: z.number(),
+  totalPages: z.number(),
+  hasNextPage: z.boolean(),
+  hasPreviousPage: z.boolean(),
+});
+
 export const createOrderRequestSchema = z.object({
-  tableNumber: z.string().min(1),
   items: z
     .array(
       z.object({
@@ -39,5 +48,6 @@ export const updateOrderStatusSchema = z.object({
 });
 
 export type ApiOrder = z.infer<typeof apiOrderSchema>;
+export type ApiOrderPaginatedList = z.infer<typeof apiOrderPaginatedListSchema>;
 export type CreateOrderRequest = z.infer<typeof createOrderRequestSchema>;
 export type UpdateOrderStatus = z.infer<typeof updateOrderStatusSchema>;

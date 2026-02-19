@@ -10,10 +10,12 @@ import {
   CaretLeftIcon,
   CaretRightIcon,
   CookingPotIcon,
+  List,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import { Logo } from "@/components/ui/logo/logo";
+import { Sheet } from "@/components/ui/sheet/sheet";
 import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
 import { LanguageSelector } from "@/components/ui/language-selector/language-selector";
 import { authService } from "@/services/auth/auth.service";
@@ -47,6 +49,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps): JSX.Element
     const stored = localStorage.getItem(StorageKeys.SIDEBAR_MINIMIZED);
     return stored === "true";
   });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await authService.logout();
@@ -204,10 +207,69 @@ export function DashboardLayout({ children }: DashboardLayoutProps): JSX.Element
         </div>
       </aside>
 
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <Sheet.Content className="flex flex-col">
+          <div className="flex items-center justify-center h-14 px-4 border-b border-border">
+            <Logo className="text-lg" />
+          </div>
+
+          <nav className="flex-1 p-2">
+            {menuItems.map((item) => {
+              const ItemIcon = item.icon;
+              const isActive = normalizedPathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  data-active={isActive}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="group flex items-center gap-3 px-3 py-2 rounded-md mb-1 transition-colors data-[active=false]:text-foreground data-[active=false]:hover:bg-secondary data-[active=true]:bg-sidebar-primary"
+                >
+                  <ItemIcon
+                    size={20}
+                    className="shrink-0 group-data-[active=true]:text-white"
+                  />
+                  <span className="text-sm group-data-[active=true]:text-white">
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="p-4 border-t border-border">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{auth?.name}</p>
+                <p className="text-xs text-muted-foreground">{auth?.profile}</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="w-full"
+            >
+              <SignOutIcon />
+              <span className="ml-2">{t("common.buttons.logout")}</span>
+            </Button>
+          </div>
+        </Sheet.Content>
+      </Sheet>
+
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="w-full bg-background border-b border-border h-14 sm:h-16 px-4 sm:px-6 md:px-8 flex items-center shadow-sm">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setIsMobileMenuOpen(true)}
+                data-testid="mobile-menu-button"
+                className="md:hidden"
+              >
+                <List size={20} />
+              </Button>
               <Link
                 to="/dashboard"
                 className="hover:text-foreground transition-colors"

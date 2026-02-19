@@ -2,7 +2,7 @@ import { api } from "@/services/api";
 import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
 import {
   apiOrderSchema,
-  apiOrderListSchema,
+  apiOrderPaginatedListSchema,
   createOrderRequestSchema,
   updateOrderStatusSchema,
 } from "./orders.schema";
@@ -12,10 +12,20 @@ type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
+export interface PaginatedOrders {
+  items: Order[];
+  total: number;
+  page: number;
+  size: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 function mapApiOrderToOrder(raw: ApiOrder): Order {
   return {
     id: raw.id,
-    table: raw.tableNumber,
+    userName: raw.userName,
     status: raw.status,
     timestamp: new Date(raw.timestamp),
     items: raw.items.map((item) => ({
@@ -33,10 +43,15 @@ function mapApiOrderToOrder(raw: ApiOrder): Order {
 }
 
 export const ordersService = {
-  async getAll(filters: { status?: string } = {}): Promise<ServiceResult<Order[]>> {
+  async getAll(filters: { status?: string; search?: string; orderBy?: string; direction?: string; page?: number; size?: number } = {}): Promise<ServiceResult<PaginatedOrders>> {
     try {
       const params = new URLSearchParams();
       if (filters.status) params.set("status", filters.status);
+      if (filters.search) params.set("search", filters.search);
+      if (filters.orderBy) params.set("orderBy", filters.orderBy);
+      if (filters.direction) params.set("direction", filters.direction);
+      if (filters.page != null) params.set("page", String(filters.page));
+      if (filters.size != null) params.set("size", String(filters.size));
 
       const query = params.toString();
       const path = query ? `/orders?${query}` : "/orders";
@@ -48,12 +63,22 @@ export const ordersService = {
         return { error: result.error };
       }
 
-      const parsed = apiOrderListSchema.safeParse(result.data);
+      const parsed = apiOrderPaginatedListSchema.safeParse(result.data);
       if (!parsed.success) {
         return { error: "Resposta inválida do servidor" };
       }
 
-      return { data: parsed.data.items.map(mapApiOrderToOrder) };
+      return {
+        data: {
+          items: parsed.data.items.map(mapApiOrderToOrder),
+          total: parsed.data.total,
+          page: parsed.data.page,
+          size: parsed.data.size,
+          totalPages: parsed.data.totalPages,
+          hasNextPage: parsed.data.hasNextPage,
+          hasPreviousPage: parsed.data.hasPreviousPage,
+        },
+      };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar pedidos";

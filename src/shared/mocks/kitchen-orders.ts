@@ -3,7 +3,7 @@ import type { Order } from "@/shared/schemas/order.schema";
 export const kitchenOrdersMock: Order[] = [
   {
     id: "order-1",
-    table: "Mesa 01",
+    userName: "garcom-1",
     items: [
       { name: "Pizza Margherita", quantity: 2, preco: 35.9 },
       { name: "Refrigerante Coca-Cola", quantity: 2, preco: 12.5 },
@@ -22,7 +22,7 @@ export const kitchenOrdersMock: Order[] = [
   },
   {
     id: "order-2",
-    table: "Mesa 03",
+    userName: "garcom-2",
     items: [
       { name: "Hambúrguer Especial", quantity: 1, preco: 28.0 },
       { name: "Batata Frita", quantity: 1, preco: 18.0 },
@@ -39,7 +39,7 @@ export const kitchenOrdersMock: Order[] = [
   },
   {
     id: "order-3",
-    table: "Mesa 05",
+    userName: "garcom-1",
     items: [
       { name: "Pizza Calabresa", quantity: 1, preco: 38.9 },
       { name: "Pizza Quatro Queijos", quantity: 1, preco: 42.0 },
@@ -56,7 +56,7 @@ export const kitchenOrdersMock: Order[] = [
   },
   {
     id: "order-4",
-    table: "Mesa 02",
+    userName: "garcom-3",
     items: [
       { name: "Lasanha à Bolonhesa", quantity: 2, preco: 32.0 },
       { name: "Salada Caesar", quantity: 1, preco: 22.0 },
@@ -72,7 +72,7 @@ export const kitchenOrdersMock: Order[] = [
   },
   {
     id: "order-5",
-    table: "Mesa 07",
+    userName: "garcom-2",
     items: [
       { name: "Espaguete Carbonara", quantity: 1, preco: 35.0 },
       { name: "Vinho Tinto", quantity: 1, preco: 55.0 },
@@ -88,7 +88,7 @@ export const kitchenOrdersMock: Order[] = [
   },
   {
     id: "order-6",
-    table: "Mesa 04",
+    userName: "garcom-1",
     items: [
       { name: "Risoto de Camarão", quantity: 1, preco: 48.0 },
       { name: "Água com Gás", quantity: 2, preco: 6.0 },

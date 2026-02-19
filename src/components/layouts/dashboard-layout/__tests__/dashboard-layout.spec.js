@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { loginAsAdmin } from "../../__tests__/helpers";
+import { loginAsAdmin } from "../../../__tests__/helpers";
 
 test.describe("DashboardLayout Component", () => {
   test.beforeEach(async ({ page }) => {

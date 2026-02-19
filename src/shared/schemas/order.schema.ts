@@ -12,7 +12,7 @@ export const orderItemSchema = z.object({
 
 export const orderSchema = baseEntitySchema.extend({
   id: z.string(),
-  table: z.string().min(1, { message: "Mesa é obrigatória" }),
+  userName: z.string(),
   items: z
     .array(orderItemSchema)
     .min(1, { message: "Pedido deve ter pelo menos um item" }),

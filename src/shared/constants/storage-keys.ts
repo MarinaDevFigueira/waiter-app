@@ -5,6 +5,7 @@ export const StorageKeys = Object.freeze({
   SIDEBAR_MINIMIZED: "sidebar-minimized",
   THEME: "theme",
   LANGUAGE: "language",
+  ORDERS_VIEW: "orders-view",
 });
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

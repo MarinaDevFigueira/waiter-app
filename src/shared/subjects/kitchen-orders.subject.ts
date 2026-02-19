@@ -1,8 +1,7 @@
 import { BehaviorSubject, type Subscription } from "rxjs";
-import { kitchenOrdersMock } from "@/shared/mocks/kitchen-orders";
 import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
 
-const kitchenOrdersSubject = new BehaviorSubject<Order[]>(kitchenOrdersMock);
+const kitchenOrdersSubject = new BehaviorSubject<Order[]>([]);
 
 export const kitchenOrdersObservable = {
   subscribe: (callback: (value: Order[]) => void): Subscription =>

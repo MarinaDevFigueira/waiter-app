@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { logger } from "@/lib/logger";
 import { productsService } from "@/services/products/products.service";
@@ -79,7 +79,7 @@ export function useProducts(): UseProductsReturn {
 
       return result.data ?? null;
     },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   const updateFilters = (newFilters: ProductFilters): void => {
