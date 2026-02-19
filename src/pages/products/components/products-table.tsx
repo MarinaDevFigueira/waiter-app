@@ -108,6 +108,7 @@ export function ProductsTable({ products, sorting, onSortingChange, onEdit }: Pr
       return [
       {
         accessorKey: "name",
+        size: 300,
         header: t("products.table.columns.name"),
         cell: (info) => {
           const product = info.row.original;
@@ -223,9 +224,14 @@ export function ProductsTable({ products, sorting, onSortingChange, onEdit }: Pr
                   const canSort = header.column.getCanSort();
                   const isSorted = header.column.getIsSorted();
 
+                  const columnSize = header.column.getSize();
+                  const hasColumnSize = columnSize !== 150;
+                  const columnStyle = hasColumnSize ? { width: columnSize, minWidth: columnSize } : undefined;
+
                   return (
                     <th
                       key={header.id}
+                      style={columnStyle}
                       className={`px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider ${
                         canSort ? "cursor-pointer select-none" : ""
                       }`}
