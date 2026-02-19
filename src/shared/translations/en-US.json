@@ -7,7 +7,10 @@
       "back": "Back",
       "logout": "Logout",
       "goToHome": "Back to home page",
-      "goToDashboard": "Go to Dashboard"
+      "goToDashboard": "Go to Dashboard",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "new": "New"
     },
     "status": {
       "active": "Active",
@@ -90,6 +93,31 @@
         "minPrice": "Minimum",
         "maxPrice": "Maximum",
         "status": "Status"
+      }
+    },
+    "form": {
+      "createTitle": "New Product",
+      "editTitle": "Edit Product",
+      "createButton": "Create Product",
+      "saveButton": "Save",
+      "createSuccess": "Product created successfully!",
+      "updateSuccess": "Product updated successfully!",
+      "createError": "Error creating product",
+      "updateError": "Error updating product",
+      "fields": {
+        "name": "Name",
+        "description": "Description",
+        "category": "Category",
+        "price": "Price",
+        "stock": "Stock",
+        "unit": "Unit",
+        "imageUrl": "Image URL",
+        "active": "Active product"
+      },
+      "placeholders": {
+        "name": "E.g.: Margherita Pizza",
+        "description": "Describe the product...",
+        "category": "E.g.: Pizzas"
       }
     }
   },

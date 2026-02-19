@@ -1,24 +1,34 @@
 import { z } from "zod";
 import { productSchema } from "@/shared/schemas/product.schema";
+import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
+import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
+import { SortDirection } from "@/shared/enums/sort-direction.enum";
+
+export const apiProductSchema = productSchema.omit({
+  deletedAt: true,
+  deletedBy: true
+})
+
+const PRODUCTS_ORDER_BY_VALUES = Object.values(ProductsOrderByEnum) as [ProductsOrderByEnum, ...ProductsOrderByEnum[]];
+const SORT_DIRECTION_VALUES = Object.values(SortDirection) as [SortDirection, ...SortDirection[]];
+const PRODUCT_STATUS_VALUES = Object.values(ProductStatusEnum) as [ProductStatusEnum, ...ProductStatusEnum[]];
 
 export const productQueryParamsSchema = z.object({
   page: z.number().int().positive().default(1),
   size: z.number().int().positive().max(100).default(10),
-  orderBy: z
-    .enum(["nome", "preco", "estoque", "categoria", "createdAt", "updatedAt"])
-    .default("nome"),
-  direction: z.enum(["ASC", "DESC"]).default("ASC"),
+  orderBy: z.enum(PRODUCTS_ORDER_BY_VALUES).default(ProductsOrderByEnum.NAME),
+  direction: z.enum(SORT_DIRECTION_VALUES).default(SortDirection.ASC),
   filters: z
     .object({
       search: z.string().optional(),
       categoria: z.array(z.string()).optional(),
-      precoMin: z.number().nullable().optional(),
-      precoMax: z.number().nullable().optional(),
+      precoMin: z.number().optional(),
+      precoMax: z.number().optional(),
       somenteEmEstoque: z.boolean().optional(),
-      estoqueMin: z.number().nullable().optional(),
-      status: z.array(z.enum(["ativo", "inativo"])).optional(),
-      dataInicio: z.date().nullable().optional(),
-      dataFim: z.date().nullable().optional(),
+      estoqueMin: z.number().optional(),
+      status: z.array(z.enum(PRODUCT_STATUS_VALUES)).optional(),
+      dataInicio: z.date().optional(),
+      dataFim: z.date().optional(),
     })
     .optional(),
 });
@@ -31,20 +41,6 @@ export const paginatedProductsSchema = z.object({
   totalPages: z.number().int().nonnegative(),
   hasNextPage: z.boolean(),
   hasPreviousPage: z.boolean(),
-});
-
-export const apiProductSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string().nullable().optional(),
-  category: z.string(),
-  price: z.number(),
-  stock: z.number().int(),
-  unit: z.enum(["un", "kg", "g", "l", "ml"]),
-  imageUrl: z.string().nullable().optional(),
-  active: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
 });
 
 export const apiProductListSchema = z.object({

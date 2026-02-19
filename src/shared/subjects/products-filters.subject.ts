@@ -1,27 +1,23 @@
 import { BehaviorSubject, type Subscription } from "rxjs";
+import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
 
 interface ProductFilters {
   search: string;
   categoria: string[];
-  precoMin: number | null;
-  precoMax: number | null;
+  precoMin?: number;
+  precoMax?: number;
   somenteEmEstoque: boolean;
-  estoqueMin: number | null;
-  status: string[];
-  dataInicio: string | null;
-  dataFim: string | null;
+  estoqueMin?: number;
+  status: ProductStatusEnum[];
+  dataInicio?: Date;
+  dataFim?: Date;
 }
 
 const initialFilters: ProductFilters = {
   search: "",
   categoria: [],
-  precoMin: null,
-  precoMax: null,
   somenteEmEstoque: false,
-  estoqueMin: null,
-  status: ["ativo", "inativo"],
-  dataInicio: null,
-  dataFim: null,
+  status: [ProductStatusEnum.ACTIVE, ProductStatusEnum.INACTIVE],
 };
 
 const filtersSubject = new BehaviorSubject<ProductFilters>(initialFilters);

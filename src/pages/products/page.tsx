@@ -1,10 +1,14 @@
+import { useState, useCallback } from "react";
 import { ProductsTable } from "@/pages/products/components/products-table";
 import { ProductsTableSkeleton } from "@/pages/products/components/products-table-skeleton";
 import { ProductsFilters } from "@/pages/products/components/products-filters";
+import { ProductFormDialog } from "@/pages/products/components/product-form-dialog";
 import { Pagination } from "@/components/ui/pagination/pagination";
+import { Button } from "@/components/ui/button/button";
 import { useProducts } from "@/shared/hooks/useProducts";
 import { usePagination } from "@/shared/hooks/usePagination";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import type { Product } from "@/shared/schemas/product.schema";
 
 export function ProductsPage() {
   const {
@@ -23,6 +27,18 @@ export function ProductsPage() {
     updatePagination,
   } = useProducts();
   const { t } = useTranslation();
+  const [formOpen, setFormOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
+
+  const handleNewProduct = useCallback(() => {
+    setSelectedProduct(undefined);
+    setFormOpen(true);
+  }, []);
+
+  const handleEditProduct = useCallback((product: Product) => {
+    setSelectedProduct(product);
+    setFormOpen(true);
+  }, []);
 
   const pagination = usePagination({
     page,
@@ -35,13 +51,18 @@ export function ProductsPage() {
   });
 
   const pageHeader = (
-    <div>
-      <h1 className="text-3xl font-bold tracking-tight">
-        {t("products.pageTitle")}
-      </h1>
-      <p className="text-muted-foreground">
-        {t("products.pageSubtitle")}
-      </p>
+    <div className="flex items-start justify-between">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {t("products.pageTitle")}
+        </h1>
+        <p className="text-muted-foreground">
+          {t("products.pageSubtitle")}
+        </p>
+      </div>
+      <Button onClick={handleNewProduct} data-testid="new-product-button">
+        {t("common.buttons.new")} {t("products.pageTitle")}
+      </Button>
     </div>
   );
 
@@ -87,6 +108,12 @@ export function ProductsPage() {
 
       {showEmpty && emptyContent}
 
+      <ProductFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        product={selectedProduct}
+      />
+
       {showTable && (
         <div className="flex-1 min-h-0 flex flex-col gap-3">
           <div className="flex-1 min-h-0">
@@ -94,6 +121,7 @@ export function ProductsPage() {
               products={products}
               sorting={sortingState}
               onSortingChange={updateSorting}
+              onEdit={handleEditProduct}
             />
           </div>
 

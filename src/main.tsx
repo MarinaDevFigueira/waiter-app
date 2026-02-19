@@ -1,14 +1,27 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { ToastProvider } from "./components/toast-provider/toast-provider";
 import { routeTree } from "./routeTree.gen";
 import { DefaultNotFound } from "./components/default-not-found/default-not-found";
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
-const queryClient = new QueryClient();
+const persister = createAsyncStoragePersister({
+  storage: window.sessionStorage,
+});
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    }
+  }
+});
 
 const router = createRouter({
   routeTree,
@@ -22,9 +35,12 @@ const rootElement = document.getElementById("app");
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister }}
+    >
       <RouterProvider router={router} />
       <ToastProvider />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
