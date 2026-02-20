@@ -119,6 +119,7 @@ export function LoginForm() {
               id="username"
               type="text"
               placeholder={t("login.form.usernamePlaceholder")}
+              autoComplete="username"
               required
               disabled={isLoading}
               data-testid="login-username-input"
@@ -134,6 +135,7 @@ export function LoginForm() {
               id="password"
               type="password"
               placeholder="••••••••"
+              autoComplete="current-password"
               required
               disabled={isLoading}
               data-testid="login-password-input"
