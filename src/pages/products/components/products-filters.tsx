@@ -45,7 +45,7 @@ export function ProductsFilters() {
 
   const currentFilters = productsFiltersObservable.getValue();
 
-  const { register, handleSubmit, reset, watch, setValue } = useForm<FilterFormValues>({
+  const { register, handleSubmit, watch, setValue } = useForm<FilterFormValues>({
     resolver: zodResolver(filterFormSchema),
     defaultValues: {
       categoria: currentFilters.categoria || [],
@@ -100,15 +100,15 @@ export function ProductsFilters() {
   }, [currentFilters, searchValue]);
 
   const handleClearFilters = useCallback(() => {
-    productsFiltersObservable.resetFilters();
+    setValue("categoria", []);
+    setValue("status", [ProductStatusEnum.ACTIVE, ProductStatusEnum.INACTIVE]);
+    setValue("precoMin", undefined);
+    setValue("precoMax", undefined);
     setSearchValue("");
-    reset({
-      categoria: [],
-      status: [ProductStatusEnum.ACTIVE, ProductStatusEnum.INACTIVE],
-    });
     setActiveFilterCount(0);
+    productsFiltersObservable.resetFilters();
     setIsModalOpen(false);
-  }, [reset]);
+  }, [setValue]);
 
   const handleCategoryChange = useCallback((newValue: string[]) => {
     setValue("categoria", newValue);
