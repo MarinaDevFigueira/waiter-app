@@ -245,7 +245,7 @@
     }
   },
   "orderSession": {
-    "viewSummary": "Exibir Resumo",
+    "viewSummary": "Resumo",
     "summary": "Resumo do Pedido",
     "total": "Total",
     "closeSession": "Encerrar Sessão",

@@ -241,7 +241,7 @@
     }
   },
   "orderSession": {
-    "viewSummary": "View Summary",
+    "viewSummary": "Summary",
     "summary": "Order Summary",
     "total": "Total",
     "closeSession": "Close Session",
