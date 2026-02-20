@@ -150,7 +150,8 @@
           "timestamp": "Time",
           "createdAt": "Created at"
         },
-        "itemsTotal": "items"
+        "itemsTotal": "items",
+        "total": "Total"
       }
     }
   },
