@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
+import { useNavigate } from "@tanstack/react-router";
 import { Title } from "./components/title";
 import { Foods } from "./components/foods";
 import { CartDrawer } from "./components/cart-drawer/cart-drawer";
@@ -11,20 +12,20 @@ import { useCategories } from "@/shared/hooks/useCategories";
 import { useProducts } from "@/shared/hooks/useProducts";
 import { useCart } from "@/shared/hooks/useCart";
 import { orderSessionsService } from "@/services/order-sessions/order-sessions.service";
+import { authService } from "@/services/auth/auth.service";
 import { logger } from "@/lib/logger";
 import { cartObservable } from "@/shared/subjects/cart.subject";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
 import type { Product } from "@/shared/schemas/product.schema";
-import type { OrderSessionSummary } from "@/services/order-sessions/order-sessions.schema";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export const FoodsPage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
-  const [sessionSummary, setSessionSummary] = useState<OrderSessionSummary | null>(null);
   const [isClosingSession, setIsClosingSession] = useState(false);
 
   const { categories } = useCategories({
@@ -70,27 +71,17 @@ export const FoodsPage = () => {
     setIsCartOpen(false);
   }, []);
 
-  const handleOpenSummary = useCallback(async () => {
+  const handleOpenSummary = useCallback(() => {
     const currentCart = cartObservable.getValue();
     const sessionId = currentCart.orderSessionId;
     const noSession = !sessionId;
     if (noSession) return;
 
-    const result = await orderSessionsService.getSummary(sessionId);
-    const hasError = "error" in result;
-    if (hasError) {
-      toast.error(result.error);
-      logger.error("Erro ao buscar resumo da sessão", new Error(result.error));
-      return;
-    }
-
-    setSessionSummary(result.data);
     setIsSummaryOpen(true);
   }, []);
 
   const handleCloseSummaryModal = useCallback(() => {
     setIsSummaryOpen(false);
-    setSessionSummary(null);
   }, []);
 
   const handleCloseSession = useCallback(async () => {
@@ -110,13 +101,14 @@ export const FoodsPage = () => {
       }
 
       cartObservable.clearCart();
-      toast.success(t("orderSession.sessionClosed"));
+      toast.success(t("orderSession.sessionClosedAndLoggedOut"));
       setIsSummaryOpen(false);
-      setSessionSummary(null);
+      await authService.logout();
+      navigate({ to: "/" });
     } finally {
       setIsClosingSession(false);
     }
-  }, [t]);
+  }, [t, navigate]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => p.active);
@@ -168,7 +160,7 @@ export const FoodsPage = () => {
       <OrderSessionSummaryModal
         open={isSummaryOpen}
         onClose={handleCloseSummaryModal}
-        summary={sessionSummary}
+        orderSessionId={cart.orderSessionId ?? null}
         onCloseSession={handleCloseSession}
         isClosing={isClosingSession}
       />

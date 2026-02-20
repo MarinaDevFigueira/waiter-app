@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useQueryClient } from "@tanstack/react-query";
 import { cartObservable, type CartData, type CartItem } from "@/shared/subjects/cart.subject";
 import { orderSessionsService } from "@/services/order-sessions/order-sessions.service";
+import { ordersService } from "@/services/orders/orders.service";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { UserProfileEnum } from "@/shared/constants/user-profile";
 import { logger } from "@/lib/logger";
@@ -13,6 +15,7 @@ interface UseCartReturn {
   removeItem: (productId: string) => Promise<void>;
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
+  confirmOrder: () => Promise<boolean>;
   isLoading: boolean;
 }
 
@@ -20,6 +23,7 @@ export function useCart(): UseCartReturn {
   const [cart, setCart] = useState<CartData>(cartObservable.getValue());
   const [isLoading, setIsLoading] = useState(false);
   const { auth } = useAuth();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const subscription = cartObservable.subscribe(setCart);
@@ -173,6 +177,45 @@ export function useCart(): UseCartReturn {
     }
   };
 
+  const confirmOrder = async (): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      const currentCart = cartObservable.getValue();
+      const isMesaProfile = auth?.profile === UserProfileEnum.MESA;
+
+      const orderItems = currentCart.items.map((item) => ({
+        name: item.productName,
+        quantity: item.quantity,
+        price: item.productPrice,
+      }));
+
+      const hasSessionId = Boolean(currentCart.orderSessionId);
+      const orderSessionId = hasSessionId && isMesaProfile
+        ? (currentCart.orderSessionId as string)
+        : undefined;
+
+      const result = await ordersService.create({ items: orderItems, orderSessionId });
+      const hasError = "error" in result;
+      if (hasError) {
+        toast.error(result.error);
+        logger.error("Erro ao criar pedido", new Error(result.error));
+        return false;
+      }
+
+      cartObservable.clearCart();
+
+      const sessionStaysOpen = isMesaProfile && hasSessionId;
+      if (sessionStaysOpen) {
+        cartObservable.setOrderSession(currentCart.orderSessionId);
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      return true;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     cart,
     itemCount: cartObservable.getItemCount(),
@@ -180,6 +223,7 @@ export function useCart(): UseCartReturn {
     removeItem,
     updateQuantity,
     clearCart,
+    confirmOrder,
     isLoading,
   };
 }

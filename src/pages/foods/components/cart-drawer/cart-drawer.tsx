@@ -2,6 +2,8 @@ import { useState, useCallback, useMemo } from "react";
 import { ShoppingBag, Trash2, Plus, Minus, X } from "lucide-react";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useCart } from "@/shared/hooks/useCart";
+import { useAuth } from "@/shared/hooks/useAuth";
+import { UserProfileEnum } from "@/shared/constants/user-profile";
 import type { CartItem } from "@/shared/subjects/cart.subject";
 
 interface CartItemRowProps {
@@ -85,10 +87,18 @@ interface CartDrawerProps {
 
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { t } = useTranslation();
-  const { cart, itemCount, removeItem, updateQuantity, clearCart, isLoading } = useCart();
+  const { auth } = useAuth();
+  const { cart, itemCount, removeItem, updateQuantity, clearCart, confirmOrder, isLoading } = useCart();
   const [isConfirming, setIsConfirming] = useState(false);
 
   const formattedTotal = useMemo(() => formatPrice(cart.total), [cart.total]);
+
+  const isMesaProfile = auth?.profile === UserProfileEnum.MESA;
+
+  const confirmButtonLabel = useMemo(() => {
+    if (isMesaProfile) return t("cart.sendToKitchen");
+    return t("cart.confirmOrder");
+  }, [isMesaProfile, t]);
 
   const itemCountLabel = useMemo(() => {
     const key = itemCount === 1 ? "cart.itemCount" : "cart.itemCountPlural";
@@ -98,12 +108,14 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const handleConfirmOrder = useCallback(async () => {
     setIsConfirming(true);
     try {
-      await clearCart();
-      onClose();
+      const success = await confirmOrder();
+      if (success) {
+        onClose();
+      }
     } finally {
       setIsConfirming(false);
     }
-  }, [clearCart, onClose]);
+  }, [confirmOrder, onClose]);
 
   const handleCancelOrder = useCallback(async () => {
     await clearCart();
@@ -177,7 +189,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
               className="w-full bg-primary text-primary-foreground font-semibold py-3 px-4 rounded-lg hover:opacity-90 active:opacity-75 hover:cursor-pointer transition-opacity data-[disabled=true]:opacity-50 data-[disabled=true]:pointer-events-none"
               data-testid="confirm-order-button"
             >
-              {t("cart.confirmOrder")}
+              {confirmButtonLabel}
             </button>
             <button
               onClick={handleCancelOrder}

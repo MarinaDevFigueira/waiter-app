@@ -16,9 +16,9 @@ export function OrderSessionButton({ hasActiveSession, onClick }: OrderSessionBu
       onClick={onClick}
       data-testid="order-session-button"
       aria-label={t("orderSession.viewSummary")}
-      className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary bg-primary text-primary-foreground hover:opacity-90 active:shadow-sm hover:cursor-pointer transition-opacity"
+      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-primary bg-primary text-primary-foreground hover:opacity-90 active:shadow-sm hover:cursor-pointer transition-opacity"
     >
-      <Receipt className="w-4 h-4" />
+      <Receipt className="w-5 h-5 shrink-0" />
       <span className="text-sm font-medium">{t("orderSession.viewSummary")}</span>
     </button>
   );

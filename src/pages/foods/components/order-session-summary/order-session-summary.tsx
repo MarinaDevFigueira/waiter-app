@@ -1,11 +1,11 @@
 import { X } from "lucide-react";
 import { useTranslation } from "@/shared/hooks/useTranslation";
-import type { OrderSessionSummary } from "@/services/order-sessions/order-sessions.schema";
+import { useOrderSessionOrders } from "@/shared/hooks/useOrderSessionOrders";
 
 interface OrderSessionSummaryModalProps {
   open: boolean;
   onClose: () => void;
-  summary: OrderSessionSummary | null;
+  orderSessionId: string | null;
   onCloseSession: () => void;
   isClosing: boolean;
 }
@@ -20,15 +20,26 @@ const formatPrice = (price: number): string => {
 export function OrderSessionSummaryModal({
   open,
   onClose,
-  summary,
+  orderSessionId,
   onCloseSession,
   isClosing,
 }: OrderSessionSummaryModalProps) {
   const { t } = useTranslation();
+  const { data: ordersData, isLoading } = useOrderSessionOrders(
+    open ? orderSessionId : null
+  );
 
-  if (!open || !summary) return null;
+  if (!open) return null;
 
-  const formattedTotal = formatPrice(summary.totalAmount);
+  const orders = ordersData?.items ?? [];
+
+  const totalAmount = orders.reduce((sum, order) => {
+    return sum + order.items.reduce((itemSum, item) => {
+      return itemSum + item.preco * item.quantity;
+    }, 0);
+  }, 0);
+
+  const formattedTotal = formatPrice(totalAmount);
 
   return (
     <div
@@ -48,7 +59,17 @@ export function OrderSessionSummaryModal({
         </div>
 
         <div className="p-4 space-y-4 overflow-y-auto flex-1">
-          {summary.orders.map((order) => {
+          {isLoading && (
+            <div className="flex items-center justify-center py-8">
+              <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            </div>
+          )}
+          {!isLoading && orders.length === 0 && (
+            <p className="text-center text-muted-foreground select-none py-8">
+              {t("orderSession.noOrders")}
+            </p>
+          )}
+          {!isLoading && orders.map((order) => {
             const shortId = order.id.slice(0, 8);
             return (
               <div key={order.id} className="border border-border rounded-lg p-4">
@@ -57,10 +78,10 @@ export function OrderSessionSummaryModal({
                   <span className="text-xs text-muted-foreground select-none">{order.status}</span>
                 </div>
                 <ul className="space-y-2">
-                  {order.items.map((item) => {
-                    const itemTotal = formatPrice(item.price * item.quantity);
+                  {order.items.map((item, index) => {
+                    const itemTotal = formatPrice(item.preco * item.quantity);
                     return (
-                      <li key={item.id} className="flex justify-between text-sm">
+                      <li key={index} className="flex justify-between text-sm">
                         <span>{item.quantity}x {item.name}</span>
                         <span className="font-medium">{itemTotal}</span>
                       </li>

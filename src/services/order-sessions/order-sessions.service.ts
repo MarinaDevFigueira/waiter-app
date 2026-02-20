@@ -70,6 +70,13 @@ export const orderSessionsService = {
 
       const hasError = "error" in result;
       if (hasError) {
+        const isNotFound =
+          result.error.includes("404") ||
+          result.error.toLowerCase().includes("not found") ||
+          result.error.toLowerCase().includes("não encontrad");
+        if (isNotFound) {
+          return { data: null };
+        }
         return { error: result.error };
       }
 

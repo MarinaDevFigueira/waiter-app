@@ -73,6 +73,7 @@
     "emptyDescription": "Add items to your order to continue",
     "total": "Total",
     "confirmOrder": "Confirm Order",
+    "sendToKitchen": "Send to Kitchen",
     "cancelOrder": "Cancel Order",
     "removeItem": "Remove item",
     "itemCount": "{{count}} item",
@@ -240,11 +241,18 @@
     }
   },
   "orderSession": {
-    "viewSummary": "Request Bill",
+    "viewSummary": "View Summary",
     "summary": "Order Summary",
     "total": "Total",
-    "closeSession": "Close Bill",
-    "sessionClosed": "Bill closed successfully"
+    "closeSession": "Close Session",
+    "sessionClosed": "Bill closed successfully",
+    "sessionClosedAndLoggedOut": "Session closed. Goodbye!",
+    "noOrders": "No orders found for this session."
+  },
+  "logout": {
+    "confirmWithActiveSession": "Close active session?",
+    "activeSessionWarning": "You have an active session. When you leave, the session will be automatically closed.",
+    "closeSessionAndLogout": "Close and Logout"
   },
   "notFound": {
     "errorCode": "404",

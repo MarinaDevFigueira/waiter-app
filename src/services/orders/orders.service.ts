@@ -43,7 +43,7 @@ function mapApiOrderToOrder(raw: ApiOrder): Order {
 }
 
 export const ordersService = {
-  async getAll(filters: { status?: string; search?: string; orderBy?: string; direction?: string; page?: number; size?: number } = {}): Promise<ServiceResult<PaginatedOrders>> {
+  async getAll(filters: { status?: string; search?: string; orderBy?: string; direction?: string; page?: number; size?: number; orderSessionId?: string } = {}): Promise<ServiceResult<PaginatedOrders>> {
     try {
       const params = new URLSearchParams();
       if (filters.status) params.set("status", filters.status);
@@ -52,6 +52,7 @@ export const ordersService = {
       if (filters.direction) params.set("direction", filters.direction);
       if (filters.page != null) params.set("page", String(filters.page));
       if (filters.size != null) params.set("size", String(filters.size));
+      if (filters.orderSessionId) params.set("orderSessionId", filters.orderSessionId);
 
       const query = params.toString();
       const path = query ? `/orders?${query}` : "/orders";

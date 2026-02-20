@@ -73,6 +73,7 @@
     "emptyDescription": "Adicione itens ao pedido para continuar",
     "total": "Total",
     "confirmOrder": "Confirmar Pedido",
+    "sendToKitchen": "Enviar para a Cozinha",
     "cancelOrder": "Cancelar Pedido",
     "removeItem": "Remover item",
     "itemCount": "{{count}} item",
@@ -244,11 +245,18 @@
     }
   },
   "orderSession": {
-    "viewSummary": "Pedir a Conta",
+    "viewSummary": "Exibir Resumo",
     "summary": "Resumo do Pedido",
     "total": "Total",
-    "closeSession": "Encerrar Conta",
-    "sessionClosed": "Conta encerrada com sucesso"
+    "closeSession": "Encerrar Sessão",
+    "sessionClosed": "Conta encerrada com sucesso",
+    "sessionClosedAndLoggedOut": "Sessão encerrada. Até logo!",
+    "noOrders": "Nenhum pedido encontrado para esta sessão."
+  },
+  "logout": {
+    "confirmWithActiveSession": "Encerrar sessão ativa?",
+    "activeSessionWarning": "Você possui uma sessão ativa. Ao sair, a sessão será encerrada automaticamente.",
+    "closeSessionAndLogout": "Encerrar e Sair"
   },
   "notFound": {
     "errorCode": "404",
