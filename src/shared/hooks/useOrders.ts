@@ -1,11 +1,11 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { logger } from "@/lib/logger";
 import { kitchenOrdersObservable } from "@/shared/subjects/kitchen-orders.subject";
 import { ordersService } from "@/services/orders/orders.service";
 import type { PaginatedOrders } from "@/services/orders/orders.service";
-import type { OrderStatus } from "@/shared/schemas/order.schema";
+import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
 import type { OrdersQueryParams, UseOrdersReturn } from "@/shared/hooks/useOrders.interface";
@@ -20,7 +20,7 @@ const DEFAULT_QUERY_PARAMS: OrdersQueryParams = {
 
 export function useOrders(): UseOrdersReturn {
   const queryClient = useQueryClient();
-  const [orders, setOrders] = useState(kitchenOrdersObservable.getValue());
+  const [optimisticOrders, setOptimisticOrders] = useState<Order[]>(kitchenOrdersObservable.getValue());
   const [queryParams, setQueryParams] = useState<OrdersQueryParams>(DEFAULT_QUERY_PARAMS);
 
   const { data, isLoading } = useQuery<PaginatedOrders | null>({
@@ -49,9 +49,17 @@ export function useOrders(): UseOrdersReturn {
   });
 
   useEffect(() => {
-    const subscription = kitchenOrdersObservable.subscribe(setOrders);
+    const subscription = kitchenOrdersObservable.subscribe(setOptimisticOrders);
     return () => subscription.unsubscribe();
   }, []);
+
+  const orders = useMemo<Order[]>(() => {
+    const hasOptimisticData = optimisticOrders.length > 0;
+    if (hasOptimisticData) return optimisticOrders;
+    const hasCachedItems = data?.items != null;
+    if (hasCachedItems) return data.items;
+    return [];
+  }, [data, optimisticOrders]);
 
   const updateOrderStatus = useCallback(async (orderId: string, status: OrderStatus) => {
     kitchenOrdersObservable.updateOrderStatus(orderId, status);
@@ -63,8 +71,9 @@ export function useOrders(): UseOrdersReturn {
       const error = new Error(result.error);
       toast.error(result.error);
       logger.error("Erro ao atualizar status do pedido", error);
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
     }
+
+    queryClient.invalidateQueries({ queryKey: ["orders"] });
   }, [queryClient]);
 
   const refetch = useCallback(() => {

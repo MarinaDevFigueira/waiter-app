@@ -108,10 +108,11 @@ export const ordersService = {
     }
   },
 
-  async create(data: CreateOrderRequest): Promise<ServiceResult<Order>> {
+  async create(data: CreateOrderRequest): Promise<ServiceResult<void>> {
     try {
       const validated = createOrderRequestSchema.safeParse(data);
-      if (!validated.success) {
+      const validationFailed = !validated.success;
+      if (validationFailed) {
         return { error: "Dados do pedido inválidos" };
       }
 
@@ -122,12 +123,7 @@ export const ordersService = {
         return { error: result.error };
       }
 
-      const parsed = apiOrderSchema.safeParse(result.data);
-      if (!parsed.success) {
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiOrderToOrder(parsed.data) };
+      return { data: undefined };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao criar pedido";
@@ -138,10 +134,11 @@ export const ordersService = {
   async updateStatus(
     orderId: string,
     status: OrderStatus
-  ): Promise<ServiceResult<Order>> {
+  ): Promise<ServiceResult<void>> {
     try {
       const validated = updateOrderStatusSchema.safeParse({ status });
-      if (!validated.success) {
+      const validationFailed = !validated.success;
+      if (validationFailed) {
         return { error: "Status inválido" };
       }
 
@@ -154,12 +151,7 @@ export const ordersService = {
         return { error: result.error };
       }
 
-      const parsed = apiOrderSchema.safeParse(result.data);
-      if (!parsed.success) {
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiOrderToOrder(parsed.data) };
+      return { data: undefined };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar status do pedido";
