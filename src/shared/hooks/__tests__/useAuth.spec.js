@@ -17,11 +17,12 @@ test.describe("useAuth Hook", () => {
     expect(page.url()).toContain("/dashboard");
   });
 
-  test("should authenticate attendant user", async ({ page }) => {
+  test("should authenticate table user", async ({ page }) => {
     await loginAsAttendant(page);
 
-    await page.waitForURL("/dashboard");
-    expect(page.url()).toContain("/dashboard");
+    await page.waitForURL("/");
+    const titleElement = page.locator("p").filter({ hasText: "Bem vindo(a) ao" });
+    await expect(titleElement).toBeVisible();
   });
 
   test("should authenticate mesa user", async ({ page }) => {
@@ -35,8 +36,8 @@ test.describe("useAuth Hook", () => {
   test("should authenticate kitchen user", async ({ page }) => {
     await loginAsKitchen(page);
 
-    await page.waitForURL("/");
-    expect(page.url()).not.toContain("/login");
+    await page.waitForURL("/dashboard");
+    expect(page.url()).toContain("/dashboard");
   });
 
   test("should store auth state after login", async ({ page }) => {
@@ -54,11 +55,12 @@ test.describe("useAuth Hook", () => {
     expect(page.url()).toContain("/dashboard");
   });
 
-  test("should have attendant profile for attendant user", async ({ page }) => {
+  test("should have table profile for table user", async ({ page }) => {
     await loginAsAttendant(page);
 
     await page.waitForTimeout(500);
-    expect(page.url()).toContain("/dashboard");
+    const titleElement = page.locator("p").filter({ hasText: "Bem vindo(a) ao" });
+    await expect(titleElement).toBeVisible();
   });
 
   test("should have mesa profile for mesa user", async ({ page }) => {
@@ -73,7 +75,7 @@ test.describe("useAuth Hook", () => {
     await loginAsKitchen(page);
 
     await page.waitForTimeout(500);
-    expect(page.url()).not.toContain("/login");
+    expect(page.url()).toContain("/dashboard");
   });
 
   test("should redirect to login when not authenticated", async ({ page }) => {

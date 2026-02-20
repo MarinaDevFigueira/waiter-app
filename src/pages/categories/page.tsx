@@ -1,19 +1,19 @@
 import { useState, useCallback } from "react";
-import { ProductsTable } from "@/pages/products/components/products-table";
-import { ProductsTableSkeleton } from "@/pages/products/components/products-table-skeleton";
-import { ProductsFilters } from "@/pages/products/components/products-filters";
-import { ProductFormDialog } from "@/pages/products/components/product-form-dialog";
+import { CategoriesTable } from "@/pages/categories/components/categories-table";
+import { CategoriesTableSkeleton } from "@/pages/categories/components/categories-table-skeleton";
+import { CategoriesSearch } from "@/pages/categories/components/categories-search";
+import { CategoryFormDialog } from "@/pages/categories/components/category-form-dialog";
 import { Pagination } from "@/components/ui/pagination/pagination";
 import { Button } from "@/components/ui/button/button";
-import { useProducts } from "@/shared/hooks/useProducts";
 import { useCategories } from "@/shared/hooks/useCategories";
 import { usePagination } from "@/shared/hooks/usePagination";
 import { useTranslation } from "@/shared/hooks/useTranslation";
-import type { Product } from "@/shared/schemas/product.schema";
+import type { Category } from "@/shared/schemas/category.schema";
 
-export function ProductsPage() {
+export function CategoriesPage() {
+  const { t } = useTranslation();
   const {
-    products,
+    categories,
     total,
     page,
     size,
@@ -24,21 +24,21 @@ export function ProductsPage() {
     isError,
     error,
     queryParams,
+    updateSearch,
     updateSorting,
     updatePagination,
-  } = useProducts();
-  const { categories } = useCategories({ initialSize: 100 });
-  const { t } = useTranslation();
-  const [formOpen, setFormOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
+  } = useCategories(t("categories.errors.loadCategories"));
 
-  const handleNewProduct = useCallback(() => {
-    setSelectedProduct(undefined);
+  const [formOpen, setFormOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
+
+  const handleNewCategory = useCallback(() => {
+    setSelectedCategory(undefined);
     setFormOpen(true);
   }, []);
 
-  const handleEditProduct = useCallback((product: Product) => {
-    setSelectedProduct(product);
+  const handleEditCategory = useCallback((category: Category) => {
+    setSelectedCategory(category);
     setFormOpen(true);
   }, []);
 
@@ -52,31 +52,39 @@ export function ProductsPage() {
     onPageChange: updatePagination,
   });
 
+  const sortingState = {
+    orderBy: queryParams.orderBy,
+    direction: queryParams.direction,
+  };
+
+  const hasError = isError;
+  const isLoadingData = isLoading;
+  const hasNoCategories = categories.length === 0;
+  const errorMessage = error?.message;
+  const showTable = !hasError && !isLoadingData && !hasNoCategories;
+  const showSkeleton = !hasError && isLoadingData;
+  const showEmpty = !hasError && !isLoadingData && hasNoCategories;
+
   const pageHeader = (
     <div className="flex items-start justify-between">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          {t("products.pageTitle")}
+          {t("categories.pageTitle")}
         </h1>
         <p className="text-muted-foreground">
-          {t("products.pageSubtitle")}
+          {t("categories.pageSubtitle")}
         </p>
       </div>
-      <Button onClick={handleNewProduct} data-testid="new-product-button">
-        {t("common.buttons.new")} {t("products.pageTitle")}
+      <Button onClick={handleNewCategory} data-testid="new-category-button">
+        {t("common.buttons.new")} {t("categories.pageTitle")}
       </Button>
     </div>
   );
 
-  const hasError = isError;
-  const isLoadingData = isLoading;
-  const hasNoProducts = products.length === 0;
-  const errorMessage = error?.message;
-
   const errorContent = (
     <div className="rounded-lg border border-destructive bg-destructive/10 p-4">
       <p className="text-sm text-destructive">
-        {t("products.errors.loadProducts")} {errorMessage}
+        {t("categories.errors.loadCategories")} {errorMessage}
       </p>
     </div>
   );
@@ -84,47 +92,37 @@ export function ProductsPage() {
   const emptyContent = (
     <div className="rounded-lg border border-border bg-card p-8 text-center">
       <p className="text-muted-foreground">
-        {t("products.emptyState.title")}
+        {t("categories.emptyState.title")}
       </p>
     </div>
   );
-
-  const sortingState = {
-    orderBy: queryParams.orderBy,
-    direction: queryParams.direction,
-  };
-
-  const showTable = !hasError && !isLoadingData && !hasNoProducts;
-  const showSkeleton = !hasError && isLoadingData;
-  const showEmpty = !hasError && !isLoadingData && hasNoProducts;
 
   return (
     <div className="flex flex-col h-full gap-6">
       {pageHeader}
 
-      <ProductsFilters />
+      <CategoriesSearch onSearch={updateSearch} />
 
       {hasError && errorContent}
 
-      {showSkeleton && <ProductsTableSkeleton />}
+      {showSkeleton && <CategoriesTableSkeleton />}
 
       {showEmpty && emptyContent}
 
-      <ProductFormDialog
+      <CategoryFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}
-        product={selectedProduct}
+        category={selectedCategory}
       />
 
       {showTable && (
         <div className="flex-1 min-h-0 flex flex-col gap-3">
           <div className="flex-1 min-h-0">
-            <ProductsTable
-              products={products}
+            <CategoriesTable
               categories={categories}
               sorting={sortingState}
               onSortingChange={updateSorting}
-              onEdit={handleEditProduct}
+              onEdit={handleEditCategory}
             />
           </div>
 

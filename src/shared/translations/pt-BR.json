@@ -150,7 +150,52 @@
           "timestamp": "Horário",
           "createdAt": "Criado em"
         },
-        "itemsTotal": "itens"
+        "itemsTotal": "itens",
+        "total": "Total"
+      }
+    }
+  },
+  "categories": {
+    "pageTitle": "Categorias",
+    "pageSubtitle": "Gerencie as categorias de produtos do restaurante",
+    "errors": {
+      "loadCategories": "Erro ao carregar categorias:"
+    },
+    "emptyState": {
+      "title": "Nenhuma categoria cadastrada"
+    },
+    "table": {
+      "columns": {
+        "name": "Nome",
+        "description": "Descrição",
+        "sortOrder": "Ordem",
+        "status": "Status"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar categorias..."
+    },
+    "form": {
+      "createTitle": "Nova Categoria",
+      "editTitle": "Editar Categoria",
+      "createButton": "Criar Categoria",
+      "saveButton": "Salvar",
+      "createSuccess": "Categoria criada com sucesso!",
+      "updateSuccess": "Categoria atualizada com sucesso!",
+      "createError": "Erro ao criar categoria",
+      "updateError": "Erro ao atualizar categoria",
+      "deleteSuccess": "Categoria removida com sucesso!",
+      "deleteError": "Erro ao remover categoria",
+      "fields": {
+        "name": "Nome",
+        "description": "Descrição",
+        "sortOrder": "Ordem de exibição",
+        "active": "Categoria ativa"
+      },
+      "placeholders": {
+        "name": "Ex: Pizzas",
+        "description": "Descreva a categoria...",
+        "sortOrder": "0"
       }
     }
   },
@@ -160,6 +205,7 @@
       "orders": "Pedidos",
       "reports": "Relatórios",
       "products": "Produtos",
+      "categories": "Categorias",
       "users": "Usuários",
       "settings": "Configurações"
     },
@@ -170,6 +216,7 @@
       "reports": "Relatórios",
       "settings": "Configurações",
       "products": "Produtos",
+      "categories": "Categorias",
       "edit": "Editar",
       "new": "Novo"
     }

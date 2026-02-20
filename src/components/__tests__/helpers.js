@@ -35,10 +35,10 @@ export async function loginAsAdmin(page) {
 }
 
 /**
- * Login as attendant user (redirects to /dashboard)
+ * Login as attendant/table user (redirects to /)
  */
 export async function loginAsAttendant(page) {
-  await loginAs(page, "atendente", "123", "/dashboard");
+  await loginAs(page, "atendente", "123", "/");
 }
 
 /**
@@ -56,7 +56,7 @@ export async function loginAsDelivery(page) {
 }
 
 /**
- * Login as kitchen user (sees KitchenPage)
+ * Login as kitchen user (redirects to /dashboard)
  */
 export async function loginAsKitchen(page) {
   await loginAs(page, "chefecozin", "123", "/dashboard");

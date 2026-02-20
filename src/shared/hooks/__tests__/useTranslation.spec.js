@@ -3,6 +3,9 @@ import { loginAsAdmin } from "@/components/__tests__/helpers";
 
 test.describe("useTranslation Hook", () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem("orders-view", "kitchen");
+    });
     await loginAsAdmin(page);
     await page.waitForTimeout(500);
   });

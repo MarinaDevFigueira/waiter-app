@@ -11,6 +11,7 @@ import {
   CaretRightIcon,
   CookingPotIcon,
   List,
+  FolderIcon,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
@@ -76,6 +77,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps): JSX.Element
     ];
 
     const adminOnlyItems: MenuItem[] = [
+      { icon: FolderIcon, label: t("dashboard.navigation.categories"), path: "/dashboard/categories" },
       { icon: UsersIcon, label: t("dashboard.navigation.users"), path: "/dashboard/users" },
       {
         icon: GearIcon,
@@ -117,6 +119,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps): JSX.Element
       reports: t("dashboard.breadcrumbs.reports"),
       settings: t("dashboard.breadcrumbs.settings"),
       products: t("dashboard.breadcrumbs.products"),
+      categories: t("dashboard.breadcrumbs.categories"),
       edit: t("dashboard.breadcrumbs.edit"),
       new: t("dashboard.breadcrumbs.new"),
     };

@@ -29,6 +29,7 @@ const roleToProfile: Record<string, UserProfile> = {
   table: UserProfileEnum.MESA,
   kitchen: UserProfileEnum.COZINHA,
   customer: UserProfileEnum.DELIVERY,
+  attendant: UserProfileEnum.ATTENDANT,
 };
 
 class AuthService {

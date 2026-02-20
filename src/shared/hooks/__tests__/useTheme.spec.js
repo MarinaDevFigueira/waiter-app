@@ -73,7 +73,7 @@ test.describe("useTheme Hook", () => {
   });
 
   test("should handle rapid theme toggles", async ({ page }) => {
-    const themeToggle = page.locator("button").filter({ has: page.locator("svg") }).nth(1);
+    const themeToggle = page.getByTestId("theme-toggle");
 
     await themeToggle.click();
     await themeToggle.click();

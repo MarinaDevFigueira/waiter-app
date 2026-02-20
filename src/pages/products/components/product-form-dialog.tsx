@@ -7,10 +7,12 @@ import { Dialog } from "@/components/ui/dialog/dialog";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
 import { Label } from "@/components/ui/label/label";
+import { Combobox } from "@/components/ui/combobox/combobox";
 import { productsService } from "@/services/products/products.service";
 import { productFormSchema } from "@/shared/schemas/product.schema";
 import type { Product, ProductForm } from "@/shared/schemas/product.schema";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import { useCategories } from "@/shared/hooks/useCategories";
 
 interface ProductFormDialogProps {
   open: boolean;
@@ -92,17 +94,21 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
   const queryClient = useQueryClient();
   const isEditing = product !== undefined;
 
+  const { categories, isLoading: isLoadingCategories } = useCategories({ initialSize: 100 });
+
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<ProductForm>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
       name: "",
       description: "",
-      category: "",
+      categoryId: "",
       price: 0,
       stock: 0,
       unit: "un",
@@ -117,7 +123,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
       reset({
         name: product.name,
         description: product.description ?? "",
-        category: product.category,
+        categoryId: product.categoryId,
         price: product.price,
         stock: product.stock,
         unit: product.unit,
@@ -132,7 +138,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
       reset({
         name: "",
         description: "",
-        category: "",
+        categoryId: "",
         price: 0,
         stock: 0,
         unit: "un",
@@ -228,15 +234,22 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
 
             <Field
               label={t("products.form.fields.category")}
-              htmlFor="category"
-              error={errors.category?.message}
+              htmlFor="categoryId"
+              error={errors.categoryId?.message}
               required
             >
-              <Input
-                id="category"
-                {...register("category")}
-                aria-invalid={errors.category ? true : undefined}
+              <Combobox
+                options={categories.map((cat) => ({
+                  value: cat.id,
+                  label: cat.name,
+                }))}
+                value={watch("categoryId")}
+                onChange={(value) => setValue("categoryId", value)}
                 placeholder={t("products.form.placeholders.category")}
+                searchPlaceholder="Buscar categoria..."
+                emptyMessage="Nenhuma categoria encontrada"
+                isLoading={isLoadingCategories}
+                disabled={isPending}
               />
             </Field>
 
