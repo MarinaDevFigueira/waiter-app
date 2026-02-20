@@ -18,7 +18,7 @@ function mapApiProductToProduct(raw: ApiProduct): Product {
     id: raw.id,
     name: raw.name,
     description: raw.description ?? undefined,
-    category: raw.category,
+    categoryId: raw.categoryId,
     price: raw.price,
     stock: raw.stock,
     unit: raw.unit as Product["unit"],

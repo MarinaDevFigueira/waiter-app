@@ -16,6 +16,7 @@ import { useTranslation } from "@/shared/hooks/useTranslation";
 import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type { Product } from "@/shared/schemas/product.schema";
+import type { Category } from "@/shared/schemas/category.schema";
 
 interface SortingConfig {
   orderBy: ProductsOrderByEnum;
@@ -24,14 +25,22 @@ interface SortingConfig {
 
 interface ProductsTableProps {
   products: Product[];
+  categories: Category[];
   sorting: SortingConfig;
   onSortingChange: (orderBy: ProductsOrderByEnum, direction: SortDirection) => void;
   onEdit: (product: Product) => void;
 }
 
-export function ProductsTable({ products, sorting, onSortingChange, onEdit }: ProductsTableProps) {
+export function ProductsTable({ products, categories, sorting, onSortingChange, onEdit }: ProductsTableProps) {
   const { t } = useTranslation();
   const hasSortingConfig = Boolean(sorting?.orderBy);
+
+  const categoryIds = categories.map(c => c.id).join(',');
+
+  const getCategoryName = useCallback((categoryId: string) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category?.name || "—";
+  }, [categoryIds]);
   const tableSorting: SortingState = useMemo(() => {
     if (!hasSortingConfig) return [];
 
@@ -123,11 +132,13 @@ export function ProductsTable({ products, sorting, onSortingChange, onEdit }: Pr
         },
       },
       {
-        accessorKey: "category",
+        accessorKey: "categoryId",
         header: t("products.table.columns.category"),
-        cell: (info) => (
-          <span className="capitalize">{info.getValue() as string}</span>
-        ),
+        cell: (info) => {
+          const categoryId = info.getValue() as string;
+          const categoryName = getCategoryName(categoryId);
+          return <span className="capitalize">{categoryName}</span>;
+        },
       },
       {
         accessorKey: "price",
@@ -199,7 +210,7 @@ export function ProductsTable({ products, sorting, onSortingChange, onEdit }: Pr
       },
     ];
     },
-    [t, getStatusBadge, getStatusValue, formatCurrency, formatDate, onEdit],
+    [t, getStatusBadge, getStatusValue, formatCurrency, formatDate, getCategoryName, onEdit],
   );
 
   const table = useReactTable({
