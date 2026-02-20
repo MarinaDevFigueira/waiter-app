@@ -97,7 +97,9 @@
     },
     "form": {
       "createTitle": "Novo Produto",
+      "createDescription": "Preencha os dados para cadastrar um novo produto",
       "editTitle": "Editar Produto",
+      "editDescription": "Atualize as informações do produto",
       "createButton": "Criar Produto",
       "saveButton": "Salvar",
       "createSuccess": "Produto criado com sucesso!",
@@ -177,7 +179,9 @@
     },
     "form": {
       "createTitle": "Nova Categoria",
+      "createDescription": "Preencha os dados para cadastrar uma nova categoria",
       "editTitle": "Editar Categoria",
+      "editDescription": "Atualize as informações da categoria",
       "createButton": "Criar Categoria",
       "saveButton": "Salvar",
       "createSuccess": "Categoria criada com sucesso!",

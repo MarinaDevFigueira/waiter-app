@@ -200,6 +200,11 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
       <Dialog.Content className="max-w-xl max-h-[90vh] overflow-y-auto">
         <Dialog.Header>
           <Dialog.Title>{dialogTitle}</Dialog.Title>
+          <Dialog.Description>
+            {isEditing
+              ? t("products.form.editDescription")
+              : t("products.form.createDescription")}
+          </Dialog.Description>
           <Dialog.Close />
         </Dialog.Header>
 

@@ -177,6 +177,11 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
       <Dialog.Content className="max-w-md">
         <Dialog.Header>
           <Dialog.Title>{dialogTitle}</Dialog.Title>
+          <Dialog.Description>
+            {isEditing
+              ? t("categories.form.editDescription")
+              : t("categories.form.createDescription")}
+          </Dialog.Description>
           <Dialog.Close />
         </Dialog.Header>
 
