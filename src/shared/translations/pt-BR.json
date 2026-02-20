@@ -150,7 +150,8 @@
           "timestamp": "Horário",
           "createdAt": "Criado em"
         },
-        "itemsTotal": "itens"
+        "itemsTotal": "itens",
+        "total": "Total"
       }
     }
   },

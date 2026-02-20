@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Order } from "@/shared/schemas/order.schema";
+import type { Order, OrderItem } from "@/shared/schemas/order.schema";
 import type { HeaderGroup, Row } from "@tanstack/react-table";
 import type { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
 import type { SortDirection } from "@/shared/enums/sort-direction.enum";
@@ -28,4 +28,14 @@ export interface OrdersTableHeaderProps {
 
 export interface OrdersTableBodyProps {
   rows: Row<Order>[];
+  expandedRowId?: string;
+  onRowToggle: (rowId: string) => void;
+  totalLabel: string;
+}
+
+export interface OrderItemsDetailsProps {
+  items: OrderItem[];
+  columnsCount: number;
+  totalLabel: string;
+  isExpanded: boolean;
 }
