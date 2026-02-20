@@ -21,8 +21,8 @@ test.describe("Foods Component", () => {
   });
 
   test("should render food item with image", async ({ page }) => {
-    const firstFoodItem = page.locator("ul").last().locator("div").first();
-    const image = firstFoodItem.locator("img");
+    const firstFoodItem = page.locator("ul").last().locator("li").first();
+    const image = firstFoodItem.locator("img").first();
 
     await expect(image).toBeVisible();
   });
@@ -68,8 +68,8 @@ test.describe("Foods Component", () => {
   });
 
   test("should display food image with proper styling", async ({ page }) => {
-    const firstFoodItem = page.locator("ul").last().locator("div").first();
-    const image = firstFoodItem.locator("img");
+    const firstFoodItem = page.locator("ul").last().locator("li").first();
+    const image = firstFoodItem.locator("img").first();
 
     const imageClass = await image.getAttribute("class");
     expect(imageClass).toContain("rounded-md");

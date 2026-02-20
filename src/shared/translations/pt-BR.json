@@ -56,11 +56,29 @@
       "pizzas": "Pizzas",
       "drinks": "Bebidas",
       "snacks": "Lanches",
-      "promotions": "Promoções"
+      "promotions": "Promoções",
+      "all": "Todos"
     },
     "actions": {
       "addToOrder": "Adicionar {{name}} ao pedido"
+    },
+    "emptyState": {
+      "noProducts": "Nenhum produto encontrado",
+      "noProductsDescription": "Não há produtos disponíveis nesta categoria"
     }
+  },
+  "cart": {
+    "title": "Meu Pedido",
+    "empty": "Seu carrinho está vazio",
+    "emptyDescription": "Adicione itens ao pedido para continuar",
+    "total": "Total",
+    "confirmOrder": "Confirmar Pedido",
+    "cancelOrder": "Cancelar Pedido",
+    "removeItem": "Remover item",
+    "itemCount": "{{count}} item",
+    "itemCountPlural": "{{count}} itens",
+    "orderConfirmed": "Pedido confirmado!",
+    "orderCancelled": "Pedido cancelado"
   },
   "products": {
     "pageTitle": "Produtos",

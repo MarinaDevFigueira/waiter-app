@@ -49,7 +49,7 @@ export const productsService = {
 
       if (filters.search) params.set("search", filters.search);
       if (filters.categoria?.length) {
-        params.set("category", filters.categoria.join(","));
+        params.set("categoryId", filters.categoria.join(","));
       }
       if (filters.precoMin !== undefined) params.set("priceMin", String(filters.precoMin));
       if (filters.precoMax !== undefined) params.set("priceMax", String(filters.precoMax));

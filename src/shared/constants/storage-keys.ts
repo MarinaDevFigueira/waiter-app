@@ -6,6 +6,7 @@ export const StorageKeys = Object.freeze({
   THEME: "theme",
   LANGUAGE: "language",
   ORDERS_VIEW: "orders-view",
+  CART: "cart",
 });
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

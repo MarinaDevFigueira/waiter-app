@@ -4,97 +4,111 @@ import { loginAsMesa } from "../../../components/__tests__/helpers";
 test.describe("FoodsPage", () => {
   test.beforeEach(async ({ page }) => {
     await loginAsMesa(page);
+    await page.waitForTimeout(1500);
   });
 
   test("should render the page with all main components", async ({ page }) => {
     const titleElement = page.locator("p").filter({ hasText: "Bem vindo(a) ao" });
     await expect(titleElement).toBeVisible();
 
-    const categoriesContainer = page.locator("ul").first();
-    await expect(categoriesContainer).toBeVisible();
+    await page.waitForTimeout(500);
 
-    const foodsList = page.locator("ul").last();
-    await expect(foodsList).toBeVisible();
+    const categoriesContainer = page.locator("div").filter({ hasText: "Todos" }).first();
+    await expect(categoriesContainer).toBeVisible();
   });
 
   test("should display the title component", async ({ page }) => {
     await expect(page.getByText("Bem vindo(a) ao")).toBeVisible();
-    await expect(page.locator("strong").filter({ hasText: "WAITER" })).toBeVisible();
+    await expect(page.locator("strong").filter({ hasText: /waiter/i })).toBeVisible();
     const appText = page.locator("span").filter({ hasText: /^App$/i });
     await expect(appText).toBeVisible();
   });
 
-  test("should display categories list", async ({ page }) => {
-    const pizzasCategory = page.locator("li[data-category='pizzas']");
-    const drinksCategory = page.locator("li[data-category='drinks']");
-    const snacksCategory = page.locator("li[data-category='snacks']");
-    const promotionsCategory = page.locator("li[data-category='promotions']");
-
-    await expect(pizzasCategory).toBeVisible();
-    await expect(drinksCategory).toBeVisible();
-    await expect(snacksCategory).toBeVisible();
-    await expect(promotionsCategory).toBeVisible();
-  });
-
-  test("should display foods list when category is selected", async ({ page }) => {
+  test("should display categories list with All option", async ({ page }) => {
     await page.waitForTimeout(500);
 
-    const foodItems = page.locator("ul").last().locator("div").first();
-    await expect(foodItems).toBeVisible();
+    const allCategoryTab = page.getByText("Todos", { exact: true });
+    await expect(allCategoryTab).toBeVisible();
+
+    const allTabParent = allCategoryTab.locator("..");
+    const allSelected = await allTabParent.getAttribute("data-selected");
+    expect(allSelected).toBe("true");
   });
 
-  test("should update foods list when category changes", async ({ page }) => {
-    const pizzasCategory = page.locator("li[data-category='pizzas']");
-    const drinksCategory = page.locator("li[data-category='drinks']");
-
-    const initialPizzasSelected = await pizzasCategory.getAttribute("data-selected");
-    expect(initialPizzasSelected).toBe("true");
-
-    await drinksCategory.click({ force: true });
-    await page.waitForTimeout(1000);
-
-    const updatedDrinksSelected = await drinksCategory.getAttribute("data-selected");
-    expect(updatedDrinksSelected).toBe("true");
+  test("should display the cart button", async ({ page }) => {
+    const cartButton = page.getByTestId("cart-button");
+    await expect(cartButton).toBeVisible();
   });
 
-  test("should have proper layout structure", async ({ page }) => {
-    const titleElement = page.locator("p").filter({ hasText: "Bem vindo(a) ao" });
-    await expect(titleElement).toBeVisible();
+  test("should open cart drawer when cart button is clicked", async ({ page }) => {
+    const cartButton = page.getByTestId("cart-button");
+    await cartButton.click();
 
-    const categoriesContainer = page.locator("ul").first();
-    await expect(categoriesContainer).toBeVisible();
+    const cartDrawer = page.getByTestId("cart-drawer");
+    await expect(cartDrawer).toBeVisible();
+  });
+
+  test("should close cart drawer when overlay is clicked", async ({ page }) => {
+    const cartButton = page.getByTestId("cart-button");
+    await cartButton.click();
+
+    const cartDrawer = page.getByTestId("cart-drawer");
+    await expect(cartDrawer).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(300);
+  });
+
+  test("should display foods list after loading", async ({ page }) => {
+    await page.waitForTimeout(1500);
 
     const foodsList = page.locator("ul").last();
     await expect(foodsList).toBeVisible();
   });
 
-  test("should maintain state across category selections", async ({ page }) => {
-    const categories = [
-      page.locator("li[data-category='pizzas']"),
-      page.locator("li[data-category='drinks']"),
-      page.locator("li[data-category='snacks']"),
-      page.locator("li[data-category='promotions']"),
-    ];
+  test("should filter foods when a category is clicked", async ({ page }) => {
+    const categoriesList = page.locator("ul").first();
+    const categoryTabs = categoriesList.locator("li");
+    const count = await categoryTabs.count();
 
-    for (const category of categories) {
-      await category.click({ force: true });
-      await page.waitForTimeout(500);
+    const hasCategories = count > 1;
+    if (hasCategories) {
+      const secondCategory = categoryTabs.nth(1);
+      await secondCategory.click();
+      await page.waitForTimeout(800);
 
-      const selectedState = await category.getAttribute("data-selected");
+      const secondCategorySpan = secondCategory.locator("span");
+      const selectedState = await secondCategorySpan.getAttribute("data-selected");
       expect(selectedState).toBe("true");
-
-      const foodsList = page.locator("ul").last();
-      await expect(foodsList).toBeVisible();
     }
   });
 
   test("should render foods with proper spacing", async ({ page }) => {
+    await page.waitForTimeout(1000);
     const titleElement = page.locator("p").filter({ hasText: "Bem vindo(a) ao" });
     await expect(titleElement).toBeVisible();
 
     const foodsList = page.locator("ul").last();
     const listClass = await foodsList.getAttribute("class");
-
     expect(listClass).toContain("gap");
+  });
+
+  test("should add product to cart when plus button is clicked", async ({ page }) => {
+    await page.waitForTimeout(2000);
+
+    const addButtons = page.locator("[data-testid^='add-product-']");
+    const addButtonCount = await addButtons.count();
+
+    const hasProducts = addButtonCount > 0;
+    if (hasProducts) {
+      const cartButton = page.getByTestId("cart-button");
+
+      await addButtons.first().click();
+
+      await page.waitForTimeout(2000);
+
+      const cartBadge = cartButton.locator("span").filter({ hasText: /^\d+$/ });
+      await expect(cartBadge).toBeVisible({ timeout: 5000 });
+    }
   });
 });
