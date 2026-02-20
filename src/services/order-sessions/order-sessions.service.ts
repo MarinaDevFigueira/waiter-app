@@ -1,4 +1,5 @@
 import { api } from "@/services/api";
+import { logger } from "@/lib/logger";
 import {
   apiOrderSessionSchema,
   apiOrderSessionSummarySchema,
@@ -52,7 +53,7 @@ export const orderSessionsService = {
 
       const parsed = apiOrderSessionSchema.safeParse(result.data);
       if (!parsed.success) {
-        console.error(parsed.error);
+        logger.error("[orderSessionsService.open] Erro de validação", new Error(parsed.error.message));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -60,6 +61,7 @@ export const orderSessionsService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao abrir sessão de pedidos";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -87,7 +89,7 @@ export const orderSessionsService = {
 
       const parsed = apiOrderSessionSchema.safeParse(result.data);
       if (!parsed.success) {
-        console.error(parsed.error);
+        logger.error("[orderSessionsService.getActive] Erro de validação", new Error(parsed.error.message));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -95,6 +97,7 @@ export const orderSessionsService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar sessão ativa";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -110,7 +113,7 @@ export const orderSessionsService = {
 
       const parsed = apiOrderSessionSummarySchema.safeParse(result.data);
       if (!parsed.success) {
-        console.error(parsed.error);
+        logger.error("[orderSessionsService.close] Erro de validação", new Error(parsed.error.message));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -118,6 +121,7 @@ export const orderSessionsService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao fechar sessão de pedidos";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -133,7 +137,7 @@ export const orderSessionsService = {
 
       const parsed = apiOrderSessionSummarySchema.safeParse(result.data);
       if (!parsed.success) {
-        console.error(parsed.error);
+        logger.error("[orderSessionsService.getSummary] Erro de validação", new Error(parsed.error.message));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -143,6 +147,7 @@ export const orderSessionsService = {
         error instanceof Error
           ? error.message
           : "Erro ao buscar resumo da sessão de pedidos";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },

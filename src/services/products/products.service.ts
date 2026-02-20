@@ -3,6 +3,7 @@ import { type Product, type ProductForm } from "@/shared/schemas/product.schema"
 import { baseEntityDefaults } from "@/shared/schemas/base-entity.schema";
 import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
 import { formatZodError } from "@/lib/zod-errors";
+import { logger } from "@/lib/logger";
 import {
   apiProductListSchema,
   apiProductSchema,
@@ -71,7 +72,7 @@ export const productsService = {
       const parsed = apiProductListSchema.safeParse(result.data);
       if (!parsed.success) {
         const zodMessage = formatZodError(parsed.error);
-        console.error("[productsService.getAll] Erro de validação:", zodMessage, parsed.error);
+        logger.error("[productsService.getAll] Erro de validação", new Error(zodMessage));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -91,6 +92,7 @@ export const productsService = {
     } catch (error: any) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar produtos";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -107,7 +109,7 @@ export const productsService = {
       const parsed = apiProductSchema.safeParse(result.data);
       if (!parsed.success) {
         const zodMessage = formatZodError(parsed.error);
-        console.error("[productsService.getById] Erro de validação:", zodMessage, parsed.error);
+        logger.error("[productsService.getById] Erro de validação", new Error(zodMessage));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -115,6 +117,7 @@ export const productsService = {
     } catch (error: any) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar produto";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -139,6 +142,7 @@ export const productsService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao criar produto";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -166,6 +170,7 @@ export const productsService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar produto";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -185,6 +190,7 @@ export const productsService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao deletar produto";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },

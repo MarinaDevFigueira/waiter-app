@@ -1,6 +1,7 @@
 import { api } from "@/services/api";
 import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
 import { formatZodError } from "@/lib/zod-errors";
+import { logger } from "@/lib/logger";
 import {
   apiOrderSchema,
   apiOrderPaginatedListSchema,
@@ -68,7 +69,7 @@ export const ordersService = {
       const parsed = apiOrderPaginatedListSchema.safeParse(result.data);
       if (!parsed.success) {
         const zodMessage = formatZodError(parsed.error);
-        console.error("[ordersService.getAll] Erro de validação:", zodMessage, parsed.error);
+        logger.error("[ordersService.getAll] Erro de validação", new Error(zodMessage));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -86,6 +87,7 @@ export const ordersService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar pedidos";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -102,7 +104,7 @@ export const ordersService = {
       const parsed = apiOrderSchema.safeParse(result.data);
       if (!parsed.success) {
         const zodMessage = formatZodError(parsed.error);
-        console.error("[ordersService.getById] Erro de validação:", zodMessage, parsed.error);
+        logger.error("[ordersService.getById] Erro de validação", new Error(zodMessage));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -110,6 +112,7 @@ export const ordersService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar pedido";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -120,7 +123,7 @@ export const ordersService = {
       const validationFailed = !validated.success;
       if (validationFailed) {
         const zodMessage = formatZodError(validated.error);
-        console.error("[ordersService.create] Erro de validação:", zodMessage, validated.error);
+        logger.error("[ordersService.create] Erro de validação", new Error(zodMessage));
         return { error: "Dados do pedido inválidos" };
       }
 
@@ -135,6 +138,7 @@ export const ordersService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao criar pedido";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -148,7 +152,7 @@ export const ordersService = {
       const validationFailed = !validated.success;
       if (validationFailed) {
         const zodMessage = formatZodError(validated.error);
-        console.error("[ordersService.updateStatus] Erro de validação:", zodMessage, validated.error);
+        logger.error("[ordersService.updateStatus] Erro de validação", new Error(zodMessage));
         return { error: "Status inválido" };
       }
 
@@ -165,6 +169,7 @@ export const ordersService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar status do pedido";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },

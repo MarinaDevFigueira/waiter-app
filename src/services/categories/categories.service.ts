@@ -1,6 +1,7 @@
 import { api } from "@/services/api";
 import type { CategoryForm, Category } from "@/shared/schemas/category.schema";
 import { formatZodError } from "@/lib/zod-errors";
+import { logger } from "@/lib/logger";
 import {
   apiCategoryListSchema,
   apiCategorySchema,
@@ -49,7 +50,7 @@ export const categoriesService = {
       const parsed = apiCategoryListSchema.safeParse(result.data);
       if (!parsed.success) {
         const zodMessage = formatZodError(parsed.error);
-        console.error("[categoriesService.getAll] Erro de validação:", zodMessage, parsed.error);
+        logger.error("[categoriesService.getAll] Erro de validação", new Error(zodMessage));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -69,6 +70,7 @@ export const categoriesService = {
     } catch (error: any) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar categorias";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -85,7 +87,7 @@ export const categoriesService = {
       const parsed = apiCategorySchema.safeParse(result.data);
       if (!parsed.success) {
         const zodMessage = formatZodError(parsed.error);
-        console.error("[categoriesService.getById] Erro de validação:", zodMessage, parsed.error);
+        logger.error("[categoriesService.getById] Erro de validação", new Error(zodMessage));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -93,6 +95,7 @@ export const categoriesService = {
     } catch (error: any) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar categoria";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -115,6 +118,7 @@ export const categoriesService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao criar categoria";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -140,6 +144,7 @@ export const categoriesService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar categoria";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -159,6 +164,7 @@ export const categoriesService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao deletar categoria";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
