@@ -6,6 +6,7 @@ import { ProductFormDialog } from "@/pages/products/components/product-form-dial
 import { Pagination } from "@/components/ui/pagination/pagination";
 import { Button } from "@/components/ui/button/button";
 import { useProducts } from "@/shared/hooks/useProducts";
+import { useCategories } from "@/shared/hooks/useCategories";
 import { usePagination } from "@/shared/hooks/usePagination";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import type { Product } from "@/shared/schemas/product.schema";
@@ -26,6 +27,7 @@ export function ProductsPage() {
     updateSorting,
     updatePagination,
   } = useProducts();
+  const { categories } = useCategories({ initialSize: 100 });
   const { t } = useTranslation();
   const [formOpen, setFormOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
@@ -119,6 +121,7 @@ export function ProductsPage() {
           <div className="flex-1 min-h-0">
             <ProductsTable
               products={products}
+              categories={categories}
               sorting={sortingState}
               onSortingChange={updateSorting}
               onEdit={handleEditProduct}

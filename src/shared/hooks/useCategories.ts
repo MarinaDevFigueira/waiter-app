@@ -26,10 +26,18 @@ interface UseCategoriesReturn {
   updatePagination: (page: number, size: number) => void;
 }
 
-export function useCategories(errorMessage?: string): UseCategoriesReturn {
+interface UseCategoriesOptions {
+  errorMessage?: string;
+  initialSize?: number;
+}
+
+export function useCategories(options?: UseCategoriesOptions | string): UseCategoriesReturn {
+  const resolvedErrorMessage = typeof options === "string" ? options : options?.errorMessage;
+  const resolvedInitialSize = typeof options === "string" ? 10 : (options?.initialSize ?? 10);
+
   const [queryParams, setQueryParams] = useState<CategoryQueryParams>({
     page: 1,
-    size: 10,
+    size: resolvedInitialSize,
     orderBy: CategoriesOrderByEnum.NAME,
     direction: SortDirection.ASC,
     search: undefined,
@@ -43,7 +51,7 @@ export function useCategories(errorMessage?: string): UseCategoriesReturn {
 
       if (hasError) {
         const queryError = new Error(result.error);
-        const message = errorMessage ?? result.error;
+        const message = resolvedErrorMessage ?? result.error;
         toast.error(message);
         logger.error("Erro ao buscar categorias", queryError);
         return null;
