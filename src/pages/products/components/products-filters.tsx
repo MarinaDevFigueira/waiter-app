@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,6 +12,7 @@ import { MultiSelect } from "@/components/ui/multi-select/multi-select";
 import { productsFiltersObservable } from "@/shared/subjects/products-filters.subject";
 import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import { useCategories } from "@/shared/hooks/useCategories";
 
 const PRODUCT_STATUS_VALUES = Object.values(ProductStatusEnum) as [ProductStatusEnum, ...ProductStatusEnum[]];
 
@@ -26,12 +27,12 @@ type FilterFormValues = z.infer<typeof filterFormSchema>;
 
 export function ProductsFilters() {
   const { t } = useTranslation();
+  const { categories } = useCategories({ initialSize: 100 });
 
-  const CATEGORIES = [
-    { value: "pizzas", label: t("foods.categories.pizzas") },
-    { value: "bebidas", label: t("foods.categories.drinks") },
-    { value: "lanches", label: t("foods.categories.snacks") },
-  ];
+  const categoryOptions = useMemo(
+    () => categories.map((cat) => ({ value: cat.id, label: cat.name })),
+    [categories]
+  );
 
   const STATUS_OPTIONS: { value: ProductStatusEnum; label: string }[] = [
     { value: ProductStatusEnum.ACTIVE, label: t("common.status.active") },
@@ -174,7 +175,7 @@ export function ProductsFilters() {
                 {t("products.filters.fields.category")}
               </Label>
               <MultiSelect
-                options={CATEGORIES}
+                options={categoryOptions}
                 value={categoriaValue || []}
                 onChange={handleCategoryChange}
                 placeholder="Selecione as categorias"
