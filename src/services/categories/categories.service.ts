@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { CategoryForm, Category } from "@/shared/schemas/category.schema";
+import { formatZodError } from "@/lib/zod-errors";
 import {
   apiCategoryListSchema,
   apiCategorySchema,
@@ -47,7 +48,8 @@ export const categoriesService = {
 
       const parsed = apiCategoryListSchema.safeParse(result.data);
       if (!parsed.success) {
-        console.error(parsed.error);
+        const zodMessage = formatZodError(parsed.error);
+        console.error("[categoriesService.getAll] Erro de validação:", zodMessage, parsed.error);
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -82,6 +84,8 @@ export const categoriesService = {
 
       const parsed = apiCategorySchema.safeParse(result.data);
       if (!parsed.success) {
+        const zodMessage = formatZodError(parsed.error);
+        console.error("[categoriesService.getById] Erro de validação:", zodMessage, parsed.error);
         return { error: "Resposta inválida do servidor" };
       }
 

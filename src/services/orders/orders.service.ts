@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
+import { formatZodError } from "@/lib/zod-errors";
 import {
   apiOrderSchema,
   apiOrderPaginatedListSchema,
@@ -66,6 +67,8 @@ export const ordersService = {
 
       const parsed = apiOrderPaginatedListSchema.safeParse(result.data);
       if (!parsed.success) {
+        const zodMessage = formatZodError(parsed.error);
+        console.error("[ordersService.getAll] Erro de validação:", zodMessage, parsed.error);
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -98,6 +101,8 @@ export const ordersService = {
 
       const parsed = apiOrderSchema.safeParse(result.data);
       if (!parsed.success) {
+        const zodMessage = formatZodError(parsed.error);
+        console.error("[ordersService.getById] Erro de validação:", zodMessage, parsed.error);
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -114,6 +119,8 @@ export const ordersService = {
       const validated = createOrderRequestSchema.safeParse(data);
       const validationFailed = !validated.success;
       if (validationFailed) {
+        const zodMessage = formatZodError(validated.error);
+        console.error("[ordersService.create] Erro de validação:", zodMessage, validated.error);
         return { error: "Dados do pedido inválidos" };
       }
 
@@ -140,6 +147,8 @@ export const ordersService = {
       const validated = updateOrderStatusSchema.safeParse({ status });
       const validationFailed = !validated.success;
       if (validationFailed) {
+        const zodMessage = formatZodError(validated.error);
+        console.error("[ordersService.updateStatus] Erro de validação:", zodMessage, validated.error);
         return { error: "Status inválido" };
       }
 

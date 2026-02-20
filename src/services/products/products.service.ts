@@ -2,6 +2,7 @@ import { api } from "@/services/api";
 import { type Product, type ProductForm } from "@/shared/schemas/product.schema";
 import { baseEntityDefaults } from "@/shared/schemas/base-entity.schema";
 import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
+import { formatZodError } from "@/lib/zod-errors";
 import {
   apiProductListSchema,
   apiProductSchema,
@@ -69,7 +70,8 @@ export const productsService = {
 
       const parsed = apiProductListSchema.safeParse(result.data);
       if (!parsed.success) {
-        console.error(parsed.error)
+        const zodMessage = formatZodError(parsed.error);
+        console.error("[productsService.getAll] Erro de validação:", zodMessage, parsed.error);
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -104,6 +106,8 @@ export const productsService = {
 
       const parsed = apiProductSchema.safeParse(result.data);
       if (!parsed.success) {
+        const zodMessage = formatZodError(parsed.error);
+        console.error("[productsService.getById] Erro de validação:", zodMessage, parsed.error);
         return { error: "Resposta inválida do servidor" };
       }
 
