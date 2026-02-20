@@ -239,6 +239,13 @@
       "new": "New"
     }
   },
+  "orderSession": {
+    "viewSummary": "Request Bill",
+    "summary": "Order Summary",
+    "total": "Total",
+    "closeSession": "Close Bill",
+    "sessionClosed": "Bill closed successfully"
+  },
   "notFound": {
     "errorCode": "404",
     "title": "Page not found",

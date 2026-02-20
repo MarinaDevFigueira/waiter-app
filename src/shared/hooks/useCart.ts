@@ -32,10 +32,9 @@ export function useCart(): UseCartReturn {
 
     const initializeSession = async (): Promise<void> => {
       const currentCart = cartObservable.getValue();
-      const hasItems = currentCart.items.length > 0;
       const noSessionId = !currentCart.orderSessionId;
 
-      if (hasItems && noSessionId) {
+      if (noSessionId) {
         setIsLoading(true);
         try {
           const result = await orderSessionsService.getActive();
@@ -43,29 +42,12 @@ export function useCart(): UseCartReturn {
           const hasError = "error" in result;
           if (hasError) {
             logger.error("Erro ao buscar sessão ativa", new Error(result.error));
-            const openResult = await orderSessionsService.open();
-            const openHasError = "error" in openResult;
-            if (openHasError) {
-              toast.error(openResult.error);
-              logger.error("Erro ao abrir sessão", new Error(openResult.error));
-              return;
-            }
-            cartObservable.setOrderSession(openResult.data.id);
             return;
           }
 
           const hasActiveSession = result.data !== null;
           if (hasActiveSession) {
             cartObservable.setOrderSession(result.data.id);
-          } else {
-            const openResult = await orderSessionsService.open();
-            const openHasError = "error" in openResult;
-            if (openHasError) {
-              toast.error(openResult.error);
-              logger.error("Erro ao abrir sessão", new Error(openResult.error));
-              return;
-            }
-            cartObservable.setOrderSession(openResult.data.id);
           }
         } catch (error) {
           logger.error(
@@ -90,15 +72,29 @@ export function useCart(): UseCartReturn {
     if (hasSessionId) return true;
 
     try {
-      const result = await orderSessionsService.open();
+      const result = await orderSessionsService.getActive();
       const hasError = "error" in result;
       if (hasError) {
         toast.error(result.error);
-        logger.error("Erro ao abrir sessão", new Error(result.error));
+        logger.error("Erro ao buscar sessão ativa", new Error(result.error));
         return false;
       }
 
-      cartObservable.setOrderSession(result.data.id);
+      const hasActiveSession = result.data !== null;
+      if (hasActiveSession) {
+        cartObservable.setOrderSession(result.data.id);
+        return true;
+      }
+
+      const openResult = await orderSessionsService.open();
+      const openHasError = "error" in openResult;
+      if (openHasError) {
+        toast.error(openResult.error);
+        logger.error("Erro ao abrir sessão", new Error(openResult.error));
+        return false;
+      }
+
+      cartObservable.setOrderSession(openResult.data.id);
       return true;
     } catch (error) {
       logger.error(

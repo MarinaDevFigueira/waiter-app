@@ -243,6 +243,13 @@
       "new": "Novo"
     }
   },
+  "orderSession": {
+    "viewSummary": "Pedir a Conta",
+    "summary": "Resumo do Pedido",
+    "total": "Total",
+    "closeSession": "Encerrar Conta",
+    "sessionClosed": "Conta encerrada com sucesso"
+  },
   "notFound": {
     "errorCode": "404",
     "title": "Página não encontrada",

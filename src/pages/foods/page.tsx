@@ -1,19 +1,31 @@
 import { useState, useCallback, useMemo } from "react";
+import { toast } from "react-toastify";
 import { Title } from "./components/title";
 import { Foods } from "./components/foods";
 import { CartDrawer } from "./components/cart-drawer/cart-drawer";
 import { CartButton } from "./components/cart-button/cart-button";
+import { OrderSessionButton } from "./components/order-session-button/order-session-button";
+import { OrderSessionSummaryModal } from "./components/order-session-summary/order-session-summary";
 import Categories from "./components/categories";
 import { useCategories } from "@/shared/hooks/useCategories";
 import { useProducts } from "@/shared/hooks/useProducts";
 import { useCart } from "@/shared/hooks/useCart";
+import { orderSessionsService } from "@/services/order-sessions/order-sessions.service";
+import { logger } from "@/lib/logger";
+import { cartObservable } from "@/shared/subjects/cart.subject";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
 import type { Product } from "@/shared/schemas/product.schema";
+import type { OrderSessionSummary } from "@/services/order-sessions/order-sessions.schema";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export const FoodsPage = () => {
+  const { t } = useTranslation();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [sessionSummary, setSessionSummary] = useState<OrderSessionSummary | null>(null);
+  const [isClosingSession, setIsClosingSession] = useState(false);
 
   const { categories } = useCategories({
     initialSize: 100,
@@ -21,7 +33,7 @@ export const FoodsPage = () => {
 
   const { products, isLoading: isProductsLoading, setQueryParams } = useProducts();
 
-  const { addItem, itemCount } = useCart();
+  const { addItem, itemCount, cart } = useCart();
 
   const activeCategories = useMemo(() => {
     return categories.filter((c) => c.active);
@@ -58,6 +70,54 @@ export const FoodsPage = () => {
     setIsCartOpen(false);
   }, []);
 
+  const handleOpenSummary = useCallback(async () => {
+    const currentCart = cartObservable.getValue();
+    const sessionId = currentCart.orderSessionId;
+    const noSession = !sessionId;
+    if (noSession) return;
+
+    const result = await orderSessionsService.getSummary(sessionId);
+    const hasError = "error" in result;
+    if (hasError) {
+      toast.error(result.error);
+      logger.error("Erro ao buscar resumo da sessão", new Error(result.error));
+      return;
+    }
+
+    setSessionSummary(result.data);
+    setIsSummaryOpen(true);
+  }, []);
+
+  const handleCloseSummaryModal = useCallback(() => {
+    setIsSummaryOpen(false);
+    setSessionSummary(null);
+  }, []);
+
+  const handleCloseSession = useCallback(async () => {
+    const currentCart = cartObservable.getValue();
+    const sessionId = currentCart.orderSessionId;
+    const noSession = !sessionId;
+    if (noSession) return;
+
+    setIsClosingSession(true);
+    try {
+      const result = await orderSessionsService.close(sessionId);
+      const hasError = "error" in result;
+      if (hasError) {
+        toast.error(result.error);
+        logger.error("Erro ao encerrar sessão", new Error(result.error));
+        return;
+      }
+
+      cartObservable.clearCart();
+      toast.success(t("orderSession.sessionClosed"));
+      setIsSummaryOpen(false);
+      setSessionSummary(null);
+    } finally {
+      setIsClosingSession(false);
+    }
+  }, [t]);
+
   const filteredProducts = useMemo(() => {
     return products.filter((p) => p.active);
   }, [products]);
@@ -75,12 +135,17 @@ export const FoodsPage = () => {
 
   const hasSelectedCategory = selectedCategoryId !== null;
   const displayProducts = hasSelectedCategory ? filteredProducts : sortedByCategory;
+  const hasActiveSession = Boolean(cart.orderSessionId);
 
   return (
     <div className="flex flex-col items-start justify-start w-full gap-4">
       <div className="flex items-start justify-between w-full gap-3">
         <Title />
-        <div className="pt-1">
+        <div className="pt-1 flex items-center gap-2">
+          <OrderSessionButton
+            hasActiveSession={hasActiveSession}
+            onClick={handleOpenSummary}
+          />
           <CartButton itemCount={itemCount} onClick={handleOpenCart} />
         </div>
       </div>
@@ -100,6 +165,13 @@ export const FoodsPage = () => {
         />
       )}
       <CartDrawer open={isCartOpen} onClose={handleCloseCart} />
+      <OrderSessionSummaryModal
+        open={isSummaryOpen}
+        onClose={handleCloseSummaryModal}
+        summary={sessionSummary}
+        onCloseSession={handleCloseSession}
+        isClosing={isClosingSession}
+      />
     </div>
   );
 };
