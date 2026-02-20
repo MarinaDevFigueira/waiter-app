@@ -23,7 +23,7 @@ export function useOrders(): UseOrdersReturn {
   const [optimisticOrders, setOptimisticOrders] = useState<Order[]>(kitchenOrdersObservable.getValue());
   const [queryParams, setQueryParams] = useState<OrdersQueryParams>(DEFAULT_QUERY_PARAMS);
 
-  const { data, isLoading } = useQuery<PaginatedOrders | null>({
+  const { data, isLoading, error, isError } = useQuery<PaginatedOrders>({
     queryKey: ["orders", queryParams],
     queryFn: async () => {
       const result = await ordersService.getAll({
@@ -34,19 +34,28 @@ export function useOrders(): UseOrdersReturn {
         size: queryParams.size,
       });
 
-      const hasError = "error" in result;
-      if (hasError) {
-        const error = new Error(result.error);
-        toast.error(result.error);
-        logger.error("Erro ao buscar pedidos", error);
-        return null;
+      if ("error" in result) {
+        throw new Error(result.error);
+      }
+
+      if (!result.data) {
+        throw new Error("Nenhum dado retornado");
       }
 
       kitchenOrdersObservable.setOrders(result.data.items);
       return result.data;
     },
     placeholderData: keepPreviousData,
+    retry: 2,
   });
+
+  useEffect(() => {
+    if (isError && error) {
+      console.error("[useOrders] Erro ao buscar pedidos:", error);
+      toast.error(error.message ?? "Erro ao buscar pedidos");
+      logger.error("Erro ao buscar pedidos", error);
+    }
+  }, [isError, error]);
 
   useEffect(() => {
     const subscription = kitchenOrdersObservable.subscribe(setOptimisticOrders);
@@ -68,9 +77,9 @@ export function useOrders(): UseOrdersReturn {
     const hasError = "error" in result;
 
     if (hasError) {
-      const error = new Error(result.error);
+      const updateError = new Error(result.error);
       toast.error(result.error);
-      logger.error("Erro ao atualizar status do pedido", error);
+      logger.error("Erro ao atualizar status do pedido", updateError);
     }
 
     queryClient.invalidateQueries({ queryKey: ["orders"] });

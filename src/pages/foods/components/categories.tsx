@@ -1,95 +1,72 @@
 import { useCallback } from "react";
-import { type Icon } from "@phosphor-icons/react";
-import { useCategory } from "@/shared/hooks/useCategory";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import type { Category } from "@/shared/schemas/category.schema";
 
-interface CategoryItem {
+interface CategoryTabProps {
   label: string;
-  value: string;
-  icon: Icon;
-}
-
-interface CategoryProps {
-  icon: Icon | undefined;
-  label?: string;
-  selected?: boolean;
-  value?: string;
-  onSelect?: () => void;
+  categoryId: string;
+  selected: boolean;
+  onSelect: (categoryId: string) => void;
 }
 
 interface CategoriesProps {
-  lista?: CategoryItem[];
-  selectedCategory?: string;
-  onCategoryChange?: () => void;
+  categories: Category[];
+  selectedCategoryId: string | null;
+  onCategoryChange: (categoryId: string | null) => void;
 }
 
-function Category({
-  icon: IconComponent,
-  label = "",
-  selected = false,
-  value = "",
-}: CategoryProps) {
-  const { changeCategory } = useCategory();
-  const { t } = useTranslation();
-
-  const categoryLabels: Record<string, string> = {
-    pizzas: t("foods.categories.pizzas"),
-    drinks: t("foods.categories.drinks"),
-    snacks: t("foods.categories.snacks"),
-    promotions: t("foods.categories.promotions"),
-  };
-
-  const translatedLabel = categoryLabels[value] || label;
-
+function CategoryTab({ label, categoryId, selected, onSelect }: CategoryTabProps) {
   const handleSelect = useCallback(() => {
-    changeCategory(value);
-  }, [value, changeCategory]);
-
-  const hasIcon = Boolean(IconComponent);
-  const iconElement = hasIcon && IconComponent ? (
-    <IconComponent
-      size={18}
-      weight="fill"
-      data-category={value}
-      className="text-primary data-[category=pizzas]:text-orange-600 data-[category=drinks]:text-blue-600 data-[category=snacks]:text-amber-700 data-[category=promotions]:text-pink-600"
-    />
-  ) : null;
+    onSelect(categoryId);
+  }, [categoryId, onSelect]);
 
   return (
     <li
       data-selected={selected}
-      data-category={value}
       onClick={handleSelect}
-      className="group flex justify-between items-center gap-2 sm:gap-3 data-[selected=true]:pointer-events-none data-[selected=false]:opacity-40 transition-opacity cursor-pointer"
+      className="flex flex-col items-center justify-center gap-1 cursor-pointer hover:cursor-pointer shrink-0"
     >
-      <div className="flex justify-center items-center flex-col gap-1 sm:gap-1.5">
-        <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-full flex items-center justify-center shadow-xs p-1.5 sm:p-2 bg-white data-[category=pizzas]:bg-orange-100 data-[category=drinks]:bg-blue-100 data-[category=snacks]:bg-amber-100 data-[category=promotions]:bg-pink-100">
-          {iconElement}
-        </div>
-        <span className="font-semibold text-xs sm:text-sm group-data-[selected=false]:opacity-30 text-center max-w-[50px] sm:max-w-none">
-          {translatedLabel}
-        </span>
-      </div>
+      <span
+        data-selected={selected}
+        className="text-sm font-semibold px-3 py-1.5 rounded-full transition-colors data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground data-[selected=false]:text-muted-foreground data-[selected=false]:hover:text-foreground"
+      >
+        {label}
+      </span>
     </li>
   );
 }
 
-const Categories = ({
-  lista = [],
-  selectedCategory = "pizzas",
-  onCategoryChange = () => {},
-}: CategoriesProps) => {
+const ALL_CATEGORY_ID = "__all__";
+
+const Categories = ({ categories, selectedCategoryId, onCategoryChange }: CategoriesProps) => {
+  const { t } = useTranslation();
+
+  const sortedCategories = [...categories].sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const handleSelect = useCallback((categoryId: string) => {
+    const isAll = categoryId === ALL_CATEGORY_ID;
+    onCategoryChange(isAll ? null : categoryId);
+  }, [onCategoryChange]);
+
+  const allSelected = selectedCategoryId === null;
+
   return (
-    <ul className="w-full flex flex-row justify-start sm:justify-between items-center gap-2 sm:gap-4 overflow-x-auto pb-2">
-      {lista?.map((item) => {
+    <ul className="w-full flex flex-row items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
+      <CategoryTab
+        label={t("foods.categories.all")}
+        categoryId={ALL_CATEGORY_ID}
+        selected={allSelected}
+        onSelect={handleSelect}
+      />
+      {sortedCategories.map((category) => {
+        const isSelected = selectedCategoryId === category.id;
         return (
-          <Category
-            key={item?.value}
-            icon={item?.icon}
-            label={item?.label}
-            selected={selectedCategory === item?.value}
-            value={item?.value}
-            onSelect={onCategoryChange}
+          <CategoryTab
+            key={category.id}
+            label={category.name}
+            categoryId={category.id}
+            selected={isSelected}
+            onSelect={handleSelect}
           />
         );
       })}

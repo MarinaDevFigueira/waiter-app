@@ -1,5 +1,7 @@
 import { api } from "@/services/api";
 import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
+import { formatZodError } from "@/lib/zod-errors";
+import { logger } from "@/lib/logger";
 import {
   apiOrderSchema,
   apiOrderPaginatedListSchema,
@@ -43,7 +45,7 @@ function mapApiOrderToOrder(raw: ApiOrder): Order {
 }
 
 export const ordersService = {
-  async getAll(filters: { status?: string; search?: string; orderBy?: string; direction?: string; page?: number; size?: number } = {}): Promise<ServiceResult<PaginatedOrders>> {
+  async getAll(filters: { status?: string; search?: string; orderBy?: string; direction?: string; page?: number; size?: number; orderSessionId?: string } = {}): Promise<ServiceResult<PaginatedOrders>> {
     try {
       const params = new URLSearchParams();
       if (filters.status) params.set("status", filters.status);
@@ -52,6 +54,7 @@ export const ordersService = {
       if (filters.direction) params.set("direction", filters.direction);
       if (filters.page != null) params.set("page", String(filters.page));
       if (filters.size != null) params.set("size", String(filters.size));
+      if (filters.orderSessionId) params.set("orderSessionId", filters.orderSessionId);
 
       const query = params.toString();
       const path = query ? `/orders?${query}` : "/orders";
@@ -65,6 +68,8 @@ export const ordersService = {
 
       const parsed = apiOrderPaginatedListSchema.safeParse(result.data);
       if (!parsed.success) {
+        const zodMessage = formatZodError(parsed.error);
+        logger.error("[ordersService.getAll] Erro de validação", new Error(zodMessage));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -82,6 +87,7 @@ export const ordersService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar pedidos";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -97,6 +103,8 @@ export const ordersService = {
 
       const parsed = apiOrderSchema.safeParse(result.data);
       if (!parsed.success) {
+        const zodMessage = formatZodError(parsed.error);
+        logger.error("[ordersService.getById] Erro de validação", new Error(zodMessage));
         return { error: "Resposta inválida do servidor" };
       }
 
@@ -104,6 +112,7 @@ export const ordersService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar pedido";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -113,6 +122,8 @@ export const ordersService = {
       const validated = createOrderRequestSchema.safeParse(data);
       const validationFailed = !validated.success;
       if (validationFailed) {
+        const zodMessage = formatZodError(validated.error);
+        logger.error("[ordersService.create] Erro de validação", new Error(zodMessage));
         return { error: "Dados do pedido inválidos" };
       }
 
@@ -127,6 +138,7 @@ export const ordersService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao criar pedido";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },
@@ -139,6 +151,8 @@ export const ordersService = {
       const validated = updateOrderStatusSchema.safeParse({ status });
       const validationFailed = !validated.success;
       if (validationFailed) {
+        const zodMessage = formatZodError(validated.error);
+        logger.error("[ordersService.updateStatus] Erro de validação", new Error(zodMessage));
         return { error: "Status inválido" };
       }
 
@@ -155,6 +169,7 @@ export const ordersService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar status do pedido";
+      logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
   },

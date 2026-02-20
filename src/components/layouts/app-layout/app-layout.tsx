@@ -1,11 +1,19 @@
+import { useState, useCallback } from "react";
 import { SignOutIcon } from "@phosphor-icons/react";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button/button";
 import { Logo } from "@/components/ui/logo/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
 import { LanguageSelector } from "@/components/ui/language-selector/language-selector";
+import { LogoutConfirmationModal } from "@/components/logout-confirmation-modal/logout-confirmation-modal";
 import { authService } from "@/services/auth/auth.service";
+import { orderSessionsService } from "@/services/order-sessions/order-sessions.service";
 import { useAuth } from "@/shared/hooks/useAuth";
+import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { cartObservable } from "@/shared/subjects/cart.subject";
+import { logger } from "@/lib/logger";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -14,11 +22,55 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps): JSX.Element {
   const navigate = useNavigate();
   const { auth } = useAuth();
+  const { t } = useTranslation();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = async () => {
-    await authService.logout();
-    navigate({ to: "/login" });
-  };
+  const isMesaProfile = auth?.profile === UserProfileEnum.MESA;
+
+  const handleLogoutClick = useCallback(() => {
+    const currentCart = cartObservable.getValue();
+    const hasActiveSession = Boolean(currentCart.orderSessionId);
+    const shouldConfirm = isMesaProfile && hasActiveSession;
+
+    if (shouldConfirm) {
+      setIsLogoutModalOpen(true);
+      return;
+    }
+
+    authService.logout().then(() => {
+      navigate({ to: "/" });
+    });
+  }, [isMesaProfile, navigate]);
+
+  const handleConfirmLogout = useCallback(async () => {
+    setIsLoggingOut(true);
+    try {
+      const currentCart = cartObservable.getValue();
+      const sessionId = currentCart.orderSessionId;
+      const hasSession = Boolean(sessionId);
+
+      if (hasSession && sessionId) {
+        const result = await orderSessionsService.close(sessionId);
+        const hasError = "error" in result;
+        if (hasError) {
+          logger.error("Erro ao encerrar sessão no logout", new Error(result.error));
+        }
+      }
+
+      cartObservable.clearCart();
+      toast.success(t("orderSession.sessionClosedAndLoggedOut"));
+      await authService.logout();
+      setIsLogoutModalOpen(false);
+      navigate({ to: "/" });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }, [navigate, t]);
+
+  const handleCancelLogout = useCallback(() => {
+    setIsLogoutModalOpen(false);
+  }, []);
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-start bg-background">
@@ -41,7 +93,7 @@ export function AppLayout({ children }: AppLayoutProps): JSX.Element {
             <Button
               variant="ghost"
               size="icon-sm"
-              onClick={handleLogout}
+              onClick={handleLogoutClick}
               data-testid="logout-button"
             >
               <SignOutIcon />
@@ -54,6 +106,12 @@ export function AppLayout({ children }: AppLayoutProps): JSX.Element {
           {children}
         </div>
       </main>
+      <LogoutConfirmationModal
+        open={isLogoutModalOpen}
+        onConfirm={handleConfirmLogout}
+        onCancel={handleCancelLogout}
+        isLoading={isLoggingOut}
+      />
     </div>
   );
 }

@@ -56,11 +56,30 @@
       "pizzas": "Pizzas",
       "drinks": "Drinks",
       "snacks": "Snacks",
-      "promotions": "Promotions"
+      "promotions": "Promotions",
+      "all": "All"
     },
     "actions": {
       "addToOrder": "Add {{name}} to order"
+    },
+    "emptyState": {
+      "noProducts": "No products found",
+      "noProductsDescription": "There are no products available in this category"
     }
+  },
+  "cart": {
+    "title": "My Order",
+    "empty": "Your cart is empty",
+    "emptyDescription": "Add items to your order to continue",
+    "total": "Total",
+    "confirmOrder": "Confirm Order",
+    "sendToKitchen": "Send to Kitchen",
+    "cancelOrder": "Cancel Order",
+    "removeItem": "Remove item",
+    "itemCount": "{{count}} item",
+    "itemCountPlural": "{{count}} items",
+    "orderConfirmed": "Order confirmed!",
+    "orderCancelled": "Order cancelled"
   },
   "products": {
     "pageTitle": "Products",
@@ -220,6 +239,20 @@
       "edit": "Edit",
       "new": "New"
     }
+  },
+  "orderSession": {
+    "viewSummary": "Summary",
+    "summary": "Order Summary",
+    "total": "Total",
+    "closeSession": "Close Session",
+    "sessionClosed": "Bill closed successfully",
+    "sessionClosedAndLoggedOut": "Session closed. Goodbye!",
+    "noOrders": "No orders found for this session."
+  },
+  "logout": {
+    "confirmWithActiveSession": "Close active session?",
+    "activeSessionWarning": "You have an active session. When you leave, the session will be automatically closed.",
+    "closeSessionAndLogout": "Close and Logout"
   },
   "notFound": {
     "errorCode": "404",

@@ -41,6 +41,7 @@ export const createOrderRequestSchema = z.object({
       })
     )
     .min(1),
+  orderSessionId: z.string().optional(),
 });
 
 export const updateOrderStatusSchema = z.object({

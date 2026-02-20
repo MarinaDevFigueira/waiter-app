@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { logger } from "@/lib/logger";
@@ -43,24 +43,33 @@ export function useCategories(options?: UseCategoriesOptions | string): UseCateg
     search: undefined,
   });
 
-  const { data, isLoading, error, isError } = useQuery<PaginatedCategories | null>({
+  const { data, isLoading, error, isError } = useQuery<PaginatedCategories>({
     queryKey: ["categories", queryParams],
     queryFn: async () => {
       const result = await categoriesService.getAll(queryParams) as { data?: PaginatedCategories; error?: string };
-      const hasError = Boolean(result.error);
 
-      if (hasError) {
-        const queryError = new Error(result.error);
-        const message = resolvedErrorMessage ?? result.error;
-        toast.error(message);
-        logger.error("Erro ao buscar categorias", queryError);
-        return null;
+      if ("error" in result) {
+        throw new Error(result.error);
       }
 
-      return result.data ?? null;
+      if (!result.data) {
+        throw new Error("Nenhum dado retornado");
+      }
+
+      return result.data;
     },
     placeholderData: keepPreviousData,
+    retry: 2,
   });
+
+  useEffect(() => {
+    if (isError && error) {
+      console.error("[useCategories] Erro ao buscar categorias:", error);
+      const message = resolvedErrorMessage ?? error.message ?? "Erro ao buscar categorias";
+      toast.error(message);
+      logger.error("Erro ao buscar categorias", error);
+    }
+  }, [isError, error, resolvedErrorMessage]);
 
   const updateSearch = (search: string): void => {
     setQueryParams((prev) => ({

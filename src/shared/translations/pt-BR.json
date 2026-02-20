@@ -56,11 +56,30 @@
       "pizzas": "Pizzas",
       "drinks": "Bebidas",
       "snacks": "Lanches",
-      "promotions": "Promoções"
+      "promotions": "Promoções",
+      "all": "Todos"
     },
     "actions": {
       "addToOrder": "Adicionar {{name}} ao pedido"
+    },
+    "emptyState": {
+      "noProducts": "Nenhum produto encontrado",
+      "noProductsDescription": "Não há produtos disponíveis nesta categoria"
     }
+  },
+  "cart": {
+    "title": "Meu Pedido",
+    "empty": "Seu carrinho está vazio",
+    "emptyDescription": "Adicione itens ao pedido para continuar",
+    "total": "Total",
+    "confirmOrder": "Confirmar Pedido",
+    "sendToKitchen": "Enviar para a Cozinha",
+    "cancelOrder": "Cancelar Pedido",
+    "removeItem": "Remover item",
+    "itemCount": "{{count}} item",
+    "itemCountPlural": "{{count}} itens",
+    "orderConfirmed": "Pedido confirmado!",
+    "orderCancelled": "Pedido cancelado"
   },
   "products": {
     "pageTitle": "Produtos",
@@ -224,6 +243,20 @@
       "edit": "Editar",
       "new": "Novo"
     }
+  },
+  "orderSession": {
+    "viewSummary": "Resumo",
+    "summary": "Resumo do Pedido",
+    "total": "Total",
+    "closeSession": "Encerrar Sessão",
+    "sessionClosed": "Conta encerrada com sucesso",
+    "sessionClosedAndLoggedOut": "Sessão encerrada. Até logo!",
+    "noOrders": "Nenhum pedido encontrado para esta sessão."
+  },
+  "logout": {
+    "confirmWithActiveSession": "Encerrar sessão ativa?",
+    "activeSessionWarning": "Você possui uma sessão ativa. Ao sair, a sessão será encerrada automaticamente.",
+    "closeSessionAndLogout": "Encerrar e Sair"
   },
   "notFound": {
     "errorCode": "404",
