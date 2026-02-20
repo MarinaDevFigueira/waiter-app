@@ -14,11 +14,16 @@ const persister = createAsyncStoragePersister({
   storage: window.sessionStorage,
 });
 
+const FIVE_MINUTES_MS = 5 * 60 * 1000;
+const TEN_MINUTES_MS = 10 * 60 * 1000;
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
+      staleTime: FIVE_MINUTES_MS,
+      gcTime: TEN_MINUTES_MS,
     }
   }
 });
