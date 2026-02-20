@@ -66,23 +66,31 @@ export function useProducts(): UseProductsReturn {
     return () => subscription.unsubscribe();
   }, []);
 
-  const { data, isLoading, error, isError } = useQuery<PaginatedProducts | null>({
+  const { data, isLoading, error, isError } = useQuery<PaginatedProducts>({
     queryKey: ["products", queryParams],
     queryFn: async () => {
       const result = await productsService.getAll(queryParams) as { data?: PaginatedProducts; error?: string };
-      const hasError = Boolean(result.error);
 
-      if (hasError) {
-        const error = new Error(result.error);
-        toast.error(result.error);
-        logger.error("Erro ao buscar produtos", error);
-        return null;
+      if ("error" in result) {
+        throw new Error(result.error);
       }
 
-      return result.data ?? null;
+      if (!result.data) {
+        throw new Error("Nenhum dado retornado");
+      }
+
+      return result.data;
     },
     placeholderData: keepPreviousData,
+    retry: 2,
   });
+
+  useEffect(() => {
+    if (isError && error) {
+      toast.error(error.message);
+      logger.error("Erro ao buscar produtos", error);
+    }
+  }, [isError, error]);
 
   const updateFilters = (newFilters: ProductFilters): void => {
     productsFiltersObservable.setFilters(newFilters);
