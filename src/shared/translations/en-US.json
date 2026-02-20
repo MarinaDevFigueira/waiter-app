@@ -154,12 +154,57 @@
       }
     }
   },
+  "categories": {
+    "pageTitle": "Categories",
+    "pageSubtitle": "Manage the restaurant's product categories",
+    "errors": {
+      "loadCategories": "Error loading categories:"
+    },
+    "emptyState": {
+      "title": "No categories registered"
+    },
+    "table": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "sortOrder": "Order",
+        "status": "Status"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Search categories..."
+    },
+    "form": {
+      "createTitle": "New Category",
+      "editTitle": "Edit Category",
+      "createButton": "Create Category",
+      "saveButton": "Save",
+      "createSuccess": "Category created successfully!",
+      "updateSuccess": "Category updated successfully!",
+      "createError": "Error creating category",
+      "updateError": "Error updating category",
+      "deleteSuccess": "Category removed successfully!",
+      "deleteError": "Error removing category",
+      "fields": {
+        "name": "Name",
+        "description": "Description",
+        "sortOrder": "Display order",
+        "active": "Active category"
+      },
+      "placeholders": {
+        "name": "E.g.: Pizzas",
+        "description": "Describe the category...",
+        "sortOrder": "0"
+      }
+    }
+  },
   "dashboard": {
     "navigation": {
       "dashboard": "Dashboard",
       "orders": "Orders",
       "reports": "Reports",
       "products": "Products",
+      "categories": "Categories",
       "users": "Users",
       "settings": "Settings"
     },
@@ -170,6 +215,7 @@
       "reports": "Reports",
       "settings": "Settings",
       "products": "Products",
+      "categories": "Categories",
       "edit": "Edit",
       "new": "New"
     }
