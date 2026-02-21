@@ -102,12 +102,7 @@ export const categoriesService = {
 
   async create(data: CategoryForm): Promise<ServiceResult<void>> {
     try {
-      const hasDescription = Boolean(data.description);
-
-      const payload: CategoryForm = { ...data };
-      if (!hasDescription) delete payload.description;
-
-      const result = await api.post<unknown>("/categories", payload);
+      const result = await api.post<unknown>("/categories", data);
 
       const hasError = "error" in result;
       if (hasError) {
@@ -128,12 +123,7 @@ export const categoriesService = {
     data: CategoryForm
   ): Promise<ServiceResult<void>> {
     try {
-      const hasDescription = Boolean(data.description);
-
-      const payload: CategoryForm = { ...data };
-      if (!hasDescription) delete payload.description;
-
-      const result = await api.patch<unknown>(`/categories/${categoryId}`, payload);
+      const result = await api.patch<unknown>(`/categories/${categoryId}`, data);
 
       const hasError = "error" in result;
       if (hasError) {

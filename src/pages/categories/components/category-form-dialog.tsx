@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -84,10 +84,16 @@ function Footer({ onCancel, isPending, submitLabel }: FooterProps) {
 
 function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDialogProps) {
   const { t } = useTranslation();
-  const { addLanguagePrefix } = useLanguage();
+  const { language, addLanguagePrefix } = useLanguage();
   const queryClient = useQueryClient();
   const isEditing = category !== undefined;
   const categoryId = category?.id ?? "";
+
+  const defaultTranslation = useMemo(() => ({
+    locale: language,
+    name: "",
+    description: "",
+  }), [language]);
 
   const {
     register,
@@ -97,8 +103,7 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
   } = useForm<CategoryForm>({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      translations: [defaultTranslation],
       sortOrder: 0,
       active: true,
     },
@@ -108,8 +113,13 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
     const shouldPopulateForm = open && isEditing && category;
     if (shouldPopulateForm) {
       reset({
-        name: category.name,
-        description: category.description ?? "",
+        translations: [
+          {
+            locale: language,
+            name: category.name,
+            description: category.description ?? "",
+          },
+        ],
         sortOrder: category.sortOrder,
         active: category.active,
       });
@@ -119,13 +129,12 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
     const shouldResetForm = open && !isEditing;
     if (shouldResetForm) {
       reset({
-        name: "",
-        description: "",
+        translations: [defaultTranslation],
         sortOrder: 0,
         active: true,
       });
     }
-  }, [open, isEditing, category, reset]);
+  }, [open, isEditing, category, reset, language, defaultTranslation]);
 
   const createMutation = useMutation({
     mutationFn: (data: CategoryForm) => categoriesService.create(data),
@@ -171,6 +180,9 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
     }
   };
 
+  const translationNameError = errors.translations?.[0]?.name?.message;
+  const translationDescriptionError = errors.translations?.[0]?.description?.message;
+
   const dialogTitle = isEditing ? t("categories.form.editTitle") : t("categories.form.createTitle");
   const submitLabel = isEditing ? t("categories.form.saveButton") : t("categories.form.createButton");
 
@@ -189,16 +201,18 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <Fields>
+            <input type="hidden" {...register("translations.0.locale")} value={language} />
+
             <Field
               label={t("categories.form.fields.name")}
               htmlFor="name"
-              error={errors.name?.message}
+              error={translationNameError}
               required
             >
               <Input
                 id="name"
-                {...register("name")}
-                aria-invalid={errors.name ? true : undefined}
+                {...register("translations.0.name")}
+                aria-invalid={translationNameError ? true : undefined}
                 placeholder={t("categories.form.placeholders.name")}
               />
             </Field>
@@ -206,11 +220,11 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
             <Field
               label={t("categories.form.fields.description")}
               htmlFor="description"
-              error={errors.description?.message}
+              error={translationDescriptionError}
             >
               <textarea
                 id="description"
-                {...register("description")}
+                {...register("translations.0.description")}
                 rows={3}
                 placeholder={t("categories.form.placeholders.description")}
                 className="flex w-full rounded-md border border-input bg-input/30 px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] resize-none"
