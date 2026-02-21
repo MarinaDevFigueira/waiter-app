@@ -19,7 +19,7 @@ interface LanguageOption {
 const LANGUAGE_OPTIONS: LanguageOption[] = [
   { value: TranslationsEnum.PT_BR, label: "Português (BR)", flag: "🇧🇷" },
   { value: TranslationsEnum.EN_US, label: "English (US)", flag: "🇺🇸" },
-  { value: TranslationsEnum.ES, label: "Espanish (ES)", flag: "🇪🇸"}
+  { value: TranslationsEnum.ES, label: "Español (ES)", flag: "🇪🇸" }
 ];
 
 export function LanguageSelector(): JSX.Element {

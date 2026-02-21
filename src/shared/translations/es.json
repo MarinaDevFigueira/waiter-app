@@ -1,0 +1,266 @@
+{
+  "common": {
+    "buttons": {
+      "search": "Buscar",
+      "clear": "Limpiar",
+      "apply": "Aplicar Filtros",
+      "back": "Volver",
+      "logout": "Cerrar Sesión",
+      "goToHome": "Volver a la página principal",
+      "goToDashboard": "Ir al Panel de Control",
+      "cancel": "Cancelar",
+      "saving": "Guardando...",
+      "new": "Nuevo"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "deleted": "Eliminado",
+      "pending": "Pendiente",
+      "preparing": "Preparando",
+      "ready": "Listo"
+    },
+    "sort": {
+      "ascending": "Ordenar ascendente",
+      "descending": "Ordenar descendente",
+      "removeSort": "Quitar ordenación"
+    },
+    "validation": {
+      "required": "Campo obligatorio",
+      "searchRequired": "Ingrese algo para buscar"
+    },
+    "errors": {
+      "loadError": "Error al cargar",
+      "notFound": "No encontrado"
+    },
+    "placeholders": {
+      "search": "Buscar..."
+    }
+  },
+  "login": {
+    "pageTitle": "Accede a tu cuenta",
+    "pageSubtitle": "Ingresa tus credenciales para continuar",
+    "form": {
+      "usernameLabel": "Usuario",
+      "usernamePlaceholder": "tu usuario",
+      "passwordLabel": "Contraseña",
+      "usernameRequired": "El usuario es obligatorio",
+      "passwordRequired": "La contraseña es obligatoria",
+      "submitButton": "Iniciar Sesión",
+      "submittingButton": "Iniciando sesión..."
+    }
+  },
+  "foods": {
+    "welcome": "Bienvenido(a) a",
+    "categories": {
+      "pizzas": "Pizzas",
+      "drinks": "Bebidas",
+      "snacks": "Bocadillos",
+      "promotions": "Promociones",
+      "all": "Todos"
+    },
+    "actions": {
+      "addToOrder": "Agregar {{name}} al pedido"
+    },
+    "emptyState": {
+      "noProducts": "No se encontraron productos",
+      "noProductsDescription": "No hay productos disponibles en esta categoría"
+    }
+  },
+  "cart": {
+    "title": "Mi Pedido",
+    "empty": "Tu carrito está vacío",
+    "emptyDescription": "Agrega artículos al pedido para continuar",
+    "total": "Total",
+    "confirmOrder": "Confirmar Pedido",
+    "sendToKitchen": "Enviar a la Cocina",
+    "cancelOrder": "Cancelar Pedido",
+    "removeItem": "Eliminar artículo",
+    "itemCount": "{{count}} artículo",
+    "itemCountPlural": "{{count}} artículos",
+    "orderConfirmed": "¡Pedido confirmado!",
+    "orderCancelled": "Pedido cancelado"
+  },
+  "products": {
+    "pageTitle": "Productos",
+    "pageSubtitle": "Gestiona el catálogo de productos del restaurante",
+    "errors": {
+      "loadProducts": "Error al cargar productos:"
+    },
+    "emptyState": {
+      "title": "Ningún producto registrado"
+    },
+    "table": {
+      "columns": {
+        "name": "Nombre",
+        "category": "Categoría",
+        "price": "Precio",
+        "stock": "Stock",
+        "status": "Estado",
+        "createdAt": "Creado el",
+        "updatedAt": "Actualizado el"
+      }
+    },
+    "filters": {
+      "title": "Filtros",
+      "modalTitle": "Filtros de Productos",
+      "modalSubtitle": "Refina tu búsqueda aplicando filtros personalizados",
+      "searchPlaceholder": "Buscar productos...",
+      "fields": {
+        "category": "Categoría",
+        "priceRange": "Rango de Precio",
+        "minPrice": "Mínimo",
+        "maxPrice": "Máximo",
+        "status": "Estado"
+      }
+    },
+    "form": {
+      "createTitle": "Nuevo Producto",
+      "createDescription": "Completa los datos para registrar un nuevo producto",
+      "editTitle": "Editar Producto",
+      "editDescription": "Actualiza la información del producto",
+      "createButton": "Crear Producto",
+      "saveButton": "Guardar",
+      "createSuccess": "¡Producto creado con éxito!",
+      "updateSuccess": "¡Producto actualizado con éxito!",
+      "createError": "Error al crear el producto",
+      "updateError": "Error al actualizar el producto",
+      "fields": {
+        "name": "Nombre",
+        "description": "Descripción",
+        "category": "Categoría",
+        "price": "Precio",
+        "stock": "Stock",
+        "unit": "Unidad",
+        "imageUrl": "URL de la Imagen",
+        "active": "Producto activo"
+      },
+      "placeholders": {
+        "name": "Ej: Pizza Margarita",
+        "description": "Describe el producto...",
+        "category": "Ej: Pizzas"
+      }
+    }
+  },
+  "orders": {
+    "kitchen": {
+      "pageTitle": "Pedidos de Cocina",
+      "pageSubtitle": "Gestiona los pedidos en preparación",
+      "searchPlaceholder": "Buscar por mesa o artículo...",
+      "emptyState": {
+        "noOrders": "Ningún pedido activo",
+        "noOrdersDescription": "No hay pedidos pendientes o en preparación en este momento",
+        "noResults": "No se encontraron pedidos",
+        "noResultsDescription": "No encontramos pedidos con \"{{query}}\"",
+        "searchHint": "Intenta buscar por mesa o nombre del artículo"
+      }
+    },
+    "admin": {
+      "pageTitle": "Pedidos",
+      "pageSubtitle": "Visualiza y gestiona todos los pedidos",
+      "emptyState": {
+        "noOrders": "No se encontraron pedidos",
+        "noOrdersDescription": "No hay pedidos registrados en este momento"
+      },
+      "table": {
+        "columns": {
+          "userName": "Usuario",
+          "status": "Estado",
+          "items": "Artículos",
+          "total": "Total",
+          "timestamp": "Horario",
+          "createdAt": "Creado el"
+        },
+        "itemsTotal": "artículos",
+        "total": "Total"
+      }
+    }
+  },
+  "categories": {
+    "pageTitle": "Categorías",
+    "pageSubtitle": "Gestiona las categorías de productos del restaurante",
+    "errors": {
+      "loadCategories": "Error al cargar categorías:"
+    },
+    "emptyState": {
+      "title": "Ninguna categoría registrada"
+    },
+    "table": {
+      "columns": {
+        "name": "Nombre",
+        "description": "Descripción",
+        "sortOrder": "Orden",
+        "status": "Estado"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar categorías..."
+    },
+    "form": {
+      "createTitle": "Nueva Categoría",
+      "createDescription": "Completa los datos para registrar una nueva categoría",
+      "editTitle": "Editar Categoría",
+      "editDescription": "Actualiza la información de la categoría",
+      "createButton": "Crear Categoría",
+      "saveButton": "Guardar",
+      "createSuccess": "¡Categoría creada con éxito!",
+      "updateSuccess": "¡Categoría actualizada con éxito!",
+      "createError": "Error al crear la categoría",
+      "updateError": "Error al actualizar la categoría",
+      "deleteSuccess": "¡Categoría eliminada con éxito!",
+      "deleteError": "Error al eliminar la categoría",
+      "fields": {
+        "name": "Nombre",
+        "description": "Descripción",
+        "sortOrder": "Orden de visualización",
+        "active": "Categoría activa"
+      },
+      "placeholders": {
+        "name": "Ej: Pizzas",
+        "description": "Describe la categoría...",
+        "sortOrder": "0"
+      }
+    }
+  },
+  "dashboard": {
+    "navigation": {
+      "dashboard": "Panel de Control",
+      "orders": "Pedidos",
+      "reports": "Informes",
+      "products": "Productos",
+      "categories": "Categorías",
+      "users": "Usuarios",
+      "settings": "Configuración"
+    },
+    "breadcrumbs": {
+      "dashboard": "Panel de Control",
+      "orders": "Pedidos",
+      "users": "Usuarios",
+      "reports": "Informes",
+      "settings": "Configuración",
+      "products": "Productos",
+      "categories": "Categorías",
+      "edit": "Editar",
+      "new": "Nuevo"
+    }
+  },
+  "orderSession": {
+    "viewSummary": "Resumen",
+    "summary": "Resumen del Pedido",
+    "total": "Total",
+    "closeSession": "Cerrar Sesión",
+    "sessionClosed": "Cuenta cerrada con éxito",
+    "sessionClosedAndLoggedOut": "Sesión cerrada. ¡Hasta luego!",
+    "noOrders": "No se encontraron pedidos para esta sesión."
+  },
+  "logout": {
+    "confirmWithActiveSession": "¿Cerrar sesión activa?",
+    "activeSessionWarning": "Tienes una sesión activa. Al salir, la sesión se cerrará automáticamente.",
+    "closeSessionAndLogout": "Cerrar y Salir"
+  },
+  "notFound": {
+    "errorCode": "404",
+    "title": "Página no encontrada",
+    "description": "La página que estás buscando no existe o ha sido eliminada."
+  }
+}

@@ -1,12 +1,14 @@
 import { TranslationsEnum, type TranslationLanguage } from "@/shared/enums/translations.enum";
 import ptBR from "@/shared/translations/pt-BR.json";
 import enUS from "@/shared/translations/en-US.json";
+import es from "@/shared/translations/es.json";
 
 type TranslationRecord = Record<string, unknown>;
 
 const translations: Record<TranslationLanguage, TranslationRecord> = {
   [TranslationsEnum.PT_BR]: ptBR as TranslationRecord,
   [TranslationsEnum.EN_US]: enUS as TranslationRecord,
+  [TranslationsEnum.ES]: es as TranslationRecord,
 };
 
 let currentLanguage: TranslationLanguage = TranslationsEnum.PT_BR;
