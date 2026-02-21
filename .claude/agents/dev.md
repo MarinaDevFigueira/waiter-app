@@ -36,6 +36,16 @@ This agent follows the specifications defined in:
 - Internationalization
 - Error handling
 
+### Global Specs (~/.specs/)
+
+12 specification files covering:
+- Code comments prohibition
+- Boolean variable extraction
+- ESLint rule enforcement
+- Playwright testing configuration
+- Named variables philosophy
+- No inline code patterns
+
 ---
 
 ## Consolidated Instructions
@@ -66,9 +76,14 @@ import { SplashScreen } from '@/components/splash-screen';
 import { SplashScreen } from '@/components/splash-screen/splash-screen';
 ```
 
-#### No Comments
+#### No Comments (GLOBAL SPEC - HIGHEST PRIORITY)
 
-**NEVER** add comments to code. No exceptions.
+**NEVER** add comments to code. No exceptions whatsoever.
+
+- **NEVER** add `//` or `/* */` comments to code
+- **NEVER** comment out code — delete it instead
+- Use descriptive variable names and function extraction instead
+- Delete unused code immediately, do not mark with `@deprecated` or `// TODO: remove`
 
 Code must be self-documenting through:
 - Descriptive variable names
@@ -76,15 +91,28 @@ Code must be self-documenting through:
 - Clear component structure
 - Proper naming conventions
 
-#### No AI Attribution
+**Rationale:** Self-documenting code through clear naming reduces maintenance burden. Comments become stale; well-named code does not.
+
+#### No AI Attribution (GLOBAL SPEC - HIGHEST PRIORITY)
 
 **NEVER** include any reference to AI tools in:
 - Git commit messages
-- Git commit co-authors
-- Pull request descriptions
+- Git commit co-authors (Never add `Co-Authored-By: Claude`)
+- Pull request descriptions (Never add "Generated with [Claude Code]" footer)
 - Code comments
 - Documentation
 - Any project files
+
+**Rationale:** Code and commits should appear as if developed manually by the team. AI attribution is unnecessary and clutters version history.
+
+#### Never Disable ESLint Rules (GLOBAL SPEC - HIGHEST PRIORITY)
+
+- **NEVER** add `/* eslint-disable */` or `// eslint-disable-next-line` comments
+- If ESLint complains, refactor the code to fix the issue
+- If a rule is invalid for the project, discuss with the team before disabling
+- Prefer clean code without suppressions
+
+**Rationale:** ESLint rules exist to prevent bugs and maintain code quality. Disabling them hides problems instead of solving them.
 
 #### KISS Principle
 
@@ -106,6 +134,128 @@ All custom `data-*` attributes must use **lowercase only** (no camelCase, no Pas
 // CORRECT
 <div data-issuccess={true}>
 ```
+
+### Global Named Variables Philosophy
+
+**CRITICAL PRINCIPLE:** Always Named Variables — Never Inline Code
+
+This philosophy is enforced by 6 global specs that must be followed rigorously:
+
+#### 1. No Inline Function Arguments (GLOBAL SPEC)
+
+**NEVER** pass computed values, ternaries, or fallback expressions directly as function arguments.
+
+```typescript
+// WRONG
+await sendEmail(user.email ?? 'fallback@example.com', status === 'ACTIVE');
+
+// CORRECT
+const email = user.email ?? 'fallback@example.com';
+const isActive = status === 'ACTIVE';
+await sendEmail(email, isActive);
+
+// WRONG
+logger.log(error instanceof Error ? error.message : String(error));
+
+// CORRECT
+const message = error instanceof Error ? error.message : String(error);
+logger.log(message);
+```
+
+#### 2. No Inline Object Properties (GLOBAL SPEC)
+
+**NEVER** assign computed values, ternaries, or fallbacks directly as object property values.
+
+```typescript
+// WRONG
+const response = {
+  name: user.name ?? 'Anonymous',
+  active: status === 'ENABLED',
+  label: count > 100 ? 'many' : 'few',
+};
+
+// CORRECT
+const name = user.name ?? 'Anonymous';
+const active = status === 'ENABLED';
+const isMany = count > 100;
+const label = isMany ? 'many' : 'few';
+const response = { name, active, label };
+```
+
+#### 3. No Inline Return Expressions (GLOBAL SPEC)
+
+**NEVER** return computed values, ternaries, or fallbacks directly.
+
+```typescript
+// WRONG
+return value > 100 ? true : false;
+
+// CORRECT
+const isOverLimit = value > 100;
+return isOverLimit;
+
+// WRONG
+return user.name ?? 'Default Name';
+
+// CORRECT
+const displayName = user.name ?? 'Default Name';
+return displayName;
+```
+
+#### 4. No Inline Conditionals (GLOBAL SPEC)
+
+**NEVER** write inline conditional expressions directly in return statements, object properties, or function arguments.
+
+```typescript
+// WRONG
+if (value > 100 || status === 'ENABLED') { ... }
+
+// CORRECT
+const isOverLimit = value > 100;
+const isEnabled = status === 'ENABLED';
+const shouldProceed = isOverLimit || isEnabled;
+if (shouldProceed) { ... }
+```
+
+#### 5. No Inline Boolean Expressions (GLOBAL SPEC)
+
+**NEVER** use raw boolean expressions in `if` conditions, `&&`, `||`, or ternaries without extraction.
+
+```typescript
+// WRONG
+if (user.role === 'admin' && user.active) { ... }
+
+// CORRECT
+const isAdmin = user.role === 'admin';
+const isActive = user.active;
+const canAccess = isAdmin && isActive;
+if (canAccess) { ... }
+```
+
+#### 6. Boolean Variable Extraction (GLOBAL SPEC)
+
+**ALWAYS** extract boolean variables before every conditional.
+
+```javascript
+// WRONG
+if (order.status === 'confirmed') { ... }
+
+// CORRECT
+const isConfirmed = order.status === 'confirmed';
+if (isConfirmed) { ... }
+
+// WRONG — ternary in object property
+const buttonProps = {
+  variant: status === 'success' ? 'primary' : 'secondary',
+};
+
+// CORRECT — pre-compute then assign
+const isSuccess = status === 'success';
+const variant = isSuccess ? 'primary' : 'secondary';
+const buttonProps = { variant };
+```
+
+**Rationale:** Named variables make code self-documenting, easier to debug, and prevent deeply nested expressions. They act as self-documenting assertions about what conditions and values mean.
 
 ### React Patterns
 
@@ -469,7 +619,8 @@ async create(data): Promise<ServiceResult<void>> {
 
 // Caller MUST invalidate cache
 const result = await service.create(data);
-if ("error" in result) {
+const hasError = "error" in result;
+if (hasError) {
   toast.error(result.error);
   return;
 }
@@ -611,7 +762,8 @@ Component with dropdown, persists in localStorage, updates document.lang.
 import { toast } from 'react-toastify';
 
 const result = await service.doSomething();
-if (result.error) {
+const hasError = "error" in result;
+if (hasError) {
   toast.error(result.error);
   return;
 }
@@ -662,6 +814,44 @@ const pagination = usePagination({
 ```
 
 ### Testing
+
+#### Playwright Testing Configuration (GLOBAL SPEC)
+
+**CRITICAL:** `slowMo` is NOT a CLI flag — it's a browser launch option configured in `playwright.config.js`.
+
+##### Valid Configuration
+
+```javascript
+// playwright.config.js
+export default defineConfig({
+  use: {
+    baseURL: "http://localhost:5173",
+    trace: "on-first-retry",
+    launchOptions: {
+      slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,
+    },
+  },
+});
+```
+
+##### Valid CLI Flags
+
+```bash
+# UI Mode (interactive debugging)
+playwright test --ui
+
+# Debug Mode (step-by-step with inspector)
+playwright test --debug
+
+# Headed Mode (visible browser)
+playwright test --headed
+
+# WRONG - slowMo is NOT a CLI flag
+playwright test --slow-mo=1000
+
+# CORRECT - Use environment variable
+SLOW_MO=1000 playwright test --headed
+```
 
 #### Data Test ID Pattern
 
@@ -728,11 +918,33 @@ Apply in `@layer base` for both webkit and Firefox.
 
 ---
 
+## Priority Rules
+
+When project specs conflict with global specs:
+
+1. **Global specs ALWAYS take precedence** for these topics:
+   - No comments (global spec overrides project)
+   - No AI attribution (global spec overrides project)
+   - Never disable ESLint (global spec overrides project)
+   - Named variables philosophy (6 global specs - highest priority)
+   - Playwright testing configuration (global spec overrides project)
+   - Boolean variable extraction (global spec reinforces project spec)
+
+2. **Project specs take precedence** for:
+   - Project-specific architecture patterns
+   - Component structure specific to this project
+   - API patterns specific to this backend
+   - Business logic and domain rules
+
+---
+
 ## Usage Notes
 
-- These specs are consolidated from 61 files in `./.specs/`
-- No global specs found in `~/.specs/`
+- These specs are consolidated from:
+  - 61 project specs in `./.specs/`
+  - 12 global specs in `~/.specs/`
+- Global specs for code style (no comments, named variables, no ESLint disable) take highest priority
 - Last updated: 2026-02-20
-- Total specs loaded: 61
+- Total specs loaded: 73
 
-You can now use `@dev` in your conversations to apply these project-specific patterns and conventions.
+You can now use `@dev` in your conversations to apply these project-specific patterns and conventions with global best practices enforced.
