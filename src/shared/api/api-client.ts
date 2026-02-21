@@ -54,6 +54,7 @@ async function doRefresh(): Promise<boolean> {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
+      credentials: "include",
     });
 
     const isSuccess = response.ok;
@@ -111,7 +112,11 @@ async function request<T>(
       ...options.headers,
     };
 
-    const response = await fetch(`${API_URL}${path}`, { ...options, headers });
+    const response = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers,
+      credentials: "include",
+    });
 
     const isUnauthorized = response.status === 401;
     if (isUnauthorized) {
@@ -128,7 +133,11 @@ async function request<T>(
         ...options.headers,
       };
 
-      const retryResponse = await fetch(`${API_URL}${path}`, { ...options, headers: retryHeaders });
+      const retryResponse = await fetch(`${API_URL}${path}`, {
+        ...options,
+        headers: retryHeaders,
+        credentials: "include",
+      });
       const retryJson = await retryResponse.json().catch(() => ({}));
 
       const retrySuccess = retryResponse.ok;

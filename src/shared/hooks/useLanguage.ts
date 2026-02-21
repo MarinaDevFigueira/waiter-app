@@ -6,6 +6,7 @@ interface UseLanguageReturn {
   language: TranslationLanguage;
   setLanguage: (language: TranslationLanguage) => void;
   toggleLanguage: () => void;
+  addLanguagePrefix: (...keys: unknown[]) => unknown[];
 }
 
 export function useLanguage(): UseLanguageReturn {
@@ -18,9 +19,14 @@ export function useLanguage(): UseLanguageReturn {
     return () => subscription.unsubscribe();
   }, []);
 
+  const addLanguagePrefix = (...keys: unknown[]): unknown[] => {
+    return [`language:${language}`, ...keys];
+  };
+
   return {
     language,
     setLanguage: languageObservable.setLanguage,
     toggleLanguage: languageObservable.toggleLanguage,
+    addLanguagePrefix,
   };
 }

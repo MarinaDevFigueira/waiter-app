@@ -2,6 +2,7 @@ import { BehaviorSubject, type Subscription } from "rxjs";
 import { StorageKeys } from "@/shared/constants/storage-keys";
 import { TranslationsEnum, type TranslationLanguage } from "@/shared/enums/translations.enum";
 import { setLanguage as setTranslationLanguage } from "@/shared/utils/translations";
+import { cookies } from "@/lib/cookies";
 
 const getStoredLanguage = (): TranslationLanguage | null => {
   const stored = localStorage.getItem(StorageKeys.LANGUAGE);
@@ -25,6 +26,7 @@ const getInitialLanguage = (): TranslationLanguage => {
 const applyLanguage = (language: TranslationLanguage): void => {
   setTranslationLanguage(language);
   document.documentElement.lang = language;
+  cookies.set("user_language", language);
 };
 
 const initialLanguage = getInitialLanguage();

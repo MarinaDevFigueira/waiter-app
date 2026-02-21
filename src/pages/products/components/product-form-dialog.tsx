@@ -13,6 +13,7 @@ import { productFormSchema } from "@/shared/schemas/product.schema";
 import type { Product, ProductForm } from "@/shared/schemas/product.schema";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useCategories } from "@/shared/hooks/useCategories";
+import { useLanguage } from "@/shared/hooks/useLanguage";
 
 interface ProductFormDialogProps {
   open: boolean;
@@ -91,6 +92,7 @@ function Footer({ onCancel, isPending, submitLabel }: FooterProps) {
 
 function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialogProps) {
   const { t } = useTranslation();
+  const { addLanguagePrefix } = useLanguage();
   const queryClient = useQueryClient();
   const isEditing = product !== undefined;
 
@@ -157,7 +159,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
         return;
       }
       toast.success(t("products.form.createSuccess"));
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("products") });
       onOpenChange(false);
     },
     onError: () => {
@@ -174,7 +176,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
         return;
       }
       toast.success(t("products.form.updateSuccess"));
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("products") });
       onOpenChange(false);
     },
     onError: () => {

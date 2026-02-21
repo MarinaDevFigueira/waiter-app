@@ -9,6 +9,7 @@ import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
 import type { OrdersQueryParams, UseOrdersReturn } from "@/shared/hooks/useOrders.interface";
+import { useLanguage } from "@/shared/hooks/useLanguage";
 
 const DEFAULT_QUERY_PARAMS: OrdersQueryParams = {
   search: "",
@@ -19,12 +20,13 @@ const DEFAULT_QUERY_PARAMS: OrdersQueryParams = {
 };
 
 export function useOrders(): UseOrdersReturn {
+  const { addLanguagePrefix } = useLanguage();
   const queryClient = useQueryClient();
   const [optimisticOrders, setOptimisticOrders] = useState<Order[]>(kitchenOrdersObservable.getValue());
   const [queryParams, setQueryParams] = useState<OrdersQueryParams>(DEFAULT_QUERY_PARAMS);
 
   const { data, isLoading, error, isError } = useQuery<PaginatedOrders>({
-    queryKey: ["orders", queryParams],
+    queryKey: addLanguagePrefix("orders", queryParams),
     queryFn: async () => {
       const result = await ordersService.getAll({
         search: queryParams.search || undefined,
@@ -82,12 +84,12 @@ export function useOrders(): UseOrdersReturn {
       logger.error("Erro ao atualizar status do pedido", updateError);
     }
 
-    queryClient.invalidateQueries({ queryKey: ["orders"] });
-  }, [queryClient]);
+    queryClient.invalidateQueries({ queryKey: addLanguagePrefix("orders") });
+  }, [queryClient, addLanguagePrefix]);
 
   const refetch = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ["orders"] });
-  }, [queryClient]);
+    queryClient.invalidateQueries({ queryKey: addLanguagePrefix("orders") });
+  }, [queryClient, addLanguagePrefix]);
 
   return {
     orders,
