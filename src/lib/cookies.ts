@@ -1,3 +1,8 @@
+const cookieDomain = import.meta.env.VITE_COOKIE_DOMAIN;
+const hostname = window.location.hostname;
+const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
+const domainAttr = cookieDomain && !isLocalhost ? `;Domain=${cookieDomain}` : "";
+
 export const cookies = {
   set: (name: string, value: string, days = 365): void => {
     const date = new Date();
@@ -5,14 +10,6 @@ export const cookies = {
     const expires = `expires=${date.toUTCString()}`;
     const isSecure = window.location.protocol === "https:";
     const secureAttr = isSecure ? ";Secure" : "";
-    const hostname = window.location.hostname;
-    const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
-    const parts = hostname.split(".");
-    const isCompoundTLD = parts.length >= 3 && parts[parts.length - 2] === "com";
-    const domainParts = isCompoundTLD ? 3 : 2;
-    const shouldAddDomain = !isLocalhost && parts.length >= domainParts;
-    const rootDomain = shouldAddDomain ? `.${parts.slice(-domainParts).join(".")}` : "";
-    const domainAttr = rootDomain ? `;Domain=${rootDomain}` : "";
     document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax${secureAttr}${domainAttr}`;
   },
 
@@ -37,14 +34,6 @@ export const cookies = {
   remove: (name: string): void => {
     const isSecure = window.location.protocol === "https:";
     const secureAttr = isSecure ? ";Secure" : "";
-    const hostname = window.location.hostname;
-    const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
-    const parts = hostname.split(".");
-    const isCompoundTLD = parts.length >= 3 && parts[parts.length - 2] === "com";
-    const domainParts = isCompoundTLD ? 3 : 2;
-    const shouldAddDomain = !isLocalhost && parts.length >= domainParts;
-    const rootDomain = shouldAddDomain ? `.${parts.slice(-domainParts).join(".")}` : "";
-    const domainAttr = rootDomain ? `;Domain=${rootDomain}` : "";
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax${secureAttr}${domainAttr}`;
   },
 };
