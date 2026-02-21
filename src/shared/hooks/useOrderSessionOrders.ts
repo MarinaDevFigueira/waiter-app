@@ -4,10 +4,13 @@ import { toast } from "react-toastify";
 import { logger } from "@/lib/logger";
 import { ordersService } from "@/services/orders/orders.service";
 import type { PaginatedOrders } from "@/services/orders/orders.service";
+import { useLanguage } from "@/shared/hooks/useLanguage";
 
 export function useOrderSessionOrders(orderSessionId: string | null) {
+  const { addLanguagePrefix } = useLanguage();
+
   const query = useQuery<PaginatedOrders>({
-    queryKey: ["orders", { orderSessionId }],
+    queryKey: addLanguagePrefix("orders", { orderSessionId }),
     queryFn: async () => {
       const result = await ordersService.getAll({
         orderSessionId: orderSessionId as string,

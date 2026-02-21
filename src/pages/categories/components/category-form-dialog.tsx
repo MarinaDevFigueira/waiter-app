@@ -11,6 +11,7 @@ import { categoriesService } from "@/services/categories/categories.service";
 import { categoryFormSchema } from "@/shared/schemas/category.schema";
 import type { Category, CategoryForm } from "@/shared/schemas/category.schema";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import { useLanguage } from "@/shared/hooks/useLanguage";
 
 interface CategoryFormDialogProps {
   open: boolean;
@@ -83,6 +84,7 @@ function Footer({ onCancel, isPending, submitLabel }: FooterProps) {
 
 function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDialogProps) {
   const { t } = useTranslation();
+  const { addLanguagePrefix } = useLanguage();
   const queryClient = useQueryClient();
   const isEditing = category !== undefined;
   const categoryId = category?.id ?? "";
@@ -134,7 +136,7 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
         return;
       }
       toast.success(t("categories.form.createSuccess"));
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("categories") });
       onOpenChange(false);
     },
     onError: () => {
@@ -151,7 +153,7 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
         return;
       }
       toast.success(t("categories.form.updateSuccess"));
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("categories") });
       onOpenChange(false);
     },
     onError: () => {

@@ -7,6 +7,7 @@ import { ordersService } from "@/services/orders/orders.service";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { UserProfileEnum } from "@/shared/constants/user-profile";
 import { logger } from "@/lib/logger";
+import { useLanguage } from "@/shared/hooks/useLanguage";
 
 interface UseCartReturn {
   cart: CartData;
@@ -23,6 +24,7 @@ export function useCart(): UseCartReturn {
   const [cart, setCart] = useState<CartData>(cartObservable.getValue());
   const [isLoading, setIsLoading] = useState(false);
   const { auth } = useAuth();
+  const { addLanguagePrefix } = useLanguage();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -215,7 +217,7 @@ export function useCart(): UseCartReturn {
         cartObservable.setOrderSession(currentCart.orderSessionId);
       }
 
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("orders") });
       return true;
     } finally {
       setIsLoading(false);

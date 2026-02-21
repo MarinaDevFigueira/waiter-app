@@ -7,6 +7,7 @@ import { productsFiltersObservable, type ProductFilters } from "@/shared/subject
 import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type { Product } from "@/shared/schemas/product.schema";
+import { useLanguage } from "@/shared/hooks/useLanguage";
 
 interface QueryParams {
   page: number;
@@ -46,6 +47,8 @@ interface UseProductsReturn {
 }
 
 export function useProducts(): UseProductsReturn {
+  const { addLanguagePrefix } = useLanguage();
+
   const [queryParams, setQueryParams] = useState<QueryParams>({
     page: 1,
     size: 10,
@@ -67,7 +70,7 @@ export function useProducts(): UseProductsReturn {
   }, []);
 
   const { data, isLoading, error, isError } = useQuery<PaginatedProducts>({
-    queryKey: ["products", queryParams],
+    queryKey: addLanguagePrefix("products", queryParams),
     queryFn: async () => {
       const result = await productsService.getAll(queryParams) as { data?: PaginatedProducts; error?: string };
 

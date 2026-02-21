@@ -7,6 +7,7 @@ import { CategoriesOrderByEnum } from "@/shared/enums/categories-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type { Category } from "@/shared/schemas/category.schema";
 import type { PaginatedCategories, CategoryQueryParams } from "@/services/categories/categories.schema";
+import { useLanguage } from "@/shared/hooks/useLanguage";
 
 interface UseCategoriesReturn {
   categories: Category[];
@@ -32,6 +33,8 @@ interface UseCategoriesOptions {
 }
 
 export function useCategories(options?: UseCategoriesOptions | string): UseCategoriesReturn {
+  const { addLanguagePrefix } = useLanguage();
+
   const resolvedErrorMessage = typeof options === "string" ? options : options?.errorMessage;
   const resolvedInitialSize = typeof options === "string" ? 10 : (options?.initialSize ?? 10);
 
@@ -44,7 +47,7 @@ export function useCategories(options?: UseCategoriesOptions | string): UseCateg
   });
 
   const { data, isLoading, error, isError } = useQuery<PaginatedCategories>({
-    queryKey: ["categories", queryParams],
+    queryKey: addLanguagePrefix("categories", queryParams),
     queryFn: async () => {
       const result = await categoriesService.getAll(queryParams) as { data?: PaginatedCategories; error?: string };
 
