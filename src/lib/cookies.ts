@@ -6,10 +6,13 @@ export const cookies = {
     const isSecure = window.location.protocol === "https:";
     const secureAttr = isSecure ? ";Secure" : "";
     const hostname = window.location.hostname;
+    const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
     const parts = hostname.split(".");
-    const hasMultipleParts = parts.length >= 2;
-    const rootDomain = hasMultipleParts ? `.${parts.slice(-2).join(".")}` : hostname;
-    const domainAttr = hasMultipleParts ? `;Domain=${rootDomain}` : "";
+    const isCompoundTLD = parts.length >= 3 && parts[parts.length - 2] === "com";
+    const domainParts = isCompoundTLD ? 3 : 2;
+    const shouldAddDomain = !isLocalhost && parts.length >= domainParts;
+    const rootDomain = shouldAddDomain ? `.${parts.slice(-domainParts).join(".")}` : "";
+    const domainAttr = rootDomain ? `;Domain=${rootDomain}` : "";
     document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax${secureAttr}${domainAttr}`;
   },
 
@@ -35,10 +38,13 @@ export const cookies = {
     const isSecure = window.location.protocol === "https:";
     const secureAttr = isSecure ? ";Secure" : "";
     const hostname = window.location.hostname;
+    const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
     const parts = hostname.split(".");
-    const hasMultipleParts = parts.length >= 2;
-    const rootDomain = hasMultipleParts ? `.${parts.slice(-2).join(".")}` : hostname;
-    const domainAttr = hasMultipleParts ? `;Domain=${rootDomain}` : "";
+    const isCompoundTLD = parts.length >= 3 && parts[parts.length - 2] === "com";
+    const domainParts = isCompoundTLD ? 3 : 2;
+    const shouldAddDomain = !isLocalhost && parts.length >= domainParts;
+    const rootDomain = shouldAddDomain ? `.${parts.slice(-domainParts).join(".")}` : "";
+    const domainAttr = rootDomain ? `;Domain=${rootDomain}` : "";
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax${secureAttr}${domainAttr}`;
   },
 };
