@@ -3,7 +3,9 @@ export const cookies = {
     const date = new Date();
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
     const expires = `expires=${date.toUTCString()}`;
-    document.cookie = `${name}=${value};${expires};path=/`;
+    const isSecure = window.location.protocol === "https:";
+    const secureAttr = isSecure ? ";Secure" : "";
+    document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax${secureAttr}`;
   },
 
   get: (name: string): string | null => {
@@ -25,6 +27,8 @@ export const cookies = {
   },
 
   remove: (name: string): void => {
-    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+    const isSecure = window.location.protocol === "https:";
+    const secureAttr = isSecure ? ";Secure" : "";
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax${secureAttr}`;
   },
 };
