@@ -5,7 +5,12 @@ export const cookies = {
     const expires = `expires=${date.toUTCString()}`;
     const isSecure = window.location.protocol === "https:";
     const secureAttr = isSecure ? ";Secure" : "";
-    document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax${secureAttr}`;
+    const hostname = window.location.hostname;
+    const parts = hostname.split(".");
+    const hasMultipleParts = parts.length >= 2;
+    const rootDomain = hasMultipleParts ? `.${parts.slice(-2).join(".")}` : hostname;
+    const domainAttr = hasMultipleParts ? `;Domain=${rootDomain}` : "";
+    document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax${secureAttr}${domainAttr}`;
   },
 
   get: (name: string): string | null => {
@@ -29,6 +34,11 @@ export const cookies = {
   remove: (name: string): void => {
     const isSecure = window.location.protocol === "https:";
     const secureAttr = isSecure ? ";Secure" : "";
-    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax${secureAttr}`;
+    const hostname = window.location.hostname;
+    const parts = hostname.split(".");
+    const hasMultipleParts = parts.length >= 2;
+    const rootDomain = hasMultipleParts ? `.${parts.slice(-2).join(".")}` : hostname;
+    const domainAttr = hasMultipleParts ? `;Domain=${rootDomain}` : "";
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax${secureAttr}${domainAttr}`;
   },
 };
