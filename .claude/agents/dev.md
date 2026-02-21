@@ -38,13 +38,18 @@ This agent follows the specifications defined in:
 
 ### Global Specs (~/.specs/)
 
-12 specification files covering:
+17 specification files covering:
 - Code comments prohibition
 - Boolean variable extraction
 - ESLint rule enforcement
 - Playwright testing configuration
 - Named variables philosophy
 - No inline code patterns
+- Internationalization (i18n) implementation
+- Language cookie management
+- Query cache invalidation on language change
+- Translations enum pattern
+- Backend translations array structure
 
 ---
 
@@ -730,15 +735,264 @@ export function ProductsTableSkeleton() {
 
 ### Internationalization (i18n)
 
-#### Structure
+#### Translations Structure (GLOBAL SPEC - HIGHEST PRIORITY)
 
+**CRITICAL:** All translation files must have identical key structure across all languages.
+
+- **ALWAYS** maintain identical key structure across all language files (pt-BR.json, en-US.json, es.json)
+- **NEVER** add a key to one language without adding to ALL languages
+- **ALWAYS** use nested objects for logical grouping
+- **NEVER** use flat key structures like `"auth.login"` - use nested objects
+
+```json
+// ✅ CORRECT - All languages have identical structure
+// pt-BR.json
+{
+  "auth": {
+    "login": "Entrar",
+    "logout": "Sair",
+    "forgotPassword": "Esqueci a senha"
+  }
+}
+
+// en-US.json
+{
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "forgotPassword": "Forgot Password"
+  }
+}
+
+// es.json
+{
+  "auth": {
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "forgotPassword": "Olvidé mi Contraseña"
+  }
+}
 ```
-src/shared/
-├── enums/translations.enum.js
-└── translations/
-    ├── pt-BR.json
-    └── en-US.json
+
+**Adding New Translations:**
+1. Add to primary language (pt-BR.json) first
+2. Immediately add to ALL other languages
+3. Verify key parity across all files
+
+**Why:** Prevents missing translations, easier maintenance, type safety.
+
+#### Translations Enum (GLOBAL SPEC - HIGHEST PRIORITY)
+
+**ALWAYS** use TypeScript enum for supported languages, **NEVER** hardcode language codes.
+
+```typescript
+// ✅ CORRECT - src/shared/enums/translations.enum.ts
+export enum TranslationsEnum {
+  PT_BR = "pt-BR",
+  EN_US = "en-US",
+  ES = "es",
+}
+
+export type TranslationLanguage =
+  | TranslationsEnum.PT_BR
+  | TranslationsEnum.EN_US
+  | TranslationsEnum.ES;
 ```
+
+**Usage:**
+```typescript
+// ✅ CORRECT - Using enum
+import { TranslationsEnum, type TranslationLanguage } from '@/shared/enums/translations.enum';
+
+const [language, setLanguage] = useState<TranslationLanguage>(
+  TranslationsEnum.PT_BR // ✅ Enum value
+);
+
+if (language === TranslationsEnum.PT_BR) { // ✅ Enum comparison
+  // ...
+}
+
+// ❌ WRONG - Hardcoded strings
+const [language, setLanguage] = useState("pt-BR"); // ❌ Hardcoded
+if (language === "pt-BR") { // ❌ String literal
+```
+
+**Why:** Type safety, autocomplete, refactor-safe, single source of truth.
+
+#### Language Cookie Pattern (GLOBAL SPEC - HIGHEST PRIORITY)
+
+**ALWAYS** send user's selected language to backend via HTTP cookie, **NEVER** via headers or query params.
+
+- **ALWAYS** send language preference via HTTP cookie named `user_language`
+- **NEVER** send language in custom headers (e.g., `Accept-Language`, `X-Language`)
+- **NEVER** send language in query parameters (e.g., `?lang=pt-BR`)
+- **ALWAYS** configure HTTP client with `credentials: "include"`
+
+```typescript
+// ✅ CORRECT - Set cookie when language changes
+import { cookies } from '@/lib/cookies';
+
+export function useLanguage() {
+  const setLanguage = (language: string) => {
+    localStorage.setItem('language', language);
+    document.documentElement.lang = language;
+    cookies.set('user_language', language); // ✅ Cookie set
+  };
+}
+
+// ✅ CORRECT - Configure HTTP client
+const response = await fetch(`${API_URL}/products`, {
+  method: 'GET',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include', // ✅ Sends cookies
+});
+```
+
+**Cookie Utility:**
+```typescript
+// src/lib/cookies.ts
+export const cookies = {
+  set: (name: string, value: string, days = 365): void => {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    const expires = `expires=${date.toUTCString()}`;
+    document.cookie = `${name}=${value};${expires};path=/`;
+  },
+  get: (name: string): string | null => { /* ... */ },
+  remove: (name: string): void => { /* ... */ },
+};
+```
+
+**Why:** Automatic transmission, backend compatibility, persistence, clean URLs.
+
+#### Query Cache Invalidation (GLOBAL SPEC - HIGHEST PRIORITY)
+
+**ALWAYS** invalidate cached queries when language changes by including language in query keys.
+
+- **ALWAYS** include language prefix in all TanStack Query keys
+- **NEVER** share cache between different languages
+- **ALWAYS** create utility function for adding language prefix
+- **NEVER** duplicate language prefix logic across files
+
+```typescript
+// ✅ CORRECT - Language prefix utility in useLanguage.ts
+export function useLanguage() {
+  const [language, setLanguage] = useState('pt-BR');
+
+  const addLanguagePrefix = (...keys: unknown[]): unknown[] => {
+    return [`language:${language}`, ...keys];
+  };
+
+  return {
+    language,
+    setLanguage,
+    addLanguagePrefix, // ✅ Utility function
+  };
+}
+
+// ✅ CORRECT - Use in all query hooks
+const { addLanguagePrefix } = useLanguage();
+
+const { data } = useQuery({
+  queryKey: addLanguagePrefix('products', queryParams),
+  // Result: ['language:pt-BR', 'products', queryParams]
+  queryFn: () => fetchProducts(queryParams),
+});
+
+// ✅ CORRECT - Use in cache invalidations
+queryClient.invalidateQueries({
+  queryKey: addLanguagePrefix('categories'), // ✅ With language
+});
+```
+
+**How It Works:**
+- User viewing in Portuguese: `queryKey: ['language:pt-BR', 'products', { page: 1 }]`
+- User switches to English: `queryKey: ['language:en-US', 'products', { page: 1 }]` → Cache EMPTY → Triggers refetch
+- User switches back to Portuguese: `queryKey: ['language:pt-BR', 'products', { page: 1 }]` → Cache HIT → Returns cached data
+
+**Why:** Prevents stale translations, automatic invalidation, cache efficiency, single source of truth.
+
+#### Backend Translations Array (GLOBAL SPEC - HIGHEST PRIORITY)
+
+Backend entities with translatable fields MUST use `translations[]` array, never top-level translated fields.
+
+- **ALWAYS** use `translations[]` array in DTOs for multilingual entities
+- **NEVER** use top-level fields like `name`, `description` that should be translated
+- **ALWAYS** include `locale` field in each translation object
+- **NEVER** send different structure than backend expects
+
+```typescript
+// ✅ CORRECT - Backend DTO Pattern
+interface CreateCategoryRequestDTO {
+  translations: Array<{
+    locale: 'pt-BR' | 'en-US' | 'es';
+    name: string;
+    description?: string;
+  }>;
+  sortOrder: number;
+  active: boolean;
+}
+
+// Request body
+{
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "name": "Pizzas",
+      "description": "Nossas deliciosas pizzas"
+    },
+    {
+      "locale": "en-US",
+      "name": "Pizzas",
+      "description": "Our delicious pizzas"
+    }
+  ],
+  "sortOrder": 1,
+  "active": true
+}
+```
+
+**Frontend Schema:**
+```typescript
+// category.schema.ts
+export const categoryTranslationSchema = z.object({
+  locale: z.enum(['pt-BR', 'en-US', 'es']),
+  name: z.string().min(1, 'Nome é obrigatório'),
+  description: z.string().optional(),
+});
+
+export const categoryFormSchema = z.object({
+  translations: z.array(categoryTranslationSchema).min(1), // ✅ Array
+  sortOrder: z.number().int().min(0),
+  active: z.boolean().default(true),
+});
+```
+
+**Form Component:**
+```typescript
+const { language } = useLanguage();
+
+const form = useForm<CategoryForm>({
+  defaultValues: {
+    translations: [
+      {
+        locale: language, // ✅ Current app language
+        name: '',
+        description: '',
+      },
+    ],
+    sortOrder: 0,
+    active: true,
+  },
+});
+
+// Form fields use translations.0.name and translations.0.description
+<input type="hidden" {...form.register('translations.0.locale')} value={language} />
+<input {...form.register('translations.0.name')} />
+<textarea {...form.register('translations.0.description')} />
+```
+
+**Why:** Backend compatibility, multilingual support, type safety, scalability.
 
 #### useTranslation Hook
 
@@ -750,7 +1004,7 @@ const { t } = useTranslation();
 
 #### Language Selector
 
-Component with dropdown, persists in localStorage, updates document.lang.
+Component with dropdown, persists in localStorage and cookie, updates document.lang.
 
 ### Error Handling & Logging
 
@@ -942,9 +1196,9 @@ When project specs conflict with global specs:
 
 - These specs are consolidated from:
   - 61 project specs in `./.specs/`
-  - 12 global specs in `~/.specs/`
-- Global specs for code style (no comments, named variables, no ESLint disable) take highest priority
-- Last updated: 2026-02-20
-- Total specs loaded: 73
+  - 17 global specs in `~/.specs/`
+- Global specs for code style (no comments, named variables, no ESLint disable, i18n patterns) take highest priority
+- Last updated: 2026-02-21
+- Total specs loaded: 78
 
 You can now use `@dev` in your conversations to apply these project-specific patterns and conventions with global best practices enforced.
