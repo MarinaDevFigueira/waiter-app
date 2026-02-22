@@ -35,11 +35,17 @@ function DrawerOverlay({
   );
 }
 
+interface DrawerContentProps
+  extends React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content> {
+  showHandle?: boolean;
+}
+
 function DrawerContent({
   className,
   children,
+  showHandle = true,
   ...props
-}: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>) {
+}: DrawerContentProps) {
   return (
     <DrawerPortal>
       <DrawerOverlay />
@@ -50,7 +56,9 @@ function DrawerContent({
         )}
         {...props}
       >
-        <div className="mx-auto mt-4 h-1.5 w-12 shrink-0 rounded-full bg-muted-foreground/20" />
+        {showHandle && (
+          <div className="mx-auto mt-4 h-1.5 w-12 shrink-0 rounded-full bg-muted-foreground/20" />
+        )}
         {children}
       </DrawerPrimitive.Content>
     </DrawerPortal>
@@ -63,7 +71,7 @@ function DrawerHeader({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("flex flex-col space-y-1.5 p-4 pb-2", className)}
+      className={cn("flex items-center justify-between gap-4 p-4 shrink-0", className)}
       {...props}
     />
   );
@@ -118,8 +126,9 @@ function DrawerClose({
   return (
     <DrawerPrimitive.Close
       className={cn(
-        "absolute right-4 top-4 rounded-sm opacity-70 transition-opacity",
-        "hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+        "rounded-sm opacity-70 transition-opacity",
+        "hover:opacity-100 hover:cursor-pointer",
+        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
         "disabled:pointer-events-none",
         className
       )}

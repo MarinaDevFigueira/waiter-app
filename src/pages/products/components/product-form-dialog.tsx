@@ -201,12 +201,14 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <Dialog.Content className="max-w-xl max-h-[90vh] overflow-y-auto">
         <Dialog.Header>
-          <Dialog.Title>{dialogTitle}</Dialog.Title>
-          <Dialog.Description>
-            {isEditing
-              ? t("products.form.editDescription")
-              : t("products.form.createDescription")}
-          </Dialog.Description>
+          <div className="flex flex-col gap-1.5">
+            <Dialog.Title>{dialogTitle}</Dialog.Title>
+            <Dialog.Description>
+              {isEditing
+                ? t("products.form.editDescription")
+                : t("products.form.createDescription")}
+            </Dialog.Description>
+          </div>
           <Dialog.Close />
         </Dialog.Header>
 

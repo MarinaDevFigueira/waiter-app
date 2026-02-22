@@ -68,8 +68,8 @@ export function AppLayout({ children }: AppLayoutProps): JSX.Element {
     }
   }, [navigate, t]);
 
-  const handleCancelLogout = useCallback(() => {
-    setIsLogoutModalOpen(false);
+  const handleLogoutModalOpenChange = useCallback((isOpen: boolean) => {
+    setIsLogoutModalOpen(isOpen);
   }, []);
 
   return (
@@ -108,8 +108,8 @@ export function AppLayout({ children }: AppLayoutProps): JSX.Element {
       </main>
       <LogoutConfirmationModal
         open={isLogoutModalOpen}
+        onOpenChange={handleLogoutModalOpenChange}
         onConfirm={handleConfirmLogout}
-        onCancel={handleCancelLogout}
         isLoading={isLoggingOut}
       />
     </div>

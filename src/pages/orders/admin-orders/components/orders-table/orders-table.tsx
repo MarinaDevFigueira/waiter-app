@@ -10,6 +10,7 @@ import {
 import { CaretDownIcon, ListBulletsIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import { multiply, add } from "@/lib/math";
 import type { Order, OrderItem, OrderStatus } from "@/shared/schemas/order.schema";
 import { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
@@ -101,7 +102,10 @@ function Header({ headerGroups, sortState, getSortTitle, onColumnSort }: OrdersT
 }
 
 function OrderItemsDetails({ items, columnsCount, totalLabel, isExpanded }: OrderItemsDetailsProps) {
-  const total = items.reduce((acc, item) => acc + item.quantity * item.preco, 0);
+  const total = items.reduce((acc, item) => {
+    const itemTotal = multiply(item.quantity, item.preco);
+    return add(acc, itemTotal);
+  }, 0);
   const formattedTotal = formatCurrency(total);
   const expandedColSpan = columnsCount;
   const gridRowsClassName = isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]";
@@ -125,7 +129,7 @@ function OrderItemsDetails({ items, columnsCount, totalLabel, isExpanded }: Orde
             <tbody>
               {items.map((item: OrderItem, index: number) => {
                 const unitPrice = formatCurrency(item.preco);
-                const subtotal = item.quantity * item.preco;
+                const subtotal = multiply(item.quantity, item.preco);
                 const formattedSubtotal = formatCurrency(subtotal);
                 const rowKey = `${item.name}-${index}`;
 
@@ -302,7 +306,10 @@ export function OrdersTable({ orders, sortState, onSortChange }: OrdersTableProp
         id: "total",
         header: t("orders.admin.table.columns.total"),
         accessorFn: (row) => {
-          return row.items.reduce((acc, item) => acc + item.quantity * item.preco, 0);
+          return row.items.reduce((acc, item) => {
+            const itemTotal = multiply(item.quantity, item.preco);
+            return add(acc, itemTotal);
+          }, 0);
         },
         cell: (info) => {
           const total = info.getValue() as number;

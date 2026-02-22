@@ -163,10 +163,13 @@ export function ProductsFilters() {
 
         <Dialog.Content>
           <Dialog.Header>
-            <Dialog.Title>{t("products.filters.modalTitle")}</Dialog.Title>
-            <Dialog.Description>
-              {t("products.filters.modalSubtitle")}
-            </Dialog.Description>
+            <div className="flex flex-col gap-1.5">
+              <Dialog.Title>{t("products.filters.modalTitle")}</Dialog.Title>
+              <Dialog.Description>
+                {t("products.filters.modalSubtitle")}
+              </Dialog.Description>
+            </div>
+            <Dialog.Close />
           </Dialog.Header>
 
           <form onSubmit={handleSubmit(handleApplyFilters)} className="space-y-6 p-6">
@@ -246,8 +249,6 @@ export function ProductsFilters() {
               {t("common.buttons.apply")}
             </Button>
           </Dialog.Footer>
-
-          <Dialog.Close />
         </Dialog.Content>
       </Dialog>
     </div>
