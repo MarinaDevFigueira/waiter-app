@@ -130,6 +130,8 @@
       "updateSuccess": "Product updated successfully!",
       "createError": "Error creating product",
       "updateError": "Error updating product",
+      "imageDeleteSuccess": "Image removed successfully",
+      "imageDeleteError": "Error removing image",
       "fields": {
         "name": "Name",
         "description": "Description",
@@ -137,7 +139,7 @@
         "price": "Price",
         "stock": "Stock",
         "unit": "Unit",
-        "images": "Image URL",
+        "images": "Product Images",
         "active": "Active product"
       },
       "placeholders": {

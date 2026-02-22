@@ -4,9 +4,17 @@ import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
 import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 
+const apiImageSchema = z.union([
+  z.string(),
+  z.object({ id: z.string(), url: z.string() }),
+]);
+
 export const apiProductSchema = productSchema.omit({
   deletedAt: true,
-  deletedBy: true
+  deletedBy: true,
+  images: true,
+}).extend({
+  images: z.array(apiImageSchema).optional(),
 })
 
 const PRODUCTS_ORDER_BY_VALUES = Object.values(ProductsOrderByEnum) as [ProductsOrderByEnum, ...ProductsOrderByEnum[]];

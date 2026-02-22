@@ -93,7 +93,7 @@ export const FoodsPage = () => {
       const productPrice = product.price;
       const productImages = product.images;
       const firstImage = productImages?.[0];
-      const productImageUrl = firstImage;
+      const productImageUrl = firstImage?.url;
 
       await addItem(
         {
@@ -277,13 +277,16 @@ export const FoodsPage = () => {
 function FoodsLoadingSkeleton() {
   const skeletonRows = [0, 1, 2, 3, 4];
   return (
-    <ul className="w-full flex flex-col items-start justify-start gap-3 sm:gap-4">
+    <ul className="w-full flex flex-col items-start justify-start gap-3 sm:gap-4 animate-fade-in">
       {skeletonRows.map((i) => {
         const rowKey = i;
+        const staggerDelay = i * 60;
+        const skeletonStyle = { animationDelay: `${staggerDelay}ms` };
         return (
           <li
             key={rowKey}
-            className="w-full flex items-start gap-3 sm:gap-4 min-h-20 sm:h-24"
+            className="w-full flex items-start gap-3 sm:gap-4 min-h-20 sm:h-24 animate-stagger-item"
+            style={skeletonStyle}
           >
             <div className="h-20 sm:h-24 aspect-video rounded-md bg-muted animate-pulse shrink-0" />
             <div className="flex-1 flex flex-col gap-2 py-1">

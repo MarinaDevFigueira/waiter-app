@@ -1,16 +1,19 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { XIcon } from "@phosphor-icons/react";
+import { logger } from "@/lib/logger";
 import { Dialog } from "@/components/ui/dialog/dialog";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
+import { InputFile } from "@/components/ui/input-file/input-file";
 import { Label } from "@/components/ui/label/label";
 import { Combobox } from "@/components/ui/combobox/combobox";
 import { productsService } from "@/services/products/products.service";
 import { productFormSchema } from "@/shared/schemas/product.schema";
-import type { Product, ProductForm } from "@/shared/schemas/product.schema";
+import type { Product, ProductForm, ProductImage } from "@/shared/schemas/product.schema";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useCategories } from "@/shared/hooks/useCategories";
 import { useLanguage } from "@/shared/hooks/useLanguage";
@@ -37,6 +40,11 @@ interface FooterProps {
   onCancel: () => void;
   isPending: boolean;
   submitLabel: string;
+}
+
+interface ImagePreview {
+  url: string;
+  name: string;
 }
 
 const UNIT_OPTIONS: { value: ProductForm["unit"]; label: string }[] = [
@@ -98,6 +106,9 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
 
   const { categories, isLoading: isLoadingCategories } = useCategories({ initialSize: 100 });
 
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<ImagePreview[]>([]);
+
   const {
     register,
     handleSubmit,
@@ -132,6 +143,8 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
         images: product.images ?? [],
         active: product.active,
       });
+      setSelectedFiles([]);
+      setImagePreviews([]);
       return;
     }
 
@@ -147,11 +160,90 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
         images: [],
         active: true,
       });
+      setSelectedFiles([]);
+      setImagePreviews([]);
     }
   }, [open, isEditing, product, reset]);
 
+  useEffect(() => {
+    return () => {
+      imagePreviews.forEach((preview) => {
+        URL.revokeObjectURL(preview.url);
+      });
+    };
+  }, [imagePreviews]);
+
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const files = event.target.files;
+      const hasNoFiles = !files || files.length === 0;
+      if (hasNoFiles) return;
+
+      const newFiles = Array.from(files);
+      setSelectedFiles((prev) => [...prev, ...newFiles]);
+
+      const newPreviews = newFiles.map((file) => ({
+        url: URL.createObjectURL(file),
+        name: file.name,
+      }));
+      setImagePreviews((prev) => [...prev, ...newPreviews]);
+
+      event.target.value = "";
+    },
+    []
+  );
+
+  const handleRemoveNewImage = useCallback(
+    (index: number) => {
+      setSelectedFiles((prev) => {
+        const updated = [...prev];
+        updated.splice(index, 1);
+        return updated;
+      });
+
+      setImagePreviews((prev) => {
+        const removed = prev[index];
+        URL.revokeObjectURL(removed.url);
+        const updated = [...prev];
+        updated.splice(index, 1);
+        return updated;
+      });
+    },
+    []
+  );
+
+  const handleRemoveExistingImage = useCallback(
+    async (index: number) => {
+      const currentImages = watch("images");
+      const imageToRemove = currentImages[index];
+      const updatedImages = currentImages.filter((_: ProductImage, i: number) => i !== index);
+      setValue("images", updatedImages);
+
+      const isEditingProduct = isEditing && product?.id;
+      if (!isEditingProduct) return;
+
+      const fileId = imageToRemove.id;
+
+      const result = await productsService.deleteFile(product.id, fileId);
+      const hasError = "error" in result;
+
+      if (hasError) {
+        setValue("images", currentImages);
+        toast.error(t("products.form.imageDeleteError"));
+        logger.error("Falha ao remover imagem do produto", new Error(result.error));
+        return;
+      }
+
+      toast.success(t("products.form.imageDeleteSuccess"));
+    },
+    [watch, setValue, isEditing, product, t]
+  );
+
+  const existingImages = watch("images");
+
   const createMutation = useMutation({
-    mutationFn: (data: ProductForm) => productsService.create(data),
+    mutationFn: (params: { data: ProductForm; files: File[] }) =>
+      productsService.create(params.data, params.files),
     onSuccess: (result) => {
       const hasError = "error" in result;
       if (hasError) {
@@ -168,7 +260,8 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: ProductForm) => productsService.update(product!.id, data),
+    mutationFn: (params: { data: ProductForm; files: File[] }) =>
+      productsService.update(product!.id, params.data, params.files),
     onSuccess: (result) => {
       const hasError = "error" in result;
       if (hasError) {
@@ -186,16 +279,74 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  const onSubmit = (data: ProductForm) => {
-    if (isEditing) {
-      updateMutation.mutate(data);
-    } else {
-      createMutation.mutate(data);
-    }
-  };
+  const onSubmit = useCallback(
+    (data: ProductForm) => {
+      const hasFiles = selectedFiles.length > 0;
+      const files = hasFiles ? selectedFiles : [];
+
+      if (isEditing) {
+        updateMutation.mutate({ data, files });
+      } else {
+        createMutation.mutate({ data, files });
+      }
+    },
+    [isEditing, selectedFiles, createMutation, updateMutation]
+  );
 
   const dialogTitle = isEditing ? t("products.form.editTitle") : t("products.form.createTitle");
   const submitLabel = isEditing ? t("products.form.saveButton") : t("products.form.createButton");
+
+  const hasExistingImages = existingImages.length > 0;
+  const hasNewPreviews = imagePreviews.length > 0;
+  const hasAnyImages = hasExistingImages || hasNewPreviews;
+
+  const existingImagesList = useMemo(() => {
+    if (!hasExistingImages) return null;
+
+    return existingImages.map((image: ProductImage, index: number) => {
+      const imageUrl = image.url;
+      const imageId = image.id;
+      const altText = `${t("products.form.fields.images")} ${index + 1}`;
+
+      return (
+        <div key={imageId} className="relative group">
+          <img
+            src={imageUrl}
+            alt={altText}
+            className="w-20 h-20 object-cover rounded-md border border-border"
+          />
+          <button
+            type="button"
+            onClick={() => handleRemoveExistingImage(index)}
+            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:cursor-pointer"
+          >
+            <XIcon size={12} />
+          </button>
+        </div>
+      );
+    });
+  }, [existingImages, hasExistingImages, handleRemoveExistingImage, t]);
+
+  const newImagesList = useMemo(() => {
+    if (!hasNewPreviews) return null;
+
+    return imagePreviews.map((preview, index) => (
+      <div key={preview.url} className="relative group">
+        <img
+          src={preview.url}
+          alt={preview.name}
+          className="w-20 h-20 object-cover rounded-md border border-border"
+        />
+        <button
+          type="button"
+          onClick={() => handleRemoveNewImage(index)}
+          className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:cursor-pointer"
+        >
+          <XIcon size={12} />
+        </button>
+      </div>
+    ));
+  }, [imagePreviews, hasNewPreviews, handleRemoveNewImage]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -318,15 +469,22 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
             <Field
               label={t("products.form.fields.images")}
               htmlFor="images"
-              error={errors.images?.message}
             >
-              <Input
+              <InputFile
                 id="images"
-                {...register("images.0")}
-                aria-invalid={errors.images ? true : undefined}
-                placeholder="https://..."
+                multiple
+                accept="image/*"
+                onChange={handleFileChange}
+                disabled={isPending}
               />
             </Field>
+
+            {hasAnyImages && (
+              <div className="flex gap-2 flex-wrap">
+                {existingImagesList}
+                {newImagesList}
+              </div>
+            )}
 
             <div className="flex items-center gap-3">
               <input

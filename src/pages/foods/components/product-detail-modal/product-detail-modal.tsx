@@ -70,12 +70,13 @@ export function ProductDetailModal({
   const images = useMemo(() => {
     const hasProduct = !!product;
     if (!hasProduct) {
-      const emptyImages: string[] = [];
+      const emptyImages: { id: string; url: string }[] = [];
       return emptyImages;
     }
 
     const hasImages = !!product.images?.length;
-    const imageList = hasImages ? product.images : ["/no-image.png"];
+    const fallbackImage = { id: "placeholder", url: "/no-image.png" };
+    const imageList = hasImages ? product.images : [fallbackImage];
     return imageList;
   }, [product]);
 
@@ -115,10 +116,11 @@ export function ProductDetailModal({
     >
       {images.map((image, index) => {
         const slideKey = `${productId}-${index}`;
+        const imageUrl = image.url;
         return (
           <SwiperSlide key={slideKey}>
             <img
-              src={image}
+              src={imageUrl}
               alt={productName}
               className="w-full h-full object-contain"
             />

@@ -97,6 +97,31 @@ async function ensureFreshToken(): Promise<void> {
   await refreshTokens();
 }
 
+function buildHeaders(
+  accessToken: string | null,
+  isFormData: boolean,
+  extraHeaders?: HeadersInit
+): Record<string, string> {
+  const headers: Record<string, string> = {};
+
+  const shouldSetContentType = !isFormData;
+  if (shouldSetContentType) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  const hasAccessToken = accessToken !== null;
+  if (hasAccessToken) {
+    headers["Authorization"] = `Bearer ${accessToken}`;
+  }
+
+  const hasExtraHeaders = extraHeaders !== undefined;
+  if (hasExtraHeaders) {
+    Object.assign(headers, extraHeaders);
+  }
+
+  return headers;
+}
+
 async function request<T>(
   path: string,
   options: RequestInit = {}
@@ -105,12 +130,9 @@ async function request<T>(
     await ensureFreshToken();
 
     const accessToken = sessionStorage.getItem(StorageKeys.ACCESS_TOKEN);
+    const isFormData = options.body instanceof FormData;
 
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      ...options.headers,
-    };
+    const headers = buildHeaders(accessToken, isFormData, options.headers as HeadersInit | undefined);
 
     const response = await fetch(`${API_URL}${path}`, {
       ...options,
@@ -127,11 +149,7 @@ async function request<T>(
       }
 
       const newToken = sessionStorage.getItem(StorageKeys.ACCESS_TOKEN);
-      const retryHeaders: HeadersInit = {
-        "Content-Type": "application/json",
-        ...(newToken ? { Authorization: `Bearer ${newToken}` } : {}),
-        ...options.headers,
-      };
+      const retryHeaders = buildHeaders(newToken, isFormData, options.headers as HeadersInit | undefined);
 
       const retryResponse = await fetch(`${API_URL}${path}`, {
         ...options,
@@ -169,8 +187,12 @@ export const apiClient = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "POST", body: JSON.stringify(body) }),
+  postFormData: <T>(path: string, formData: FormData) =>
+    request<T>(path, { method: "POST", body: formData }),
   put: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "PUT", body: JSON.stringify(body) }),
+  putFormData: <T>(path: string, formData: FormData) =>
+    request<T>(path, { method: "PUT", body: formData }),
   patch: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
