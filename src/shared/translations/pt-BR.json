@@ -67,6 +67,10 @@
       "noProductsDescription": "Não há produtos disponíveis nesta categoria"
     }
   },
+  "productDetail": {
+    "unitPrice": "Preço unitário",
+    "addToCart": "Adicionar ao Carrinho"
+  },
   "cart": {
     "title": "Meu Pedido",
     "empty": "Seu carrinho está vazio",

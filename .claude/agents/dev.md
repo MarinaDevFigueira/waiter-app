@@ -5,6 +5,7 @@ model: sonnet
 color: purple
 permissionMode: acceptEdits
 memory: project
+tools: AskUserQuestion,Bash,Edit,Glob,Grep,LSP,MCPSearch,Read,Skill,Task,WebFetch,Write,WebSearch
 ---
 
 # Dev Agent
@@ -38,7 +39,7 @@ This agent follows the specifications defined in:
 
 ### Global Specs (~/.specs/)
 
-17 specification files covering:
+21 specification files covering:
 - Code comments prohibition
 - Boolean variable extraction
 - ESLint rule enforcement
@@ -50,6 +51,10 @@ This agent follows the specifications defined in:
 - Query cache invalidation on language change
 - Translations enum pattern
 - Backend translations array structure
+- SwiperJS basics and installation
+- SwiperJS React integration
+- SwiperJS modules architecture
+- SwiperJS advanced patterns and best practices
 
 ---
 
@@ -1170,6 +1175,224 @@ Define scrollbar variables in `:root` and `.dark`:
 
 Apply in `@layer base` for both webkit and Firefox.
 
+### SwiperJS (Carousels & Sliders) - GLOBAL SPEC
+
+**CRITICAL:** SwiperJS is the standard library for touch sliders, carousels, and galleries. Always use the modular architecture with React components.
+
+#### Installation & Setup
+
+```bash
+npm i swiper
+```
+
+#### Basic React Pattern
+
+```jsx
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
+export default function ProductCarousel({ products }) {
+  return (
+    <Swiper
+      modules={[Navigation, Pagination, Autoplay]}
+      spaceBetween={50}
+      slidesPerView={3}
+      navigation
+      pagination={{ clickable: true }}
+      autoplay={{ delay: 3000 }}
+      onSlideChange={() => console.log('slide change')}
+    >
+      {products.map((product) => (
+        <SwiperSlide key={product.id}>
+          <ProductCard data={product} />
+        </SwiperSlide>
+      ))}
+    </Swiper>
+  );
+}
+```
+
+#### Core Principles
+
+**ALWAYS:**
+- Import only needed modules to reduce bundle size
+- Import module-specific CSS (`import 'swiper/css/navigation'`)
+- Use `modules` prop to register modules
+- Use `useSwiper()` hook for imperative control inside slides
+- Use `useSwiperSlide()` for slide-specific state
+- Add `virtualIndex` for virtual slides (100+ items)
+
+**NEVER:**
+- Import entire Swiper bundle
+- Forget CSS imports (modules won't render correctly)
+- Use vanilla JS version in React (`new Swiper()`)
+- Render 100+ slides without Virtual module
+- Mix multiple effects (fade + cube)
+
+#### Common Modules
+
+```javascript
+import {
+  Navigation,      // Prev/Next buttons
+  Pagination,      // Dots/bullets/progressbar
+  Scrollbar,       // Draggable scrollbar
+  A11y,            // Accessibility (ALWAYS include)
+  Autoplay,        // Auto-advance slides
+  Keyboard,        // Keyboard navigation
+  Mousewheel,      // Mouse wheel control
+  EffectFade,      // Fade transition
+  EffectCoverflow, // iTunes coverflow
+  EffectCube,      // 3D cube rotation
+  Virtual,         // Virtual slides (performance)
+  Lazy,            // Lazy loading images
+  Zoom,            // Image zoom
+  Thumbs,          // Thumbnail navigation
+} from 'swiper/modules';
+```
+
+#### Responsive Breakpoints
+
+```jsx
+<Swiper
+  breakpoints={{
+    320: { slidesPerView: 1, spaceBetween: 10 },
+    640: { slidesPerView: 2, spaceBetween: 20 },
+    1024: { slidesPerView: 3, spaceBetween: 30 },
+  }}
+>
+```
+
+#### Virtual Slides Pattern (100+ Items)
+
+```jsx
+import { Virtual } from 'swiper/modules';
+
+const slides = Array.from({ length: 1000 });
+
+<Swiper modules={[Virtual]} virtual>
+  {slides.map((_, index) => (
+    <SwiperSlide key={index} virtualIndex={index}>
+      Slide {index}
+    </SwiperSlide>
+  ))}
+</Swiper>
+```
+
+**Benefits:**
+- Only renders visible slides (~3-5 DOM nodes)
+- Essential for large datasets (1000+ items)
+- Massive performance improvement
+
+#### Custom Navigation with Hooks
+
+```jsx
+import { useSwiper, useSwiperSlide } from 'swiper/react';
+
+function CustomNav() {
+  const swiper = useSwiper();
+  const { isActive } = useSwiperSlide();
+
+  return (
+    <div>
+      <button onClick={() => swiper.slidePrev()}>Prev</button>
+      <button onClick={() => swiper.slideNext()}>Next</button>
+    </div>
+  );
+}
+
+<Swiper>
+  <CustomNav />
+  {slides.map(slide => <SwiperSlide key={slide.id}>{slide}</SwiperSlide>)}
+</Swiper>
+```
+
+#### Common Patterns
+
+**Product Gallery with Thumbnails:**
+```jsx
+const [thumbsSwiper, setThumbsSwiper] = useState(null);
+
+<Swiper modules={[Thumbs, Zoom]} thumbs={{ swiper: thumbsSwiper }}>
+  {images.map(img => <SwiperSlide key={img.id}><img src={img.url} /></SwiperSlide>)}
+</Swiper>
+
+<Swiper onSwiper={setThumbsSwiper} slidesPerView={4}>
+  {images.map(img => <SwiperSlide key={img.id}><img src={img.thumb} /></SwiperSlide>)}
+</Swiper>
+```
+
+**Auto-play Hero Slider:**
+```jsx
+<Swiper
+  modules={[Autoplay, Pagination, EffectFade]}
+  effect="fade"
+  autoplay={{ delay: 5000, pauseOnMouseEnter: true }}
+  pagination={{ clickable: true }}
+  loop
+>
+```
+
+#### Accessibility (ALWAYS Include)
+
+```jsx
+import { A11y, Keyboard } from 'swiper/modules';
+
+<Swiper
+  modules={[A11y, Keyboard]}
+  keyboard={{ enabled: true }}
+  a11y={{
+    prevSlideMessage: 'Previous slide',
+    nextSlideMessage: 'Next slide',
+  }}
+>
+```
+
+#### Common Pitfalls
+
+**Pitfall 1: Missing CSS Imports**
+```jsx
+// ❌ WRONG
+import { Navigation } from 'swiper/modules';
+
+// ✅ CORRECT
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+```
+
+**Pitfall 2: Loop with Duplicate Keys**
+```jsx
+// ❌ WRONG
+<Swiper loop>
+  {items.map(item => <SwiperSlide key={item.id}>{item.name}</SwiperSlide>)}
+</Swiper>
+
+// ✅ CORRECT
+<Swiper loop>
+  {items.map((item, index) => (
+    <SwiperSlide key={`${item.id}-${index}`}>{item.name}</SwiperSlide>
+  ))}
+</Swiper>
+```
+
+**Pitfall 3: No Cleanup**
+```jsx
+// ❌ WRONG
+const [swiper, setSwiper] = useState(null);
+
+// ✅ CORRECT
+const [swiper, setSwiper] = useState(null);
+useEffect(() => {
+  return () => swiper?.destroy(true, true);
+}, [swiper]);
+```
+
+**Rationale:** SwiperJS is the industry-standard carousel library with superior performance, touch support, and modular architecture. The module system ensures minimal bundle size and only loads needed features.
+
 ---
 
 ## Priority Rules
@@ -1196,9 +1419,9 @@ When project specs conflict with global specs:
 
 - These specs are consolidated from:
   - 61 project specs in `./.specs/`
-  - 17 global specs in `~/.specs/`
-- Global specs for code style (no comments, named variables, no ESLint disable, i18n patterns) take highest priority
-- Last updated: 2026-02-21
-- Total specs loaded: 78
+  - 21 global specs in `~/.specs/`
+- Global specs for code style (no comments, named variables, no ESLint disable, i18n patterns, SwiperJS patterns) take highest priority
+- Last updated: 2026-02-22
+- Total specs loaded: 82
 
 You can now use `@dev` in your conversations to apply these project-specific patterns and conventions with global best practices enforced.

@@ -7,6 +7,7 @@ import { CartDrawer } from "./components/cart-drawer/cart-drawer";
 import { CartButton } from "./components/cart-button/cart-button";
 import { OrderSessionButton } from "./components/order-session-button/order-session-button";
 import { OrderSessionSummaryModal } from "./components/order-session-summary/order-session-summary";
+import { ProductDetailModal } from "./components/product-detail-modal/product-detail-modal";
 import Categories from "./components/categories";
 import { useCategories } from "@/shared/hooks/useCategories";
 import { useProducts } from "@/shared/hooks/useProducts";
@@ -27,6 +28,8 @@ export const FoodsPage = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isClosingSession, setIsClosingSession] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isProductDetailOpen, setIsProductDetailOpen] = useState(false);
 
   const { categories } = useCategories({
     initialSize: 100,
@@ -37,31 +40,70 @@ export const FoodsPage = () => {
   const { addItem, itemCount, cart } = useCart();
 
   const activeCategories = useMemo(() => {
-    return categories.filter((c) => c.active);
+    const filtered = categories.filter((c) => {
+      const isActive = c.active;
+      return isActive;
+    });
+    return filtered;
   }, [categories]);
 
-  const handleCategoryChange = useCallback((categoryId: string | null) => {
-    setSelectedCategoryId(categoryId);
-    setQueryParams((prev) => ({
-      ...prev,
-      page: 1,
-      orderBy: ProductsOrderByEnum.NAME,
-      direction: SortDirection.ASC,
-      filters: {
-        ...prev.filters,
-        categoria: categoryId ? [categoryId] : undefined,
-      },
-    }));
-  }, [setQueryParams]);
+  const handleCategoryChange = useCallback(
+    (categoryId: string | null) => {
+      setSelectedCategoryId(categoryId);
+      setQueryParams((prev) => {
+        const firstPage = 1;
+        const nameOrderBy = ProductsOrderByEnum.NAME;
+        const ascDirection = SortDirection.ASC;
+        const hasCategoryId = !!categoryId;
+        const categoryFilter = hasCategoryId ? [categoryId] : undefined;
 
-  const handleAddItem = useCallback(async (product: Product) => {
-    await addItem({
-      productId: product.id,
-      productName: product.name,
-      productPrice: product.price,
-      productImageUrl: product.imageUrl,
-    });
-  }, [addItem]);
+        const newParams = {
+          ...prev,
+          page: firstPage,
+          orderBy: nameOrderBy,
+          direction: ascDirection,
+          filters: {
+            ...prev.filters,
+            categoria: categoryFilter,
+          },
+        };
+        return newParams;
+      });
+    },
+    [setQueryParams]
+  );
+
+  const handleProductClick = useCallback((product: Product) => {
+    setSelectedProduct(product);
+    setIsProductDetailOpen(true);
+  }, []);
+
+  const handleCloseProductDetail = useCallback(() => {
+    setIsProductDetailOpen(false);
+    setSelectedProduct(null);
+  }, []);
+
+  const handleAddToCart = useCallback(
+    async (product: Product, quantity: number) => {
+      const quantityArray = Array.from({ length: quantity });
+      const productId = product.id;
+      const productName = product.name;
+      const productPrice = product.price;
+      const productImageUrl = product.imageUrl;
+
+      const promises = quantityArray.map(() =>
+        addItem({
+          productId,
+          productName,
+          productPrice,
+          productImageUrl,
+        })
+      );
+
+      await Promise.all(promises);
+    },
+    [addItem]
+  );
 
   const handleOpenCart = useCallback(() => {
     setIsCartOpen(true);
@@ -87,51 +129,95 @@ export const FoodsPage = () => {
   const handleCloseSession = useCallback(async () => {
     const currentCart = cartObservable.getValue();
     const sessionId = currentCart.orderSessionId;
-    const noSession = !sessionId;
+    const sessionExists = !!sessionId;
+    const noSession = !sessionExists;
     if (noSession) return;
 
-    setIsClosingSession(true);
+    const isClosing = true;
+    setIsClosingSession(isClosing);
     try {
       const result = await orderSessionsService.close(sessionId);
-      const hasError = "error" in result;
+      const errorExists = "error" in result;
+      const hasError = errorExists;
       if (hasError) {
-        toast.error(result.error);
-        logger.error("Erro ao encerrar sessão", new Error(result.error));
+        const errorMessage = result.error;
+        toast.error(errorMessage);
+        const error = new Error(errorMessage);
+        const logMessage = "Erro ao encerrar sessão";
+        logger.error(logMessage, error);
         return;
       }
 
       cartObservable.clearCart();
-      toast.success(t("orderSession.sessionClosedAndLoggedOut"));
-      setIsSummaryOpen(false);
+      const successMessage = t("orderSession.sessionClosedAndLoggedOut");
+      toast.success(successMessage);
+      const isClosed = false;
+      setIsSummaryOpen(isClosed);
       await authService.logout();
-      navigate({ to: "/" });
+      const homeRoute = { to: "/" };
+      navigate(homeRoute);
     } finally {
-      setIsClosingSession(false);
+      const isNotClosing = false;
+      setIsClosingSession(isNotClosing);
     }
   }, [t, navigate]);
 
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => p.active);
+    const activeProducts = products.filter((p) => {
+      const isActive = p.active;
+      return isActive;
+    });
+    return activeProducts;
   }, [products]);
 
   const sortedByCategory = useMemo(() => {
-    const categoryOrderMap = new Map(
-      activeCategories.map((c) => [c.id, c.sortOrder])
-    );
-    return [...filteredProducts].sort((a, b) => {
-      const orderA = categoryOrderMap.get(a.categoryId) ?? 999;
-      const orderB = categoryOrderMap.get(b.categoryId) ?? 999;
-      return orderA - orderB;
+    const categoryPairs = activeCategories.map((c) => {
+      const categoryId = c.id;
+      const sortOrder = c.sortOrder;
+      const pair = [categoryId, sortOrder] as const;
+      return pair;
     });
+    const categoryOrderMap = new Map(categoryPairs);
+    const productsCopy = [...filteredProducts];
+    const sorted = productsCopy.sort((a, b) => {
+      const categoryIdA = a.categoryId;
+      const categoryIdB = b.categoryId;
+      const defaultOrder = 999;
+      const orderA = categoryOrderMap.get(categoryIdA) ?? defaultOrder;
+      const orderB = categoryOrderMap.get(categoryIdB) ?? defaultOrder;
+      const comparison = orderA - orderB;
+      return comparison;
+    });
+    return sorted;
   }, [filteredProducts, activeCategories]);
 
-  const hasSelectedCategory = selectedCategoryId !== null;
-  const displayProducts = hasSelectedCategory ? filteredProducts : sortedByCategory;
-  const hasActiveSession = Boolean(cart.orderSessionId);
+  const categoryIdExists = selectedCategoryId !== null;
+  const hasSelectedCategory = categoryIdExists;
+  const displayProducts = hasSelectedCategory
+    ? filteredProducts
+    : sortedByCategory;
+  const sessionIdExists = !!cart.orderSessionId;
+  const hasActiveSession = sessionIdExists;
+
+  const contentToRender = useMemo(() => {
+    if (isProductsLoading) {
+      return (
+        <FoodsLoadingSkeleton />
+      );
+    }
+    return (
+      <Foods
+        items={displayProducts}
+        onProductClick={handleProductClick}
+        categories={activeCategories}
+        showCategoryHeaders={!hasSelectedCategory}
+      />
+    );
+  }, [isProductsLoading, displayProducts, handleProductClick, activeCategories, hasSelectedCategory]);
 
   return (
-    <div className="flex flex-col items-start justify-start w-full gap-4">
-      <div className="flex items-start justify-between w-full gap-3">
+    <div className="flex flex-col items-start justify-start w-full gap-4 animate-fade-in">
+      <div className="flex items-start justify-between w-full gap-3 animate-slide-in-down">
         <Title />
         <div className="pt-1 flex items-center gap-2">
           <OrderSessionButton
@@ -146,16 +232,7 @@ export const FoodsPage = () => {
         selectedCategoryId={selectedCategoryId}
         onCategoryChange={handleCategoryChange}
       />
-      {isProductsLoading ? (
-        <FoodsLoadingSkeleton />
-      ) : (
-        <Foods
-          items={displayProducts}
-          onAddItem={handleAddItem}
-          categories={activeCategories}
-          showCategoryHeaders={!hasSelectedCategory}
-        />
-      )}
+      {contentToRender}
       <CartDrawer open={isCartOpen} onClose={handleCloseCart} />
       <OrderSessionSummaryModal
         open={isSummaryOpen}
@@ -163,6 +240,12 @@ export const FoodsPage = () => {
         orderSessionId={cart.orderSessionId ?? null}
         onCloseSession={handleCloseSession}
         isClosing={isClosingSession}
+      />
+      <ProductDetailModal
+        product={selectedProduct}
+        open={isProductDetailOpen}
+        onClose={handleCloseProductDetail}
+        onAddToCart={handleAddToCart}
       />
     </div>
   );
@@ -172,16 +255,22 @@ function FoodsLoadingSkeleton() {
   const skeletonRows = [0, 1, 2, 3, 4];
   return (
     <ul className="w-full flex flex-col items-start justify-start gap-3 sm:gap-4">
-      {skeletonRows.map((i) => (
-        <li key={i} className="w-full flex items-start gap-3 sm:gap-4 min-h-20 sm:h-24">
-          <div className="h-20 sm:h-24 aspect-video rounded-md bg-muted animate-pulse shrink-0" />
-          <div className="flex-1 flex flex-col gap-2 py-1">
-            <div className="h-4 w-3/4 rounded bg-muted animate-pulse" />
-            <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
-            <div className="h-4 w-1/4 rounded bg-muted animate-pulse mt-auto" />
-          </div>
-        </li>
-      ))}
+      {skeletonRows.map((i) => {
+        const rowKey = i;
+        return (
+          <li
+            key={rowKey}
+            className="w-full flex items-start gap-3 sm:gap-4 min-h-20 sm:h-24"
+          >
+            <div className="h-20 sm:h-24 aspect-video rounded-md bg-muted animate-pulse shrink-0" />
+            <div className="flex-1 flex flex-col gap-2 py-1">
+              <div className="h-4 w-3/4 rounded bg-muted animate-pulse" />
+              <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
+              <div className="h-4 w-1/4 rounded bg-muted animate-pulse mt-auto" />
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }
