@@ -25,36 +25,147 @@ This agent follows the specifications defined in:
 
 ### Project Specs (./.specs/)
 
-61 specification files covering:
-- Code style and naming conventions
-- Architecture patterns
-- Component structure
-- Testing requirements
-- Routing patterns
-- State management
-- Form handling
-- API integration
-- Internationalization
-- Error handling
+66 specification files:
+
+**Code Style & Principles:**
+- `no-comments.spec.md` - Never add code comments
+- `no-hardcoded-values.spec.md` - Use Tailwind classes/theme variables
+- `no-barrel-exports.spec.md` - Import from specific file paths
+- `data-attributes-lowercase.spec.md` - Lowercase data-* attributes
+- `kiss-principle.spec.md` - Keep It Simple, Stupid
+- `dry-principle.spec.md` - Don't Repeat Yourself
+- `single-source-of-truth.spec.md` - One authoritative source
+- `utility-first-mindset.spec.md` - Utility-first approach
+- `extract-before-second-use.spec.md` - Extract on second use
+- `dont-replicate-logic.spec.md` - No logic duplication
+- `no-copy-paste-coding.spec.md` - Avoid copy-paste
+
+**Named Variables:**
+- `named-variables-in-conditionals.spec.md` - Extract conditionals
+- `named-variables-over-inline-ternaries.spec.md` - No inline ternaries
+
+**React Patterns:**
+- `no-ternary-in-jsx.spec.md` - Extract ternaries from JSX
+- `no-chained-ternaries.spec.md` - Use if-else or maps
+- `no-inline-expressions-in-jsx.spec.md` - No inline arrays/objects/calculations
+- `component-variants.spec.md` - data-variant pattern
+- `always-use-composite-pattern.spec.md` - Composite component structure
+- `composite-component-pattern.spec.md` - Card.Header pattern
+- `use-memo-for-computed-values.spec.md` - useMemo for derived values
+- `use-callback-for-stable-references.spec.md` - useCallback for functions
+- `dependency-arrays.spec.md` - Only primitives/stable refs
+
+**TypeScript/Interfaces:**
+- `no-interface-in-implementation.spec.md` - Sibling *.interface.ts files
+
+**Component Structure:**
+- `component-isolation-no-duplication.spec.md` - Reusable UI components
+- `component-test-coverage.spec.md` - __tests__/ with 3-5 tests
+- `button-interaction-states.spec.md` - cursor-pointer + active shadow
+- `group-data-attribute-pattern.spec.md` - group-data-[active=true] pattern
+- `page-component-structure.spec.md` - page.tsx + components/ folder
+
+**State Management (RxJS):**
+- `rxjs-subject-pattern.spec.md` - Encapsulated BehaviorSubjects
+- `rxjs-subscription-cleanup.spec.md` - Unsubscribe in useEffect cleanup
+
+**Routing (TanStack Router):**
+- `tanstack-router-file-based-routing.spec.md` - File-based routes
+- `tanstack-router-navigation.spec.md` - Link vs useNavigate
+- `tanstack-router-protected-routes.spec.md` - beforeLoad guards
+- `tanstack-router-not-found-handling.spec.md` - defaultNotFoundComponent
+- `tanstack-router-layout-outlet-pattern.spec.md` - <Outlet /> for children
+- `tanstack-router-context.spec.md` - Router context patterns
+- `profile-based-routing.spec.md` - Same / route, different content
+- `protected-route-profile-sync.spec.md` - Profile-based protection
+- `normalize-pathname-trailing-slash.spec.md` - Remove trailing slashes
+
+**Forms & Validation:**
+- `forms-rhf-tanstack-zod.spec.md` - React Hook Form + Zod v4
+
+**Data Fetching & Services:**
+- `error-handling-return-pattern.spec.md` - Return {data} or {error}
+- `write-operations-return-void.spec.md` - Create/update return void
+- `api-query-params-pattern.spec.md` - API filtering/sorting/pagination
+- `no-client-side-filtering.spec.md` - No .filter() on client
+- `service-schemas-pattern.spec.md` - Co-located schemas
+- `base-entity-pattern.spec.md` - Extend baseEntitySchema
+- `mock-data-schema-compliance.spec.md` - Mock data follows schemas
+- `api-client-refresh-token.spec.md` - Automatic token refresh
+- `auth-service-pattern.spec.md` - Authentication service patterns
+
+**Tables (TanStack Table):**
+- `tanstack-table-pattern.spec.md` - useReactTable pattern
+- `tanstack-table-row-rendering.spec.md` - Check data length in parent
+- `table-loading-skeleton.spec.md` - Dedicated skeleton component
+
+**Internationalization (i18n):**
+- `i18n-pattern.spec.md` - useTranslation hook
+- `use-translation-pattern.spec.md` - Translation patterns
+- `language-selector-pattern.spec.md` - Language selector component
+
+**Error Handling & Logging:**
+- `react-toastify-usage.spec.md` - toast.error/success
+- `logger-pattern.spec.md` - logger.debug/info/warn/error
+- `error-display-toast-logger.spec.md` - Toast + logger on error
+
+**Pagination:**
+- `pagination-hook-pattern.spec.md` - usePagination hook
+
+**Testing:**
+- `component-test-coverage.spec.md` - Minimum test coverage
+- `data-testid-pattern.spec.md` - data-testid selectors
+- `selective-test-execution.spec.md` - Run affected tests
+- `test-before-commit.spec.md` - Run tests before commit
+
+**Layout & Styling:**
+- `responsive-layout-constraints.spec.md` - w-screen, max-w-7xl
+- `inaccessible-element-styling.spec.md` - text-muted, select-none
+- `custom-scrollbar-theme.spec.md` - Scrollbar CSS variables
+
+**Git:**
+- `no-ai-attribution.spec.md` - No AI attribution in commits/PRs
+
+**Other:**
+- `foods-page.spec.md` - Foods page specific patterns
+- `README.md` - Project README
 
 ### Global Specs (~/.specs/)
 
-21 specification files covering:
-- Code comments prohibition
-- Boolean variable extraction
-- ESLint rule enforcement
-- Playwright testing configuration
-- Named variables philosophy
-- No inline code patterns
-- Internationalization (i18n) implementation
-- Language cookie management
-- Query cache invalidation on language change
-- Translations enum pattern
-- Backend translations array structure
-- SwiperJS basics and installation
-- SwiperJS React integration
-- SwiperJS modules architecture
-- SwiperJS advanced patterns and best practices
+21 specification files:
+
+**Code Style Fundamentals:**
+- `no-code-comments.spec.md` - Never add code comments
+- `eslint-no-disable.spec.md` - Never disable ESLint rules
+- `boolean-variable-extraction.spec.md` - Extract booleans before conditionals
+
+**Named Variables Philosophy (6 specs):**
+- `always-named-variables-never-inline-code.spec.md` - Core principle
+- `no-inline-function-arguments.spec.md` - Extract function arguments
+- `no-inline-object-properties.spec.md` - Extract object property values
+- `no-inline-return-expressions.spec.md` - Extract return expressions
+- `no-inline-conditionals.spec.md` - Extract conditional expressions
+- `no-inline-boolean-expressions.spec.md` - Extract boolean expressions
+
+**Git Practices:**
+- `git-commit-no-coauthor.spec.md` - No co-author attribution
+- `no-coauthor-attribution.spec.md` - No AI attribution in commits/PRs
+
+**Internationalization (5 specs):**
+- `i18n-translations-structure.spec.md` - Identical key structure across languages
+- `i18n-translations-enum.spec.md` - TypeScript enum for languages
+- `i18n-language-cookie-pattern.spec.md` - Language via HTTP cookie
+- `i18n-query-cache-invalidation.spec.md` - Language prefix in query keys
+- `i18n-backend-translations-array.spec.md` - translations[] array in DTOs
+
+**Testing:**
+- `playwright-testing.spec.md` - Playwright E2E testing configuration
+
+**SwiperJS (Carousels/Sliders - 4 specs):**
+- `swiperjs-basics.spec.md` - Installation, core concepts, configuration
+- `swiperjs-react.spec.md` - React components, hooks, events
+- `swiperjs-modules.spec.md` - Modular architecture (Navigation, Pagination, Effects, etc.)
+- `swiperjs-advanced-patterns.spec.md` - Performance, accessibility, best practices
 
 ---
 
@@ -1418,10 +1529,10 @@ When project specs conflict with global specs:
 ## Usage Notes
 
 - These specs are consolidated from:
-  - 61 project specs in `./.specs/`
+  - 66 project specs in `./.specs/`
   - 21 global specs in `~/.specs/`
 - Global specs for code style (no comments, named variables, no ESLint disable, i18n patterns, SwiperJS patterns) take highest priority
 - Last updated: 2026-02-22
-- Total specs loaded: 82
+- Total specs loaded: 87
 
 You can now use `@dev` in your conversations to apply these project-specific patterns and conventions with global best practices enforced.
