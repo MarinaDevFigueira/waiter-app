@@ -114,7 +114,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
       price: 0,
       stock: 0,
       unit: "un",
-      imageUrl: undefined,
+      images: [],
       active: true,
     },
   });
@@ -129,7 +129,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
         price: product.price,
         stock: product.stock,
         unit: product.unit,
-        imageUrl: product.imageUrl ?? "",
+        images: product.images ?? [],
         active: product.active,
       });
       return;
@@ -144,7 +144,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
         price: 0,
         stock: 0,
         unit: "un",
-        imageUrl: "",
+        images: [],
         active: true,
       });
     }
@@ -316,14 +316,14 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
             </Field>
 
             <Field
-              label={t("products.form.fields.imageUrl")}
-              htmlFor="imageUrl"
-              error={errors.imageUrl?.message}
+              label={t("products.form.fields.images")}
+              htmlFor="images"
+              error={errors.images?.message}
             >
               <Input
-                id="imageUrl"
-                {...register("imageUrl")}
-                aria-invalid={errors.imageUrl ? true : undefined}
+                id="images"
+                {...register("images.0")}
+                aria-invalid={errors.images ? true : undefined}
                 placeholder="https://..."
               />
             </Field>

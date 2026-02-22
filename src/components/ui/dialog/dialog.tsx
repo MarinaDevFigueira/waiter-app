@@ -2,19 +2,19 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function Dialog({ children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Root>): JSX.Element {
+function Dialog({ children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root {...props}>{children}</DialogPrimitive.Root>;
 }
 
-function DialogTrigger({ ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Trigger>): JSX.Element {
+function DialogTrigger({ ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Trigger>) {
   return <DialogPrimitive.Trigger {...props} />;
 }
 
-function DialogPortal({ ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Portal>): JSX.Element {
+function DialogPortal({ ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal {...props} />;
 }
 
-function DialogOverlay({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>): JSX.Element {
+function DialogOverlay({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>) {
   return (
     <DialogPrimitive.Overlay
       className={cn(
@@ -28,7 +28,7 @@ function DialogOverlay({ className, ...props }: React.ComponentPropsWithoutRef<t
   );
 }
 
-function DialogContent({ children, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>): JSX.Element {
+function DialogContent({ children, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>) {
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -52,7 +52,7 @@ function DialogContent({ children, className, ...props }: React.ComponentPropsWi
   );
 }
 
-function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>): JSX.Element {
+function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn("flex items-center justify-between gap-4 p-6 pb-4 shrink-0", className)}
@@ -61,7 +61,7 @@ function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
   );
 }
 
-function DialogTitle({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>): JSX.Element {
+function DialogTitle({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
       className={cn("text-lg font-semibold leading-none tracking-tight", className)}
@@ -70,7 +70,7 @@ function DialogTitle({ className, ...props }: React.ComponentPropsWithoutRef<typ
   );
 }
 
-function DialogDescription({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>): JSX.Element {
+function DialogDescription({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
       className={cn("text-sm text-muted-foreground", className)}
@@ -79,7 +79,7 @@ function DialogDescription({ className, ...props }: React.ComponentPropsWithoutR
   );
 }
 
-function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>): JSX.Element {
+function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn("flex items-center justify-end gap-2 p-6 pt-4", className)}
@@ -88,7 +88,7 @@ function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
   );
 }
 
-function DialogClose({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close>): JSX.Element {
+function DialogClose({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close>) {
   return (
     <DialogPrimitive.Close
       className={cn(

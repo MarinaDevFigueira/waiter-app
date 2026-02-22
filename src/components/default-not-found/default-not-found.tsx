@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card/card";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 
-export function DefaultNotFound(): JSX.Element {
+export function DefaultNotFound() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 

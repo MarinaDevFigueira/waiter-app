@@ -2,7 +2,7 @@ import { Moon, Sun } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import { useTheme } from "@/shared/hooks/useTheme";
 
-export function ThemeToggle(): JSX.Element {
+export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
 
   const isDark = theme === "dark";

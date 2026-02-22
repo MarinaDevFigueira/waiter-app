@@ -19,7 +19,7 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-export function AppLayout({ children }: AppLayoutProps): JSX.Element {
+export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
   const { auth } = useAuth();
   const { t } = useTranslation();

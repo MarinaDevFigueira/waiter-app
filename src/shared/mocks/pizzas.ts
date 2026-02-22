@@ -6,7 +6,7 @@ interface Pizza {
   name: string;
   description: string;
   price: number;
-  imageUrl: string;
+  images: string[];
 }
 
 export const pizzasMock: Pizza[] = [
@@ -14,18 +14,18 @@ export const pizzasMock: Pizza[] = [
     name: "Quatro Queijos",
     description: "Pizza de Quatro Queijos com borda tradicional",
     price: 40.0,
-    imageUrl: quatroQueijosUrl,
+    images: [quatroQueijosUrl],
   },
   {
     name: "Frango com Catupiry",
     description: "Pizza de Frango com Catupiry e borda tradicional",
     price: 40.0,
-    imageUrl: frangoCatupiryUrl,
+    images: [frangoCatupiryUrl],
   },
   {
     name: "Marguerita",
     description: "Pizza de Marguerita no melhor estilo italiano",
     price: 50.0,
-    imageUrl: margueritaUrl,
+    images: [margueritaUrl],
   },
 ];

@@ -137,7 +137,7 @@
         "price": "Precio",
         "stock": "Stock",
         "unit": "Unidad",
-        "imageUrl": "URL de la Imagen",
+        "images": "URL de la Imagen",
         "active": "Producto activo"
       },
       "placeholders": {

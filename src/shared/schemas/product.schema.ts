@@ -9,7 +9,7 @@ export const productSchema = baseEntitySchema.extend({
   price: z.number().positive({ error: "Preço deve ser positivo" }),
   stock: z.number().int().nonnegative({ error: "Estoque deve ser não-negativo" }),
   unit: z.enum(["un", "kg", "g", "l", "ml"]),
-  imageUrl: z.string().optional(),
+  images: z.array(z.string()),
   active: z.boolean(),
 });
 

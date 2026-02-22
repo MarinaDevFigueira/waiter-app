@@ -22,7 +22,7 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
   { value: TranslationsEnum.ES, label: "Español (ES)", flag: "🇪🇸" }
 ];
 
-export function LanguageSelector(): JSX.Element {
+export function LanguageSelector() {
   const { language, setLanguage } = useLanguage();
 
   return (

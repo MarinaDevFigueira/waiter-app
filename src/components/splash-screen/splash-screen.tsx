@@ -13,7 +13,7 @@ interface SplashScreenProps {
   onDismiss?: () => void;
 }
 
-export function SplashScreen({ onDismiss }: SplashScreenProps): JSX.Element | null {
+export function SplashScreen({ onDismiss }: SplashScreenProps){
   const [isVisible, setIsVisible] = useState<boolean>(getInitialVisibility);
 
   const handleDismiss = () => {

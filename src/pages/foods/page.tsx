@@ -91,7 +91,9 @@ export const FoodsPage = () => {
       const productId = product.id;
       const productName = product.name;
       const productPrice = product.price;
-      const productImageUrl = product.imageUrl;
+      const productImages = product.images;
+      const firstImage = productImages?.[0];
+      const productImageUrl = firstImage;
 
       await addItem(
         {
@@ -260,12 +262,14 @@ export const FoodsPage = () => {
         onCloseSession={handleCloseSession}
         isClosing={isClosingSession}
       />
-      <ProductDetailModal
-        product={selectedProduct}
-        open={isProductDetailOpen}
-        onClose={handleCloseProductDetail}
-        onAddToCart={handleAddToCart}
-      />
+      {selectedProduct && (
+        <ProductDetailModal
+          product={selectedProduct}
+          open={isProductDetailOpen}
+          onClose={handleCloseProductDetail}
+          onAddToCart={handleAddToCart}
+        />
+      )}
     </div>
   );
 };

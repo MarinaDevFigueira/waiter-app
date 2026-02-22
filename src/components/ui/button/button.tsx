@@ -15,7 +15,7 @@ function Button({
   size,
   asChild = false,
   ...props
-}: ButtonProps): JSX.Element {
+}: ButtonProps) {
   const Comp = asChild ? Slot : "button";
 
   return (

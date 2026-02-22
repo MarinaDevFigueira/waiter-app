@@ -15,7 +15,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 interface ProductDetailModalProps {
-  product: Product | null;
+  product: Product;
   open: boolean;
   onClose: () => void;
   onAddToCart: (product: Product, quantity: number) => void;
@@ -74,9 +74,8 @@ export function ProductDetailModal({
       return emptyImages;
     }
 
-    const hasImageUrl = !!product.imageUrl;
-    const mainImage = hasImageUrl ? product.imageUrl : "/no-image.png";
-    const imageList = [mainImage];
+    const hasImages = !!product.images?.length;
+    const imageList = hasImages ? product.images : ["/no-image.png"];
     return imageList;
   }, [product]);
 

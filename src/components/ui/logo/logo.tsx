@@ -5,7 +5,7 @@ interface LogoProps extends React.HTMLAttributes<HTMLAnchorElement> {
   className?: string;
 }
 
-export function Logo({ className = "", ...props }: LogoProps): JSX.Element {
+export function Logo({ className = "", ...props }: LogoProps) {
   return (
     <Link
       to="/"

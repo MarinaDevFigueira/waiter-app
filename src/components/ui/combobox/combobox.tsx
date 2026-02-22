@@ -65,7 +65,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
     useEffect(() => {
       const shouldFocusInput = open && inputRef.current;
       if (shouldFocusInput) {
-        inputRef.current.focus();
+        inputRef.current?.focus();
       }
     }, [open]);
 

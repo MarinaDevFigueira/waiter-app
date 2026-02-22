@@ -46,7 +46,7 @@ export function LoginForm() {
     mutationFn: async (formData: LoginFormValues) => {
       const result = await authService.login(formData.username, formData.password);
 
-      const hasError = result.error !== undefined;
+      const hasError = "error" in result;
       if (hasError) {
         const error = new Error(result.error);
         toast.error(result.error);

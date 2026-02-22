@@ -21,9 +21,9 @@ export const FoodOption = ({ product, onProductClick }: FoodOptionProps) => {
     onProductClick(product);
   }, [product, onProductClick]);
 
-  const imageUrlExists = !!product.imageUrl;
-  const hasImage = imageUrlExists;
-  const imageSrc = hasImage ? product.imageUrl : "/no-image.png";
+  const productImages = product.images ?? [];
+  const hasImages = productImages.length > 0;
+  const imageSrc = hasImages ? productImages[0] : "/no-image.png";
   const productPrice = product.price;
   const formattedPrice = formatPrice(productPrice);
 
@@ -42,7 +42,7 @@ export const FoodOption = ({ product, onProductClick }: FoodOptionProps) => {
         <img
           src={imageSrc}
           alt={productName}
-          className="h-16 aspect-video rounded-md object-cover shrink-0 bg-muted sm:h-auto sm:aspect-[4/3] sm:rounded-none sm:w-full"
+          className="h-16 aspect-video rounded-md object-cover shrink-0 bg-muted sm:h-auto sm:aspect-4/3 sm:rounded-none sm:w-full"
         />
         <div className="w-full flex flex-col items-start justify-between gap-1 py-0.5 h-16 sm:h-auto sm:py-3 sm:px-3 sm:gap-2">
           <span className="font-semibold text-xs sm:text-sm line-clamp-2">

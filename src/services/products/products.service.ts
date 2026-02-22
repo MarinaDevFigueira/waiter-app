@@ -24,7 +24,7 @@ function mapApiProductToProduct(raw: ApiProduct): Product {
     price: raw.price,
     stock: raw.stock,
     unit: raw.unit as Product["unit"],
-    imageUrl: raw.imageUrl ?? undefined,
+    images: raw.images ?? [],
     active: raw.active,
     createdAt: new Date(raw.createdAt),
     updatedAt: new Date(raw.updatedAt),
@@ -125,11 +125,12 @@ export const productsService = {
   async create(data: ProductForm): Promise<ServiceResult<void>> {
     try {
       const hasDescription = Boolean(data.description);
-      const hasImageUrl = Boolean(data.imageUrl);
+      const hasImages = Boolean(data.images?.length);
 
-      const payload: ProductForm = { ...data };
-      if (!hasDescription) delete payload.description;
-      if (!hasImageUrl) delete payload.imageUrl;
+      const { description: _desc, images: _imgs, ...rest } = data;
+      const payload: Record<string, unknown> = { ...rest };
+      if (hasDescription) payload.description = data.description;
+      if (hasImages) payload.images = data.images;
 
       const result = await api.post<unknown>("/products", payload);
 
@@ -153,11 +154,12 @@ export const productsService = {
   ): Promise<ServiceResult<void>> {
     try {
       const hasDescription = Boolean(data.description);
-      const hasImageUrl = Boolean(data.imageUrl);
+      const hasImages = Boolean(data.images?.length);
 
-      const payload: ProductForm = { ...data };
-      if (!hasDescription) delete payload.description;
-      if (!hasImageUrl) delete payload.imageUrl;
+      const { description: _desc2, images: _imgs2, ...rest2 } = data;
+      const payload: Record<string, unknown> = { ...rest2 };
+      if (hasDescription) payload.description = data.description;
+      if (hasImages) payload.images = data.images;
 
       const result = await api.put<unknown>(`/products/${productId}`, payload);
 

@@ -1,7 +1,7 @@
 import { ToastContainer } from "react-toastify";
 import { useTheme } from "@/shared/hooks/useTheme";
 
-export function ToastProvider(): JSX.Element {
+export function ToastProvider() {
   const { theme } = useTheme();
 
   return (
