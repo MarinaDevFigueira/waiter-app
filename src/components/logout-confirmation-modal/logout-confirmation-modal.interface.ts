@@ -1,6 +1,6 @@
 export interface LogoutConfirmationModalProps {
   open: boolean;
+  onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  onCancel: () => void;
   isLoading?: boolean;
 }

@@ -1,9 +1,11 @@
 import { useState, useCallback, useMemo } from "react";
-import { ShoppingBag, Trash2, Plus, Minus, X } from "lucide-react";
+import { ShoppingBag, Trash2, Plus, Minus } from "lucide-react";
+import { Drawer } from "@/components/ui/drawer/drawer";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useCart } from "@/shared/hooks/useCart";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { multiply } from "@/lib/math";
 import type { CartItem } from "@/shared/subjects/cart.subject";
 
 interface CartItemRowProps {
@@ -34,7 +36,8 @@ function CartItemRow({ item, onRemove, onUpdateQuantity }: CartItemRowProps) {
     onUpdateQuantity(item.productId, item.quantity - 1);
   }, [item.productId, item.quantity, onUpdateQuantity]);
 
-  const itemTotal = formatPrice(item.productPrice * item.quantity);
+  const itemTotalValue = multiply(item.productPrice, item.quantity);
+  const itemTotal = formatPrice(itemTotalValue);
   const hasImage = Boolean(item.productImageUrl);
   const imageSrc = hasImage ? item.productImageUrl : "/placeholder-food.png";
 
@@ -83,9 +86,10 @@ function CartItemRow({ item, onRemove, onUpdateQuantity }: CartItemRowProps) {
 interface CartDrawerProps {
   open: boolean;
   onClose: () => void;
+  onOrderConfirmed?: () => void;
 }
 
-export function CartDrawer({ open, onClose }: CartDrawerProps) {
+export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps) {
   const { t } = useTranslation();
   const { auth } = useAuth();
   const { cart, itemCount, removeItem, updateQuantity, clearCart, confirmOrder, isLoading } = useCart();
@@ -105,17 +109,28 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
     return t(key, { count: String(itemCount) });
   }, [itemCount, t]);
 
+  const handleOpenChange = useCallback(
+    (isOpen: boolean) => {
+      const isClosed = !isOpen;
+      if (isClosed) {
+        onClose();
+      }
+    },
+    [onClose]
+  );
+
   const handleConfirmOrder = useCallback(async () => {
     setIsConfirming(true);
     try {
       const success = await confirmOrder();
       if (success) {
+        onOrderConfirmed?.();
         onClose();
       }
     } finally {
       setIsConfirming(false);
     }
-  }, [confirmOrder, onClose]);
+  }, [confirmOrder, onClose, onOrderConfirmed]);
 
   const handleCancelOrder = useCallback(async () => {
     await clearCart();
@@ -125,35 +140,23 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const hasItems = cart.items.length > 0;
   const isDisabled = isLoading || isConfirming;
 
-  if (!open) return null;
-
   return (
-    <>
-      <div
-        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <aside
-        className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-background shadow-xl flex flex-col"
+    <Drawer open={open} onOpenChange={handleOpenChange} direction="right">
+      <Drawer.Content
+        className="fixed inset-y-0 right-0 left-auto w-full max-w-sm rounded-t-none rounded-l-xl flex flex-col"
+        showHandle={false}
         data-testid="cart-drawer"
       >
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <Drawer.Header className="border-b border-border">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold">{t("cart.title")}</h2>
+            <Drawer.Title>{t("cart.title")}</Drawer.Title>
             {hasItems && (
               <span className="text-sm text-muted-foreground">({itemCountLabel})</span>
             )}
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted hover:cursor-pointer transition-colors"
-            aria-label="Fechar carrinho"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+          <Drawer.Close />
+        </Drawer.Header>
 
         <div className="flex-1 overflow-y-auto px-4">
           {hasItems ? (
@@ -202,7 +205,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
             </button>
           </div>
         )}
-      </aside>
-    </>
+      </Drawer.Content>
+    </Drawer>
   );
 }

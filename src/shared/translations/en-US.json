@@ -67,6 +67,11 @@
       "noProductsDescription": "There are no products available in this category"
     }
   },
+  "productDetail": {
+    "unitPrice": "Unit price",
+    "quantity": "Quantity",
+    "addToCart": "Add to Cart"
+  },
   "cart": {
     "title": "My Order",
     "empty": "Your cart is empty",

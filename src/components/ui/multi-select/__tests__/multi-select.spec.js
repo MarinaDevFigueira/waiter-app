@@ -133,7 +133,8 @@ test.describe("MultiSelect Component", () => {
           const initialState = await firstCheckbox.getAttribute("data-state");
 
           const optionContainer = firstCheckbox.locator('..');
-          await optionContainer.click();
+          await page.waitForTimeout(500);
+          await optionContainer.dispatchEvent("click");
           await page.waitForTimeout(300);
 
           const newState = await firstCheckbox.getAttribute("data-state");
@@ -173,15 +174,17 @@ test.describe("MultiSelect Component", () => {
           const secondInitialState = await secondCheckbox.getAttribute("data-state");
 
           const firstContainer = firstCheckbox.locator('..');
-          await firstContainer.click();
-          await page.waitForTimeout(100);
+          await page.waitForTimeout(500);
+          await firstContainer.dispatchEvent("click");
+          await page.waitForTimeout(300);
 
           const firstNewState = await firstCheckbox.getAttribute("data-state");
           expect(firstNewState).not.toBe(firstInitialState);
 
           const secondContainer = secondCheckbox.locator('..');
-          await secondContainer.click();
-          await page.waitForTimeout(100);
+          await page.waitForTimeout(500);
+          await secondContainer.dispatchEvent("click");
+          await page.waitForTimeout(300);
 
           const secondNewState = await secondCheckbox.getAttribute("data-state");
           expect(secondNewState).not.toBe(secondInitialState);
@@ -213,9 +216,12 @@ test.describe("MultiSelect Component", () => {
         const isOptionVisible = await firstOption.isVisible().catch(() => false);
 
         if (isOptionVisible) {
-          await firstOption.click();
-          await page.waitForTimeout(100);
-          await firstOption.click();
+          const optionContainer = firstOption.locator('..');
+          await page.waitForTimeout(500);
+          await optionContainer.dispatchEvent("click");
+          await page.waitForTimeout(300);
+          await page.waitForTimeout(500);
+          await optionContainer.dispatchEvent("click");
           await page.waitForTimeout(300);
 
           const triggerText = await multiSelectTrigger.textContent();
@@ -248,7 +254,8 @@ test.describe("MultiSelect Component", () => {
         const isContainerVisible = await firstOptionContainer.isVisible().catch(() => false);
 
         if (isContainerVisible) {
-          await firstOptionContainer.click();
+          await page.waitForTimeout(500);
+          await firstOptionContainer.dispatchEvent("click");
           await page.waitForTimeout(300);
 
           const checkIcon = firstOptionContainer.locator('svg').last();

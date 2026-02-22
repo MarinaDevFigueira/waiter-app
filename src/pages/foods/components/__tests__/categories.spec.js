@@ -47,8 +47,7 @@ test.describe("Categories Component", () => {
     const todosTab = page.getByText("Todos", { exact: true });
     await expect(todosTab).toBeVisible();
 
-    const parent = todosTab.locator("..");
-    const className = await parent.getAttribute("class");
-    expect(className).toContain("rounded");
+    const className = await todosTab.getAttribute("class");
+    expect(className).toContain("rounded-full");
   });
 });

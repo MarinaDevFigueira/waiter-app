@@ -126,7 +126,6 @@ export function useCart(): UseCartReturn {
       if (sessionNotReady) return;
 
       cartObservable.addItem(item, quantity);
-      toast.success(`${item.productName} adicionado ao carrinho`);
     } finally {
       setIsLoading(false);
     }

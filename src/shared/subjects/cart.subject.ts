@@ -1,5 +1,6 @@
 import { BehaviorSubject, type Subscription } from "rxjs";
 import { StorageKeys } from "@/shared/constants/storage-keys";
+import { sumProducts } from "@/lib/math";
 
 export interface CartItem {
   productId: string;
@@ -25,7 +26,12 @@ const getStoredCart = (): CartData => {
 };
 
 const calculateTotal = (items: CartItem[]): number => {
-  return items.reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
+  const mappedItems = items.map((item) => ({
+    price: item.productPrice,
+    quantity: item.quantity,
+  }));
+  const total = sumProducts(mappedItems);
+  return total;
 };
 
 const initialCart = getStoredCart();
