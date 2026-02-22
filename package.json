@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "playwright test",
+    "test": "playwright test --workers=7",
     "test:ui": "playwright test --ui",
     "test:headed": "SLOW_MO=1000 playwright test --headed",
     "test:debug": "SLOW_MO=500 playwright test --headed --debug"
@@ -40,8 +40,10 @@
     "react-hook-form": "^7.71.1",
     "react-toastify": "^11.0.5",
     "rxjs": "^7.8.2",
+    "swiper": "^12.1.2",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.17",
+    "vaul": "^1.1.2",
     "zod": "^4.3.6"
   },
   "devDependencies": {

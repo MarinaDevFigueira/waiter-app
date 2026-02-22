@@ -96,14 +96,21 @@ test.describe("FoodsPage", () => {
   test("should add product to cart when plus button is clicked", async ({ page }) => {
     await page.waitForTimeout(2000);
 
-    const addButtons = page.locator("[data-testid^='add-product-']");
-    const addButtonCount = await addButtons.count();
+    const products = page.locator("[data-testid^='product-']");
+    const productCount = await products.count();
 
-    const hasProducts = addButtonCount > 0;
+    const hasProducts = productCount > 0;
     if (hasProducts) {
       const cartButton = page.getByTestId("cart-button");
 
-      await addButtons.first().click();
+      await products.first().click();
+
+      const modal = page.locator('[role="dialog"]');
+      await expect(modal).toBeVisible();
+
+      const addToCartButton = modal.locator('[data-testid="add-to-cart-button"]');
+      await page.waitForTimeout(500);
+      await addToCartButton.dispatchEvent("click");
 
       await page.waitForTimeout(2000);
 
