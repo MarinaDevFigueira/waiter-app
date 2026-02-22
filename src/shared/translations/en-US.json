@@ -121,7 +121,9 @@
     },
     "form": {
       "createTitle": "New Product",
+      "createDescription": "Fill in the details to create a new product",
       "editTitle": "Edit Product",
+      "editDescription": "Update the product information",
       "createButton": "Create Product",
       "saveButton": "Save",
       "createSuccess": "Product created successfully!",
@@ -201,7 +203,9 @@
     },
     "form": {
       "createTitle": "New Category",
+      "createDescription": "Fill in the details to create a new category",
       "editTitle": "Edit Category",
+      "editDescription": "Update the category information",
       "createButton": "Create Category",
       "saveButton": "Save",
       "createSuccess": "Category created successfully!",

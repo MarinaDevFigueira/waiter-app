@@ -33,6 +33,7 @@ function DialogContent({ children, className, ...props }: React.ComponentPropsWi
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
+        aria-describedby={undefined}
         className={cn(
           "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2",
           "bg-card border border-border rounded-lg shadow-lg",
