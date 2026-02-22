@@ -55,7 +55,7 @@ function DialogContent({ children, className, ...props }: React.ComponentPropsWi
 function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>): JSX.Element {
   return (
     <div
-      className={cn("flex flex-col space-y-1.5 p-6 pb-4", className)}
+      className={cn("flex items-center justify-between gap-4 p-6 pb-4 shrink-0", className)}
       {...props}
     />
   );
@@ -92,8 +92,9 @@ function DialogClose({ className, ...props }: React.ComponentPropsWithoutRef<typ
   return (
     <DialogPrimitive.Close
       className={cn(
-        "absolute right-4 top-4 rounded-sm opacity-70 transition-opacity",
-        "hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+        "rounded-sm opacity-70 transition-opacity",
+        "hover:opacity-100 hover:cursor-pointer",
+        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
         "disabled:pointer-events-none",
         className
       )}

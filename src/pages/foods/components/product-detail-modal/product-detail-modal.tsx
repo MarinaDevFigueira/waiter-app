@@ -91,18 +91,6 @@ export function ProductDetailModal({
     return price;
   }, [product]);
 
-  const totalPrice = useMemo(() => {
-    const hasProduct = !!product;
-    if (!hasProduct) {
-      const emptyTotal = "";
-      return emptyTotal;
-    }
-
-    const total = product.price * quantity;
-    const formattedTotal = formatPrice(total);
-    return formattedTotal;
-  }, [product, quantity]);
-
   const hasProduct = !!product;
   if (!hasProduct) return null;
 
@@ -115,6 +103,7 @@ export function ProductDetailModal({
   const productName = product.name;
   const productDescription = product.description;
   const unitPriceLabel = t("productDetail.unitPrice");
+  const quantityLabel = t("productDetail.quantity");
   const addToCartLabel = t("productDetail.addToCart");
 
   const imageSwiper = (
@@ -132,7 +121,7 @@ export function ProductDetailModal({
             <img
               src={image}
               alt={productName}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </SwiperSlide>
         );
@@ -141,32 +130,48 @@ export function ProductDetailModal({
   );
 
   const quantityControls = (
-    <div className="flex items-center gap-3">
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleDecrement}
-        disabled={!canDecrement}
-        data-testid="decrement-quantity"
-        className="size-10"
-      >
-        <Minus className="size-4" />
-      </Button>
-      <span
-        className="text-xl font-semibold w-12 text-center"
-        data-testid="quantity-display"
-      >
-        {quantity}
+    <div className="flex flex-col gap-2">
+      <span className="text-sm font-medium text-muted-foreground">
+        {quantityLabel}
       </span>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleIncrement}
-        data-testid="increment-quantity"
-        className="size-10"
-      >
-        <Plus className="size-4" />
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleDecrement}
+          disabled={!canDecrement}
+          data-testid="decrement-quantity"
+          className="size-10"
+        >
+          <Minus className="size-4" />
+        </Button>
+        <span
+          className="text-xl font-semibold w-12 text-center"
+          data-testid="quantity-display"
+        >
+          {quantity}
+        </span>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleIncrement}
+          data-testid="increment-quantity"
+          className="size-10"
+        >
+          <Plus className="size-4" />
+        </Button>
+      </div>
+    </div>
+  );
+
+  const priceBlock = (
+    <div className="flex flex-col gap-2">
+      <span className="text-sm font-medium text-muted-foreground">
+        {unitPriceLabel}
+      </span>
+      <span className="text-xl font-bold text-primary">
+        {formattedPrice}
+      </span>
     </div>
   );
 
@@ -179,7 +184,7 @@ export function ProductDetailModal({
     >
       <ShoppingCart className="size-5 mr-2" />
       <span>
-        {addToCartLabel} - {totalPrice}
+        {addToCartLabel}
       </span>
     </Button>
   );
@@ -188,29 +193,24 @@ export function ProductDetailModal({
     return (
       <Drawer open={open} onOpenChange={handleOpenChange}>
         <Drawer.Content className="max-h-[85vh] flex flex-col">
+          <Drawer.Header className="border-b">
+            <Drawer.Title>{productName}</Drawer.Title>
+            <Drawer.Close />
+          </Drawer.Header>
+
           <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="relative w-full aspect-video bg-muted shrink-0">
               {imageSwiper}
             </div>
 
             <div className="p-4 flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <h2 className="text-xl font-semibold">{productName}</h2>
-                <p className="text-sm text-muted-foreground">
-                  {productDescription}
-                </p>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                {productDescription}
+              </p>
 
-              <div className="flex items-center justify-between pt-4 border-t">
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm text-muted-foreground">
-                    {unitPriceLabel}
-                  </span>
-                  <span className="text-xl font-bold text-primary">
-                    {formattedPrice}
-                  </span>
-                </div>
+              <div className="flex flex-col gap-4 pt-4 border-t">
                 {quantityControls}
+                {priceBlock}
               </div>
             </div>
           </div>
@@ -226,30 +226,24 @@ export function ProductDetailModal({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <Dialog.Content className="max-w-lg p-0 overflow-hidden max-h-[85vh] flex flex-col">
+        <Dialog.Header className="border-b">
+          <Dialog.Title>{productName}</Dialog.Title>
+          <Dialog.Close />
+        </Dialog.Header>
+
         <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="relative w-full aspect-video bg-muted shrink-0">
             {imageSwiper}
-            <Dialog.Close />
           </div>
 
           <div className="p-4 flex flex-col gap-3">
-            <div className="flex flex-col gap-1">
-              <h2 className="text-xl font-semibold">{productName}</h2>
-              <p className="text-sm text-muted-foreground">
-                {productDescription}
-              </p>
-            </div>
+            <p className="text-sm text-muted-foreground">
+              {productDescription}
+            </p>
 
-            <div className="flex items-center justify-between pt-3 border-t">
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-muted-foreground">
-                  {unitPriceLabel}
-                </span>
-                <span className="text-xl font-bold text-primary">
-                  {formattedPrice}
-                </span>
-              </div>
+            <div className="flex flex-col gap-4 pt-3 border-t">
               {quantityControls}
+              {priceBlock}
             </div>
           </div>
         </div>

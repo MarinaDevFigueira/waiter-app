@@ -69,6 +69,7 @@
   },
   "productDetail": {
     "unitPrice": "Preço unitário",
+    "quantity": "Quantidade",
     "addToCart": "Adicionar ao Carrinho"
   },
   "cart": {

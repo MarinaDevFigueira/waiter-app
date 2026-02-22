@@ -190,12 +190,14 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <Dialog.Content className="max-w-md">
         <Dialog.Header>
-          <Dialog.Title>{dialogTitle}</Dialog.Title>
-          <Dialog.Description>
-            {isEditing
-              ? t("categories.form.editDescription")
-              : t("categories.form.createDescription")}
-          </Dialog.Description>
+          <div className="flex flex-col gap-1.5">
+            <Dialog.Title>{dialogTitle}</Dialog.Title>
+            <Dialog.Description>
+              {isEditing
+                ? t("categories.form.editDescription")
+                : t("categories.form.createDescription")}
+            </Dialog.Description>
+          </div>
           <Dialog.Close />
         </Dialog.Header>
 

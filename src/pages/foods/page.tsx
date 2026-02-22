@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "@tanstack/react-router";
 import { Title } from "./components/title";
@@ -30,6 +30,9 @@ export const FoodsPage = () => {
   const [isClosingSession, setIsClosingSession] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false);
+  const [isCartAnimating, setIsCartAnimating] = useState(false);
+  const [hasUnviewedOrder, setHasUnviewedOrder] = useState(false);
+  const cartAnimationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { categories } = useCategories({
     initialSize: 100,
@@ -85,22 +88,32 @@ export const FoodsPage = () => {
 
   const handleAddToCart = useCallback(
     async (product: Product, quantity: number) => {
-      const quantityArray = Array.from({ length: quantity });
       const productId = product.id;
       const productName = product.name;
       const productPrice = product.price;
       const productImageUrl = product.imageUrl;
 
-      const promises = quantityArray.map(() =>
-        addItem({
+      await addItem(
+        {
           productId,
           productName,
           productPrice,
           productImageUrl,
-        })
+        },
+        quantity
       );
 
-      await Promise.all(promises);
+      const hasExistingTimer = cartAnimationTimerRef.current !== null;
+      if (hasExistingTimer) {
+        clearTimeout(cartAnimationTimerRef.current!);
+      }
+
+      setIsCartAnimating(true);
+      const animationDuration = 2000;
+      cartAnimationTimerRef.current = setTimeout(() => {
+        setIsCartAnimating(false);
+        cartAnimationTimerRef.current = null;
+      }, animationDuration);
     },
     [addItem]
   );
@@ -113,12 +126,17 @@ export const FoodsPage = () => {
     setIsCartOpen(false);
   }, []);
 
+  const handleOrderConfirmed = useCallback(() => {
+    setHasUnviewedOrder(true);
+  }, []);
+
   const handleOpenSummary = useCallback(() => {
     const currentCart = cartObservable.getValue();
     const sessionId = currentCart.orderSessionId;
     const noSession = !sessionId;
     if (noSession) return;
 
+    setHasUnviewedOrder(false);
     setIsSummaryOpen(true);
   }, []);
 
@@ -223,8 +241,9 @@ export const FoodsPage = () => {
           <OrderSessionButton
             hasActiveSession={hasActiveSession}
             onClick={handleOpenSummary}
+            hasUnviewedOrder={hasUnviewedOrder}
           />
-          <CartButton itemCount={itemCount} onClick={handleOpenCart} />
+          <CartButton itemCount={itemCount} onClick={handleOpenCart} isAnimating={isCartAnimating} />
         </div>
       </div>
       <Categories
@@ -233,7 +252,7 @@ export const FoodsPage = () => {
         onCategoryChange={handleCategoryChange}
       />
       {contentToRender}
-      <CartDrawer open={isCartOpen} onClose={handleCloseCart} />
+      <CartDrawer open={isCartOpen} onClose={handleCloseCart} onOrderConfirmed={handleOrderConfirmed} />
       <OrderSessionSummaryModal
         open={isSummaryOpen}
         onClose={handleCloseSummaryModal}
