@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 interface CheckboxProps
   extends React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> {}
 
-function Checkbox({ className, ...props }: CheckboxProps): JSX.Element {
+function Checkbox({ className, ...props }: CheckboxProps) {
   return (
     <CheckboxPrimitive.Root
       className={cn(

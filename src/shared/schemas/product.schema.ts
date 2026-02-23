@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { baseEntitySchema } from "@/shared/schemas/base-entity.schema";
 
+export const productImageSchema = z.object({
+  id: z.string(),
+  url: z.string(),
+});
+
 export const productSchema = baseEntitySchema.extend({
   id: z.string(),
   name: z.string().min(1, { error: "Nome é obrigatório" }),
@@ -9,7 +14,7 @@ export const productSchema = baseEntitySchema.extend({
   price: z.number().positive({ error: "Preço deve ser positivo" }),
   stock: z.number().int().nonnegative({ error: "Estoque deve ser não-negativo" }),
   unit: z.enum(["un", "kg", "g", "l", "ml"]),
-  imageUrl: z.string().optional(),
+  images: z.array(productImageSchema),
   active: z.boolean(),
 });
 
@@ -23,5 +28,6 @@ export const productFormSchema = productSchema.omit({
   deletedBy: true,
 });
 
+export type ProductImage = z.infer<typeof productImageSchema>;
 export type Product = z.infer<typeof productSchema>;
 export type ProductForm = z.infer<typeof productFormSchema>;

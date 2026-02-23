@@ -5,7 +5,7 @@ interface KitchenEmptyStateProps {
   searchQuery?: string;
 }
 
-export function KitchenEmptyState({ searchQuery }: KitchenEmptyStateProps): JSX.Element {
+export function KitchenEmptyState({ searchQuery }: KitchenEmptyStateProps) {
   const { t } = useTranslation();
   const isSearching = Boolean(searchQuery && searchQuery.trim().length > 0);
 

@@ -19,7 +19,7 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-export function AppLayout({ children }: AppLayoutProps): JSX.Element {
+export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
   const { auth } = useAuth();
   const { t } = useTranslation();
@@ -73,8 +73,8 @@ export function AppLayout({ children }: AppLayoutProps): JSX.Element {
   }, []);
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center justify-start bg-background">
-      <header className="w-full bg-background shadow-sm sticky top-0 z-50">
+    <div className="w-screen min-h-screen flex flex-col items-center justify-start bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+      <header className="w-full bg-background shadow-sm shrink-0 z-50">
         <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 py-3 sm:py-4">
           <Logo className="text-lg sm:text-xl" />
           <div className="flex items-center gap-4">
@@ -101,8 +101,8 @@ export function AppLayout({ children }: AppLayoutProps): JSX.Element {
           </div>
         </div>
       </header>
-      <main className="w-full flex-1 overflow-y-auto flex justify-center">
-        <div className="w-full h-full max-w-7xl max-h-[720px] px-2 md:px-0 py-4">
+      <main className="w-full flex-1 min-h-0 overflow-y-auto flex justify-center h-full">
+        <div className="w-full max-w-7xl px-2 md:px-4 py-4">
           {children}
         </div>
       </main>

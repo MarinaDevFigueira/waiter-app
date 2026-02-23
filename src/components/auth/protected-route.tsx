@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
   allowedProfiles: UserProfile[];
 }
 
-export function ProtectedRoute({ children, allowedProfiles }: ProtectedRouteProps): JSX.Element {
+export function ProtectedRoute({ children, allowedProfiles }: ProtectedRouteProps) {
   const { auth, isAuthenticated } = useAuth();
 
   const userIsNotAuthenticated = !isAuthenticated;

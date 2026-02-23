@@ -57,7 +57,9 @@
       "drinks": "Drinks",
       "snacks": "Snacks",
       "promotions": "Promotions",
-      "all": "All"
+      "all": "All",
+      "scrollLeft": "Scroll categories left",
+      "scrollRight": "Scroll categories right"
     },
     "actions": {
       "addToOrder": "Add {{name}} to order"
@@ -121,13 +123,17 @@
     },
     "form": {
       "createTitle": "New Product",
+      "createDescription": "Fill in the details to create a new product",
       "editTitle": "Edit Product",
+      "editDescription": "Update the product information",
       "createButton": "Create Product",
       "saveButton": "Save",
       "createSuccess": "Product created successfully!",
       "updateSuccess": "Product updated successfully!",
       "createError": "Error creating product",
       "updateError": "Error updating product",
+      "imageDeleteSuccess": "Image removed successfully",
+      "imageDeleteError": "Error removing image",
       "fields": {
         "name": "Name",
         "description": "Description",
@@ -135,7 +141,7 @@
         "price": "Price",
         "stock": "Stock",
         "unit": "Unit",
-        "imageUrl": "Image URL",
+        "images": "Product Images",
         "active": "Active product"
       },
       "placeholders": {
@@ -201,7 +207,9 @@
     },
     "form": {
       "createTitle": "New Category",
+      "createDescription": "Fill in the details to create a new category",
       "editTitle": "Edit Category",
+      "editDescription": "Update the category information",
       "createButton": "Create Category",
       "saveButton": "Save",
       "createSuccess": "Category created successfully!",

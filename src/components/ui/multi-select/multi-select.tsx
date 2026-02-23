@@ -24,7 +24,7 @@ export function MultiSelect({
   onChange,
   placeholder = "Selecionar...",
   className,
-}: MultiSelectProps): JSX.Element {
+}: MultiSelectProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleToggle = useCallback(

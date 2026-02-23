@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card/card";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 
-export function DefaultNotFound(): JSX.Element {
+export function DefaultNotFound() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -13,7 +13,7 @@ export function DefaultNotFound(): JSX.Element {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen w-screen bg-background p-4">
+    <div className="flex items-center justify-center min-h-screen w-screen bg-background p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-6xl font-bold text-muted-foreground mb-2">

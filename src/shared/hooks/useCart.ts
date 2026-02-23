@@ -53,9 +53,10 @@ export function useCart(): UseCartReturn {
             return;
           }
 
-          const hasActiveSession = result.data !== null;
+          const activeSession = result.data;
+          const hasActiveSession = activeSession !== null && activeSession !== undefined;
           if (hasActiveSession) {
-            cartObservable.setOrderSession(result.data.id);
+            cartObservable.setOrderSession(activeSession.id);
           }
         } catch (error) {
           const sessionError = error instanceof Error ? error : new Error(String(error));
@@ -89,9 +90,10 @@ export function useCart(): UseCartReturn {
         return false;
       }
 
-      const hasActiveSession = result.data !== null;
+      const activeSessionData = result.data;
+      const hasActiveSession = activeSessionData !== null && activeSessionData !== undefined;
       if (hasActiveSession) {
-        cartObservable.setOrderSession(result.data.id);
+        cartObservable.setOrderSession(activeSessionData.id);
         return true;
       }
 

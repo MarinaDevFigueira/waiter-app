@@ -15,7 +15,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 interface ProductDetailModalProps {
-  product: Product | null;
+  product: Product;
   open: boolean;
   onClose: () => void;
   onAddToCart: (product: Product, quantity: number) => void;
@@ -70,13 +70,13 @@ export function ProductDetailModal({
   const images = useMemo(() => {
     const hasProduct = !!product;
     if (!hasProduct) {
-      const emptyImages: string[] = [];
+      const emptyImages: { id: string; url: string }[] = [];
       return emptyImages;
     }
 
-    const hasImageUrl = !!product.imageUrl;
-    const mainImage = hasImageUrl ? product.imageUrl : "/no-image.png";
-    const imageList = [mainImage];
+    const hasImages = !!product.images?.length;
+    const fallbackImage = { id: "placeholder", url: "/no-image.png" };
+    const imageList = hasImages ? product.images : [fallbackImage];
     return imageList;
   }, [product]);
 
@@ -116,12 +116,13 @@ export function ProductDetailModal({
     >
       {images.map((image, index) => {
         const slideKey = `${productId}-${index}`;
+        const imageUrl = image.url;
         return (
           <SwiperSlide key={slideKey}>
             <img
-              src={image}
+              src={imageUrl}
               alt={productName}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
             />
           </SwiperSlide>
         );
@@ -130,7 +131,7 @@ export function ProductDetailModal({
   );
 
   const quantityControls = (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1">
       <span className="text-sm font-medium text-muted-foreground">
         {quantityLabel}
       </span>
@@ -141,12 +142,12 @@ export function ProductDetailModal({
           onClick={handleDecrement}
           disabled={!canDecrement}
           data-testid="decrement-quantity"
-          className="size-10"
+          className="size-9"
         >
           <Minus className="size-4" />
         </Button>
         <span
-          className="text-xl font-semibold w-12 text-center"
+          className="text-lg font-semibold w-10 text-center"
           data-testid="quantity-display"
         >
           {quantity}
@@ -156,7 +157,7 @@ export function ProductDetailModal({
           size="icon"
           onClick={handleIncrement}
           data-testid="increment-quantity"
-          className="size-10"
+          className="size-9"
         >
           <Plus className="size-4" />
         </Button>
@@ -165,11 +166,11 @@ export function ProductDetailModal({
   );
 
   const priceBlock = (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1">
       <span className="text-sm font-medium text-muted-foreground">
         {unitPriceLabel}
       </span>
-      <span className="text-xl font-bold text-primary">
+      <span className="text-lg font-bold text-primary">
         {formattedPrice}
       </span>
     </div>
@@ -199,23 +200,23 @@ export function ProductDetailModal({
           </Drawer.Header>
 
           <div className="flex-1 min-h-0 overflow-y-auto">
-            <div className="relative w-full aspect-video bg-muted shrink-0">
+            <div className="relative w-full aspect-4/3 bg-muted shrink-0">
               {imageSwiper}
             </div>
 
-            <div className="p-4 flex flex-col gap-4">
-              <p className="text-sm text-muted-foreground">
+            <div className="px-4 pt-3 pb-2 flex flex-col gap-3">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {productDescription}
               </p>
 
-              <div className="flex flex-col gap-4 pt-4 border-t">
+              <div className="flex items-end justify-between pt-3 border-t">
                 {quantityControls}
                 {priceBlock}
               </div>
             </div>
           </div>
 
-          <div className="shrink-0 border-t p-4">
+          <div className="shrink-0 border-t px-4 py-3">
             {addToCartButton}
           </div>
         </Drawer.Content>
@@ -232,23 +233,23 @@ export function ProductDetailModal({
         </Dialog.Header>
 
         <div className="flex-1 min-h-0 overflow-y-auto">
-          <div className="relative w-full aspect-video bg-muted shrink-0">
+          <div className="relative w-full aspect-4/3 bg-muted shrink-0">
             {imageSwiper}
           </div>
 
-          <div className="p-4 flex flex-col gap-3">
-            <p className="text-sm text-muted-foreground">
+          <div className="px-4 pt-3 pb-2 flex flex-col gap-2">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {productDescription}
             </p>
 
-            <div className="flex flex-col gap-4 pt-3 border-t">
+            <div className="flex items-end justify-between pt-2 border-t">
               {quantityControls}
               {priceBlock}
             </div>
           </div>
         </div>
 
-        <div className="shrink-0 border-t p-4">
+        <div className="shrink-0 border-t px-4 py-3">
           {addToCartButton}
         </div>
       </Dialog.Content>

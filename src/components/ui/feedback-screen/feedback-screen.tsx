@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button/button";
 import { feedbackScreenVariants } from "./variants";
 
 interface FeedbackScreenProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title">,
     VariantProps<typeof feedbackScreenVariants> {
   illustration?: React.ReactNode | string;
   title?: React.ReactNode;

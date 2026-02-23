@@ -2,19 +2,19 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function Sheet({ children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Root>): JSX.Element {
+function Sheet({ children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root {...props}>{children}</DialogPrimitive.Root>;
 }
 
-function SheetTrigger({ ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Trigger>): JSX.Element {
+function SheetTrigger({ ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Trigger>) {
   return <DialogPrimitive.Trigger {...props} />;
 }
 
-function SheetPortal({ ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Portal>): JSX.Element {
+function SheetPortal({ ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal {...props} />;
 }
 
-function SheetOverlay({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>): JSX.Element {
+function SheetOverlay({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>) {
   return (
     <DialogPrimitive.Overlay
       className={cn(
@@ -28,7 +28,7 @@ function SheetOverlay({ className, ...props }: React.ComponentPropsWithoutRef<ty
   );
 }
 
-function SheetContent({ children, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>): JSX.Element {
+function SheetContent({ children, className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>) {
   return (
     <SheetPortal>
       <SheetOverlay />

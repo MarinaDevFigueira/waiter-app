@@ -7,6 +7,7 @@ import type { Category } from "@/shared/schemas/category.schema";
 interface FoodOptionProps {
   product: Product;
   onProductClick: (product: Product) => void;
+  animationIndex?: number;
 }
 
 interface FoodsProps {
@@ -16,14 +17,15 @@ interface FoodsProps {
   showCategoryHeaders?: boolean;
 }
 
-export const FoodOption = ({ product, onProductClick }: FoodOptionProps) => {
+export const FoodOption = ({ product, onProductClick, animationIndex = 0 }: FoodOptionProps) => {
   const handleClick = useCallback(() => {
     onProductClick(product);
   }, [product, onProductClick]);
 
-  const imageUrlExists = !!product.imageUrl;
-  const hasImage = imageUrlExists;
-  const imageSrc = hasImage ? product.imageUrl : "/no-image.png";
+  const productImages = product.images ?? [];
+  const hasImages = productImages.length > 0;
+  const firstImage = hasImages ? productImages[0] : null;
+  const imageSrc = firstImage ? firstImage.url : "/no-image.png";
   const productPrice = product.price;
   const formattedPrice = formatPrice(productPrice);
 
@@ -32,8 +34,16 @@ export const FoodOption = ({ product, onProductClick }: FoodOptionProps) => {
   const productName = product.name;
   const productDescription = product.description;
 
+  const maxStaggerDelay = 300;
+  const perItemDelay = 40;
+  const staggerDelay = Math.min(animationIndex * perItemDelay, maxStaggerDelay);
+  const animationStyle = { animationDelay: `${staggerDelay}ms` };
+
   return (
-    <li className="w-full flex items-start justify-start gap-3 min-h-16 sm:flex-col sm:items-stretch sm:gap-0 sm:min-h-0 sm:border sm:rounded-lg sm:overflow-hidden sm:shadow-sm">
+    <li
+      className="w-full flex items-start justify-start gap-3 min-h-16 sm:flex-col sm:items-stretch sm:gap-0 sm:min-h-0 sm:border sm:rounded-lg sm:overflow-hidden sm:shadow-sm animate-stagger-item sm:transition-shadow sm:duration-200 sm:hover:shadow-md"
+      style={animationStyle}
+    >
       <button
         onClick={handleClick}
         className="contents hover:cursor-pointer"
@@ -42,7 +52,7 @@ export const FoodOption = ({ product, onProductClick }: FoodOptionProps) => {
         <img
           src={imageSrc}
           alt={productName}
-          className="h-16 aspect-video rounded-md object-cover shrink-0 bg-muted sm:h-auto sm:aspect-[4/3] sm:rounded-none sm:w-full"
+          className="h-16 aspect-video rounded-md object-cover shrink-0 bg-muted transition-transform duration-200 sm:h-auto sm:aspect-4/3 sm:rounded-none sm:w-full sm:hover:scale-[1.02]"
         />
         <div className="w-full flex flex-col items-start justify-between gap-1 py-0.5 h-16 sm:h-auto sm:py-3 sm:px-3 sm:gap-2">
           <span className="font-semibold text-xs sm:text-sm line-clamp-2">
@@ -73,7 +83,7 @@ export const Foods = ({ items, onProductClick, categories, showCategoryHeaders =
     const noProductsDescription = t("foods.emptyState.noProductsDescription");
 
     return (
-      <div className="w-full flex flex-col items-center justify-center gap-2 py-12 text-center">
+      <div className="w-full flex flex-col items-center justify-center gap-2 py-12 text-center animate-fade-in">
         <span className="text-base font-semibold text-foreground">
           {noProductsMessage}
         </span>
@@ -88,13 +98,14 @@ export const Foods = ({ items, onProductClick, categories, showCategoryHeaders =
   if (!shouldShowHeaders) {
     return (
       <ul className="w-full flex flex-col items-start justify-start gap-3 sm:grid sm:grid-cols-3 sm:items-stretch md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 sm:gap-4">
-        {items.map((product) => {
+        {items.map((product, index) => {
           const productId = product.id;
           return (
             <FoodOption
               key={productId}
               product={product}
               onProductClick={onProductClick}
+              animationIndex={index}
             />
           );
         })}
@@ -138,18 +149,23 @@ export const Foods = ({ items, onProductClick, categories, showCategoryHeaders =
     return comparison;
   });
 
+  let runningIndex = 0;
+
   return (
     <div className="w-full flex flex-col items-start justify-start gap-6">
-      {sortedCategoryIds.map((categoryId) => {
+      {sortedCategoryIds.map((categoryId, categoryIndex) => {
         const defaultCategoryName = "Outros";
         const categoryName =
           categoryMap.get(categoryId) ?? defaultCategoryName;
         const categoryProducts = groupedByCategory[categoryId];
+        const categoryDelay = categoryIndex * 80;
+        const categoryAnimationStyle = { animationDelay: `${categoryDelay}ms` };
 
-        return (
+        const categorySection = (
           <div
             key={categoryId}
-            className="w-full flex flex-col items-start justify-start gap-3"
+            className="w-full flex flex-col items-start justify-start gap-3 animate-slide-in-up"
+            style={categoryAnimationStyle}
           >
             <div className="w-full flex items-center gap-3">
               <div className="flex-1 h-px bg-border" />
@@ -159,19 +175,24 @@ export const Foods = ({ items, onProductClick, categories, showCategoryHeaders =
               <div className="flex-1 h-px bg-border" />
             </div>
             <ul className="w-full flex flex-col items-start justify-start gap-3 sm:grid sm:grid-cols-3 sm:items-stretch md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 sm:gap-4">
-              {categoryProducts.map((product) => {
+              {categoryProducts.map((product, productIndex) => {
                 const productId = product.id;
+                const itemIndex = runningIndex + productIndex;
                 return (
                   <FoodOption
                     key={productId}
                     product={product}
                     onProductClick={onProductClick}
+                    animationIndex={itemIndex}
                   />
                 );
               })}
             </ul>
           </div>
         );
+
+        runningIndex += categoryProducts.length;
+        return categorySection;
       })}
     </div>
   );

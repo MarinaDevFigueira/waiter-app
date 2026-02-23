@@ -41,7 +41,7 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps): JSX.Element {
+export function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
@@ -133,7 +133,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps): JSX.Element
   }, [normalizedPathname, t]);
 
   return (
-    <div className="w-screen h-screen flex bg-background">
+    <div className="w-screen h-screen flex bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
       <aside
         data-minimized={isMinimized}
         className="hidden md:flex flex-col bg-background border-r border-border data-[minimized=false]:w-64 data-[minimized=true]:w-16 transition-all duration-300 shadow-lg"
