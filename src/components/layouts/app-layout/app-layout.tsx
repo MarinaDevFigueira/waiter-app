@@ -73,7 +73,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   }, []);
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center justify-start bg-background">
+    <div className="w-screen h-screen flex flex-col items-center justify-start bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
       <header className="w-full bg-background shadow-sm sticky top-0 z-50">
         <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 py-3 sm:py-4">
           <Logo className="text-lg sm:text-xl" />
