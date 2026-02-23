@@ -44,14 +44,14 @@ function mapApiProductToProduct(raw: ApiProduct): Product {
 }
 
 
-function buildProductPayload(data: ProductForm): Record<string, unknown> {
+function buildProductPayload(data: ProductForm, options?: { excludeImages?: boolean }): Record<string, unknown> {
   const hasDescription = Boolean(data.description);
-  const hasImages = Boolean(data.images?.length);
+  const shouldIncludeImages = !options?.excludeImages && Boolean(data.images?.length);
 
   const { description: _desc, images: _imgs, ...rest } = data;
   const payload: Record<string, unknown> = { ...rest };
   if (hasDescription) payload.description = data.description;
-  if (hasImages) {
+  if (shouldIncludeImages) {
     const imageUrls = data.images.map((img) => img.url);
     payload.images = imageUrls;
   }
@@ -59,7 +59,7 @@ function buildProductPayload(data: ProductForm): Record<string, unknown> {
   return payload;
 }
 
-function buildProductFormData(data: ProductForm, files: File[]): FormData {
+function buildProductFormData(data: ProductForm, files: File[], options?: { excludeImages?: boolean }): FormData {
   const formData = new FormData();
 
   formData.append("name", data.name);
@@ -74,8 +74,8 @@ function buildProductFormData(data: ProductForm, files: File[]): FormData {
     formData.append("description", data.description!);
   }
 
-  const hasExistingImages = Boolean(data.images?.length);
-  if (hasExistingImages) {
+  const shouldIncludeImages = !options?.excludeImages && Boolean(data.images?.length);
+  if (shouldIncludeImages) {
     data.images.forEach((image) => {
       const imageUrl = image.url;
       formData.append("images", imageUrl);
@@ -217,7 +217,7 @@ export const productsService = {
       const hasFiles = Boolean(files?.length);
 
       if (hasFiles) {
-        const formData = buildProductFormData(data, files!);
+        const formData = buildProductFormData(data, files!, { excludeImages: true });
         const result = await api.putFormData<unknown>(`/products/${productId}`, formData);
 
         const hasError = "error" in result;
@@ -228,7 +228,7 @@ export const productsService = {
         return { data: undefined };
       }
 
-      const payload = buildProductPayload(data);
+      const payload = buildProductPayload(data, { excludeImages: true });
       const result = await api.put<unknown>(`/products/${productId}`, payload);
 
       const hasError = "error" in result;
