@@ -74,7 +74,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-start bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
-      <header className="w-full bg-background shadow-sm sticky top-0 z-50">
+      <header className="w-full bg-background shadow-sm shrink-0 z-50">
         <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 py-3 sm:py-4">
           <Logo className="text-lg sm:text-xl" />
           <div className="flex items-center gap-4">
@@ -101,8 +101,8 @@ export function AppLayout({ children }: AppLayoutProps) {
           </div>
         </div>
       </header>
-      <main className="w-full flex-1 overflow-y-auto flex justify-center">
-        <div className="w-full h-full max-w-7xl max-h-[720px] px-2 md:px-0 py-4">
+      <main className="w-full flex-1 min-h-0 overflow-y-auto flex justify-center">
+        <div className="w-full max-w-7xl px-2 md:px-0 py-4 overflow-y-auto">
           {children}
         </div>
       </main>
