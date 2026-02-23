@@ -57,7 +57,9 @@
       "drinks": "Bebidas",
       "snacks": "Bocadillos",
       "promotions": "Promociones",
-      "all": "Todos"
+      "all": "Todos",
+      "scrollLeft": "Desplazar categorías a la izquierda",
+      "scrollRight": "Desplazar categorías a la derecha"
     },
     "actions": {
       "addToOrder": "Agregar {{name}} al pedido"

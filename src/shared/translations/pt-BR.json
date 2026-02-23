@@ -57,7 +57,9 @@
       "drinks": "Bebidas",
       "snacks": "Lanches",
       "promotions": "Promoções",
-      "all": "Todos"
+      "all": "Todos",
+      "scrollLeft": "Rolar categorias para a esquerda",
+      "scrollRight": "Rolar categorias para a direita"
     },
     "actions": {
       "addToOrder": "Adicionar {{name}} ao pedido"

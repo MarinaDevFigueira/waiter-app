@@ -57,7 +57,9 @@
       "drinks": "Drinks",
       "snacks": "Snacks",
       "promotions": "Promotions",
-      "all": "All"
+      "all": "All",
+      "scrollLeft": "Scroll categories left",
+      "scrollRight": "Scroll categories right"
     },
     "actions": {
       "addToOrder": "Add {{name}} to order"
