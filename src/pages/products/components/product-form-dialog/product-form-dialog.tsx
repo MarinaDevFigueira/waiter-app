@@ -85,6 +85,11 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
     },
   });
 
+  const allTranslationsKey = useMemo(
+    () => allTranslations.map((t) => `${t.locale}:${t.name}`).join("|"),
+    [allTranslations]
+  );
+
   const checkUnsavedChanges = useCallback(() => {
     const currentName = watch("translations.0.name");
     const currentDescription = watch("translations.0.description");
@@ -106,7 +111,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
     const hasChanges = nameChanged || descriptionChanged;
 
     return hasChanges;
-  }, [watch, allTranslations, editingLanguage]);
+  }, [allTranslationsKey, editingLanguage]);
 
   const switchToLanguage = useCallback(
     (newLanguage: TranslationLanguage) => {
@@ -144,11 +149,13 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
 
       setEditingLanguage(newLanguage);
     },
-    [watch, setValue, allTranslations, editingLanguage]
+    [setValue, allTranslationsKey, editingLanguage]
   );
 
   const handleLanguageChange = useCallback(
     (newLanguage: TranslationLanguage) => {
+      const startTime = performance.now();
+
       const isSameLanguage = newLanguage === editingLanguage;
       if (isSameLanguage) return;
 
@@ -160,6 +167,16 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
       }
 
       switchToLanguage(newLanguage);
+
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      const isSlowOperation = duration > 100;
+      if (isSlowOperation) {
+        logger.warn(`Language switch took ${duration.toFixed(2)}ms`, {
+          from: editingLanguage,
+          to: newLanguage,
+        });
+      }
     },
     [editingLanguage, checkUnsavedChanges, switchToLanguage]
   );
@@ -414,7 +431,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
         createMutation.mutate({ data: finalData, files });
       }
     },
-    [isEditing, selectedFiles, createMutation, updateMutation, watch, editingLanguage, allTranslations, t]
+    [isEditing, selectedFiles, createMutation, updateMutation, editingLanguage, allTranslationsKey, t]
   );
 
   const translationNameError = errors.translations?.[0]?.name?.message;

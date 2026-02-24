@@ -19,13 +19,41 @@ Specialized development agent following project specs and coding standards for t
 - Ensure consistency with established patterns
 - Follow security and performance guidelines
 
+## ⚠️ CRITICAL: useEffect Anti-Pattern
+
+**useEffect is an ANTI-PATTERN and creates confusing, hard-to-maintain code.**
+
+### Default to useMemo/useCallback
+
+Before using useEffect, ask:
+1. **Is this derived state?** → Use `useMemo`
+2. **Is this an event handler?** → Use `useCallback`
+3. **Is this initialization?** → Use `useRef` + minimal `useEffect`
+4. **Is this synchronization?** → OK to use `useEffect` (document why)
+
+### Problems with useEffect
+- Creates circular dependencies and infinite loops
+- Makes code hard to debug and understand
+- Causes performance issues with unnecessary re-renders
+- Scatters side effects throughout component
+
+### When useEffect is Actually Needed
+- Subscribing to external data sources (WebSocket, RxJS observables)
+- Setting up/cleaning up browser APIs (addEventListener, timers)
+- Synchronizing with non-React systems (DOM manipulation, third-party libraries)
+
+**See specs:**
+- `avoid-use-effect-anti-pattern.md` - Full anti-pattern guide
+- `prefer-use-memo.md` - Using useMemo for derived state
+- `prefer-use-callback.md` - Using useCallback for stable functions
+
 ## Specs Reference
 
 This agent follows the specifications defined in:
 
 ### Project Specs (./.specs/)
 
-69 specification files:
+72 specification files:
 
 **Code Style & Principles:**
 - `no-comments.spec.md` - Never add code comments
@@ -54,6 +82,9 @@ This agent follows the specifications defined in:
 - `use-memo-for-computed-values.spec.md` - useMemo for derived values
 - `use-callback-for-stable-references.spec.md` - useCallback for functions
 - `dependency-arrays.spec.md` - Only primitives/stable refs
+- `avoid-use-effect-anti-pattern.md` - **CRITICAL: Minimize useEffect usage**
+- `prefer-use-memo.md` - **Prefer useMemo for derived state**
+- `prefer-use-callback.md` - **Prefer useCallback for stable functions**
 
 **TypeScript/Interfaces:**
 - `no-interface-in-implementation.spec.md` - Sibling *.interface.ts files

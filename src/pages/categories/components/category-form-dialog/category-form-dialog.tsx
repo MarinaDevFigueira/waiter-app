@@ -61,8 +61,8 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
     register,
     handleSubmit,
     reset,
-    watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<CategoryForm>({
     resolver: zodResolver(categoryFormSchema),
@@ -73,14 +73,10 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
     },
   });
 
-  const allTranslationsKey = useMemo(
-    () => allTranslations.map((t) => `${t.locale}:${t.name}`).join("|"),
-    [allTranslations]
-  );
-
   const checkUnsavedChanges = useCallback(() => {
-    const currentName = watch("translations.0.name");
-    const currentDescription = watch("translations.0.description");
+    const formValues = getValues();
+    const currentName = formValues.translations[0].name;
+    const currentDescription = formValues.translations[0].description;
 
     const existingTranslation = allTranslations.find(
       (t) => t.locale === editingLanguage
@@ -99,12 +95,13 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
     const hasChanges = nameChanged || descriptionChanged;
 
     return hasChanges;
-  }, [allTranslationsKey, editingLanguage]);
+  }, [getValues, allTranslations, editingLanguage]);
 
   const switchToLanguage = useCallback(
     (newLanguage: TranslationLanguage) => {
-      const currentName = watch("translations.0.name");
-      const currentDescription = watch("translations.0.description");
+      const formValues = getValues();
+      const currentName = formValues.translations[0].name;
+      const currentDescription = formValues.translations[0].description;
 
       const currentTranslation = {
         locale: editingLanguage,
@@ -137,7 +134,7 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
 
       setEditingLanguage(newLanguage);
     },
-    [setValue, allTranslationsKey, editingLanguage]
+    [getValues, setValue, allTranslations, editingLanguage]
   );
 
   const handleLanguageChange = useCallback(
@@ -184,49 +181,64 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
   }, []);
 
   useEffect(() => {
-    const shouldPopulateForm = open && isEditing && category && !hasInitializedRef.current;
-    if (shouldPopulateForm) {
-      const hasTranslationsData = Boolean(translationsData?.translations);
-      if (hasTranslationsData && translationsData) {
-        const allFetchedTranslations = translationsData.translations;
-        setAllTranslations(allFetchedTranslations);
-
-        const currentLangTranslation = allFetchedTranslations.find(
-          (t) => t.locale === editingLanguage
-        );
-
-        const hasCurrentLangTranslation = Boolean(currentLangTranslation);
-        const translationToUse = hasCurrentLangTranslation
-          ? currentLangTranslation
-          : allFetchedTranslations[0];
-
-        const hasTranslationToUse = Boolean(translationToUse);
-        if (hasTranslationToUse) {
-          const translationLocale = translationToUse!.locale as TranslationLanguage;
-          const translationName = translationToUse!.name;
-          const translationDescription = translationToUse!.description ?? "";
-
-          reset({
-            translations: [
-              {
-                locale: translationLocale,
-                name: translationName,
-                description: translationDescription,
-              },
-            ],
-            sortOrder: category.sortOrder,
-            active: category.active,
-          });
-
-          setEditingLanguage(translationLocale);
-          hasInitializedRef.current = true;
-        }
-      }
+    const shouldResetInitFlag = !open;
+    if (shouldResetInitFlag) {
+      hasInitializedRef.current = false;
       return;
     }
 
-    const shouldResetForm = open && !isEditing && !hasInitializedRef.current;
-    if (shouldResetForm) {
+    const isAlreadyInitialized = hasInitializedRef.current;
+    if (isAlreadyInitialized) {
+      return;
+    }
+
+    const shouldPopulateFormForEdit = isEditing && Boolean(category);
+    if (shouldPopulateFormForEdit) {
+      const hasTranslationsData = Boolean(translationsData?.translations);
+      if (!hasTranslationsData || !translationsData) {
+        return;
+      }
+
+      const allFetchedTranslations = translationsData.translations;
+      setAllTranslations(allFetchedTranslations);
+
+      const currentLangTranslation = allFetchedTranslations.find(
+        (t) => t.locale === editingLanguage
+      );
+
+      const hasCurrentLangTranslation = Boolean(currentLangTranslation);
+      const translationToUse = hasCurrentLangTranslation
+        ? currentLangTranslation
+        : allFetchedTranslations[0];
+
+      const hasTranslationToUse = Boolean(translationToUse);
+      if (!hasTranslationToUse) {
+        return;
+      }
+
+      const translationLocale = translationToUse!.locale as TranslationLanguage;
+      const translationName = translationToUse!.name;
+      const translationDescription = translationToUse!.description ?? "";
+
+      reset({
+        translations: [
+          {
+            locale: translationLocale,
+            name: translationName,
+            description: translationDescription,
+          },
+        ],
+        sortOrder: category.sortOrder,
+        active: category.active,
+      });
+
+      setEditingLanguage(translationLocale);
+      hasInitializedRef.current = true;
+      return;
+    }
+
+    const shouldResetFormForCreate = !isEditing;
+    if (shouldResetFormForCreate) {
       const initialTranslation = {
         locale: language,
         name: "",
@@ -243,11 +255,6 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
       });
 
       hasInitializedRef.current = true;
-    }
-
-    const shouldResetInitFlag = !open;
-    if (shouldResetInitFlag) {
-      hasInitializedRef.current = false;
     }
   }, [open, isEditing, category, reset, translationsData, editingLanguage, language]);
 
@@ -297,8 +304,8 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
 
   const onSubmit = useCallback(
     (data: CategoryForm) => {
-      const currentName = watch("translations.0.name");
-      const currentDescription = watch("translations.0.description");
+      const currentName = data.translations[0].name;
+      const currentDescription = data.translations[0].description;
 
       const currentTranslation = {
         locale: editingLanguage,
@@ -333,7 +340,7 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
         createMutation.mutate(finalData);
       }
     },
-    [isEditing, categoryId, createMutation, updateMutation, editingLanguage, allTranslationsKey, t]
+    [isEditing, categoryId, createMutation, updateMutation, editingLanguage, allTranslations, t]
   );
 
   const translationNameError = errors.translations?.[0]?.name?.message;
