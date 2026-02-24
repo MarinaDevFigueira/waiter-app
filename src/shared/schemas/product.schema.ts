@@ -17,8 +17,8 @@ export const productTranslationSchema = z.object({
 
 export const productSchema = baseEntitySchema.extend({
   id: z.string(),
-  name: z.string().min(1, { message: "Nome é obrigatório" }),
-  description: z.string().optional(),
+  name: z.string().optional().default(''),
+  description: z.string().optional().default(''),
   categoryId: z.string().min(1, { message: "Categoria é obrigatória" }),
   price: z.number().positive({ message: "Preço deve ser positivo" }),
   stock: z.number().int().nonnegative({ message: "Estoque deve ser não-negativo" }),

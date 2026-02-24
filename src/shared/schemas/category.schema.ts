@@ -11,8 +11,8 @@ export const categoryTranslationSchema = z.object({
 
 export const categorySchema = z.object({
   id: z.string(),
-  name: z.string().min(1, { message: "Nome é obrigatório" }),
-  description: z.string().optional(),
+  name: z.string().default(''),
+  description: z.string().optional().default(''),
   sortOrder: z.number().int().nonnegative(),
   active: z.boolean(),
   businessId: z.string(),

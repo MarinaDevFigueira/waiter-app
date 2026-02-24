@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { ProductsTable } from "@/pages/products/components/products-table";
 import { ProductsTableSkeleton } from "@/pages/products/components/products-table-skeleton";
 import { ProductsFilters } from "@/pages/products/components/products-filters";
-import { ProductFormDialog } from "@/pages/products/components/product-form-dialog";
+import { ProductFormDialog } from "@/pages/products/components/product-form-dialog/product-form-dialog";
 import { Pagination } from "@/components/ui/pagination/pagination";
 import { Button } from "@/components/ui/button/button";
 import { useProducts } from "@/shared/hooks/useProducts";

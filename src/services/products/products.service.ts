@@ -7,8 +7,9 @@ import { logger } from "@/lib/logger";
 import {
   apiProductListSchema,
   apiProductSchema,
+  apiProductTranslationsSchema,
 } from "./products.schema";
-import type { PaginatedProducts, ApiProduct, ProductQueryParams } from "./products.schema";
+import type { PaginatedProducts, ApiProduct, ProductQueryParams, ApiProductTranslations } from "./products.schema";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
@@ -238,6 +239,33 @@ export const productsService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao deletar produto";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async getTranslations(
+    productId: string
+  ): Promise<ServiceResult<ApiProductTranslations>> {
+    try {
+      const result = await api.get<unknown>(`/products/${productId}/translations`);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      const parsed = apiProductTranslationsSchema.safeParse(result.data);
+      if (!parsed.success) {
+        const zodMessage = formatZodError(parsed.error);
+        logger.error("[productsService.getTranslations] Erro de validação", new Error(zodMessage));
+        return { error: "Resposta inválida do servidor" };
+      }
+
+      return { data: parsed.data };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao buscar traduções";
       logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }

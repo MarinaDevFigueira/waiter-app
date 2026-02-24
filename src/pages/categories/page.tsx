@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { CategoriesTable } from "@/pages/categories/components/categories-table";
 import { CategoriesTableSkeleton } from "@/pages/categories/components/categories-table-skeleton";
 import { CategoriesSearch } from "@/pages/categories/components/categories-search";
-import { CategoryFormDialog } from "@/pages/categories/components/category-form-dialog";
+import { CategoryFormDialog } from "@/pages/categories/components/category-form-dialog/category-form-dialog";
 import { Pagination } from "@/components/ui/pagination/pagination";
 import { Button } from "@/components/ui/button/button";
 import { useCategories } from "@/shared/hooks/useCategories";

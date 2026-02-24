@@ -92,7 +92,8 @@
     "pageTitle": "Productos",
     "pageSubtitle": "Gestiona el catálogo de productos del restaurante",
     "errors": {
-      "loadProducts": "Error al cargar productos:"
+      "loadProducts": "Error al cargar productos:",
+      "noTranslations": "Completa al menos una traducción completa"
     },
     "emptyState": {
       "title": "Ningún producto registrado"
@@ -134,6 +135,17 @@
       "updateError": "Error al actualizar el producto",
       "imageDeleteSuccess": "Imagen eliminada con éxito",
       "imageDeleteError": "Error al eliminar la imagen",
+      "translationsLoadError": "Error al cargar las traducciones del producto",
+      "languageSelector": {
+        "label": "Idioma de la Traducción",
+        "editing": "Editando en"
+      },
+      "unsavedChanges": {
+        "title": "Cambios sin guardar",
+        "description": "Tienes cambios sin guardar en este idioma. Si cambias de idioma, estos cambios se descartarán.",
+        "cancel": "Continuar Editando",
+        "confirm": "Cambiar Idioma"
+      },
       "fields": {
         "name": "Nombre",
         "description": "Descripción",
@@ -189,7 +201,8 @@
     "pageTitle": "Categorías",
     "pageSubtitle": "Gestiona las categorías de productos del restaurante",
     "errors": {
-      "loadCategories": "Error al cargar categorías:"
+      "loadCategories": "Error al cargar categorías:",
+      "noTranslations": "Complete al menos una traducción completa"
     },
     "emptyState": {
       "title": "Ninguna categoría registrada"
@@ -218,6 +231,17 @@
       "updateError": "Error al actualizar la categoría",
       "deleteSuccess": "¡Categoría eliminada con éxito!",
       "deleteError": "Error al eliminar la categoría",
+      "translationsLoadError": "Error al cargar traducciones de la categoría",
+      "languageSelector": {
+        "label": "Idioma de Traducción",
+        "editing": "Editando en"
+      },
+      "unsavedChanges": {
+        "title": "Cambios sin guardar",
+        "description": "Tienes cambios sin guardar en este idioma. Al cambiar de idioma, estos cambios se descartarán.",
+        "cancel": "Continuar Editando",
+        "confirm": "Cambiar Idioma"
+      },
       "fields": {
         "name": "Nombre",
         "description": "Descripción",
