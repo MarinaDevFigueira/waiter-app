@@ -100,7 +100,7 @@ function Footer({ onCancel, isPending, submitLabel }: FooterProps) {
 
 function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialogProps) {
   const { t } = useTranslation();
-  const { addLanguagePrefix } = useLanguage();
+  const { language, addLanguagePrefix } = useLanguage();
   const queryClient = useQueryClient();
   const isEditing = product !== undefined;
 
@@ -108,6 +108,12 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<ImagePreview[]>([]);
+
+  const defaultTranslation = useMemo(() => ({
+    locale: language,
+    name: "",
+    description: "",
+  }), [language]);
 
   const {
     register,
@@ -119,8 +125,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
   } = useForm<ProductForm>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      translations: [defaultTranslation],
       categoryId: "",
       price: 0,
       stock: 0,
@@ -134,8 +139,13 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
     const shouldPopulateForm = open && isEditing && product;
     if (shouldPopulateForm) {
       reset({
-        name: product.name,
-        description: product.description ?? "",
+        translations: [
+          {
+            locale: language,
+            name: product.name,
+            description: product.description ?? "",
+          },
+        ],
         categoryId: product.categoryId,
         price: product.price,
         stock: product.stock,
@@ -151,8 +161,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
     const shouldResetForm = open && !isEditing;
     if (shouldResetForm) {
       reset({
-        name: "",
-        description: "",
+        translations: [defaultTranslation],
         categoryId: "",
         price: 0,
         stock: 0,
@@ -163,7 +172,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
       setSelectedFiles([]);
       setImagePreviews([]);
     }
-  }, [open, isEditing, product, reset]);
+  }, [open, isEditing, product, reset, language, defaultTranslation]);
 
   useEffect(() => {
     return () => {
@@ -214,7 +223,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
 
   const handleRemoveExistingImage = useCallback(
     async (index: number) => {
-      const currentImages = watch("images");
+      const currentImages = watch("images") ?? [];
       const imageToRemove = currentImages[index];
       const updatedImages = currentImages.filter((_: ProductImage, i: number) => i !== index);
       setValue("images", updatedImages);
@@ -239,7 +248,7 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
     [watch, setValue, isEditing, product, t]
   );
 
-  const existingImages = watch("images");
+  const existingImages = watch("images") ?? [];
 
   const createMutation = useMutation({
     mutationFn: (params: { data: ProductForm; files: File[] }) =>
@@ -292,6 +301,9 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
     },
     [isEditing, selectedFiles, createMutation, updateMutation]
   );
+
+  const translationNameError = errors.translations?.[0]?.name?.message;
+  const translationDescriptionError = errors.translations?.[0]?.description?.message;
 
   const dialogTitle = isEditing ? t("products.form.editTitle") : t("products.form.createTitle");
   const submitLabel = isEditing ? t("products.form.saveButton") : t("products.form.createButton");
@@ -365,16 +377,18 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <Fields>
+            <input type="hidden" {...register("translations.0.locale")} value={language} />
+
             <Field
               label={t("products.form.fields.name")}
               htmlFor="name"
-              error={errors.name?.message}
+              error={translationNameError}
               required
             >
               <Input
                 id="name"
-                {...register("name")}
-                aria-invalid={errors.name ? true : undefined}
+                {...register("translations.0.name")}
+                aria-invalid={translationNameError ? true : undefined}
                 placeholder={t("products.form.placeholders.name")}
               />
             </Field>
@@ -382,10 +396,11 @@ function ProductFormDialogRoot({ open, onOpenChange, product }: ProductFormDialo
             <Field
               label={t("products.form.fields.description")}
               htmlFor="description"
+              error={translationDescriptionError}
             >
               <textarea
                 id="description"
-                {...register("description")}
+                {...register("translations.0.description")}
                 rows={3}
                 placeholder={t("products.form.placeholders.description")}
                 className="flex w-full rounded-md border border-input bg-input/30 px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] resize-none"
