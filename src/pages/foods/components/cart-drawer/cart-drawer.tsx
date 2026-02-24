@@ -141,10 +141,9 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
   const isDisabled = isLoading || isConfirming;
 
   return (
-    <Drawer open={open} onOpenChange={handleOpenChange} direction="right">
+    <Drawer open={open} onOpenChange={handleOpenChange}>
       <Drawer.Content
-        className="fixed inset-y-0 right-0 left-auto w-full max-w-sm rounded-t-none rounded-l-xl flex flex-col"
-        showHandle={false}
+        className="max-h-[85vh] flex flex-col"
         data-testid="cart-drawer"
       >
         <Drawer.Header className="border-b border-border">
@@ -158,7 +157,7 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
           <Drawer.Close />
         </Drawer.Header>
 
-        <div className="flex-1 overflow-y-auto px-4">
+        <div className="flex-1 overflow-y-auto px-4 min-h-0">
           {hasItems ? (
             <ul className="py-2">
               {cart.items.map((item) => (
@@ -180,7 +179,7 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
         </div>
 
         {hasItems && (
-          <div className="p-4 border-t border-border flex flex-col gap-3">
+          <Drawer.Footer className="border-t border-border gap-3">
             <div className="flex items-center justify-between">
               <span className="text-base font-semibold">{t("cart.total")}</span>
               <span className="text-xl font-bold text-primary">{formattedTotal}</span>
@@ -203,7 +202,7 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
             >
               {t("cart.cancelOrder")}
             </button>
-          </div>
+          </Drawer.Footer>
         )}
       </Drawer.Content>
     </Drawer>

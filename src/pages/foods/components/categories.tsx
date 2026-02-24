@@ -102,7 +102,7 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
         <CaretLeftIcon size={iconSize} weight="bold" />
       </button>
 
-      <div className="px-8">
+      <div className="">`
         <Swiper
           modules={[Navigation, FreeMode]}
           navigation={navigationConfig}
