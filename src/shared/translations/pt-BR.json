@@ -1,5 +1,6 @@
 {
   "common": {
+    "loading": "Carregando",
     "buttons": {
       "search": "Buscar",
       "clear": "Limpar",

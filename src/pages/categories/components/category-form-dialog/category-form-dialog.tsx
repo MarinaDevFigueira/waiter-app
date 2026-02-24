@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { Dialog } from "@/components/ui/dialog/dialog";
 import { Input } from "@/components/ui/input/input";
@@ -12,6 +12,7 @@ import type { CategoryForm, CategoryTranslation } from "@/shared/schemas/categor
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useLanguage } from "@/shared/hooks/useLanguage";
 import type { TranslationLanguage } from "@/shared/enums/translations.enum";
+import { logger } from "@/lib/logger";
 import type { CategoryFormDialogProps } from "./category-form-dialog.interface";
 import { Fields } from "./fields";
 import { Field } from "./field";
@@ -38,6 +39,23 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
   }), [language]);
 
   const categoryId = category?.id;
+  const shouldFetchTranslations = open && isEditing && Boolean(categoryId);
+
+  const { data: translationsData, isLoading: isLoadingTranslations } = useQuery({
+    queryKey: addLanguagePrefix("category-translations", categoryId),
+    queryFn: async () => {
+      if (!categoryId) return null;
+      const result = await categoriesService.getTranslations(categoryId);
+      const hasError = "error" in result;
+      if (hasError) {
+        toast.error(t("categories.form.translationsLoadError"));
+        logger.error("Erro ao carregar traduções da categoria", new Error(result.error));
+        return null;
+      }
+      return result.data;
+    },
+    enabled: shouldFetchTranslations,
+  });
 
   const {
     register,
@@ -54,6 +72,11 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
       active: true,
     },
   });
+
+  const allTranslationsKey = useMemo(
+    () => allTranslations.map((t) => `${t.locale}:${t.name}`).join("|"),
+    [allTranslations]
+  );
 
   const checkUnsavedChanges = useCallback(() => {
     const currentName = watch("translations.0.name");
@@ -76,7 +99,7 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
     const hasChanges = nameChanged || descriptionChanged;
 
     return hasChanges;
-  }, [watch, allTranslations, editingLanguage]);
+  }, [allTranslationsKey, editingLanguage]);
 
   const switchToLanguage = useCallback(
     (newLanguage: TranslationLanguage) => {
@@ -114,11 +137,13 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
 
       setEditingLanguage(newLanguage);
     },
-    [watch, setValue, allTranslations, editingLanguage]
+    [setValue, allTranslationsKey, editingLanguage]
   );
 
   const handleLanguageChange = useCallback(
     (newLanguage: TranslationLanguage) => {
+      const startTime = performance.now();
+
       const isSameLanguage = newLanguage === editingLanguage;
       if (isSameLanguage) return;
 
@@ -130,6 +155,16 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
       }
 
       switchToLanguage(newLanguage);
+
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      const isSlowOperation = duration > 100;
+      if (isSlowOperation) {
+        logger.warn(`Language switch took ${duration.toFixed(2)}ms`, {
+          from: editingLanguage,
+          to: newLanguage,
+        });
+      }
     },
     [editingLanguage, checkUnsavedChanges, switchToLanguage]
   );
@@ -151,22 +186,42 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
   useEffect(() => {
     const shouldPopulateForm = open && isEditing && category && !hasInitializedRef.current;
     if (shouldPopulateForm) {
-      const initialTranslation = {
-        locale: language,
-        name: category.name,
-        description: category.description ?? "",
-      };
+      const hasTranslationsData = Boolean(translationsData?.translations);
+      if (hasTranslationsData && translationsData) {
+        const allFetchedTranslations = translationsData.translations;
+        setAllTranslations(allFetchedTranslations);
 
-      setAllTranslations([initialTranslation]);
-      setEditingLanguage(language);
+        const currentLangTranslation = allFetchedTranslations.find(
+          (t) => t.locale === editingLanguage
+        );
 
-      reset({
-        translations: [initialTranslation],
-        sortOrder: category.sortOrder,
-        active: category.active,
-      });
+        const hasCurrentLangTranslation = Boolean(currentLangTranslation);
+        const translationToUse = hasCurrentLangTranslation
+          ? currentLangTranslation
+          : allFetchedTranslations[0];
 
-      hasInitializedRef.current = true;
+        const hasTranslationToUse = Boolean(translationToUse);
+        if (hasTranslationToUse) {
+          const translationLocale = translationToUse!.locale as TranslationLanguage;
+          const translationName = translationToUse!.name;
+          const translationDescription = translationToUse!.description ?? "";
+
+          reset({
+            translations: [
+              {
+                locale: translationLocale,
+                name: translationName,
+                description: translationDescription,
+              },
+            ],
+            sortOrder: category.sortOrder,
+            active: category.active,
+          });
+
+          setEditingLanguage(translationLocale);
+          hasInitializedRef.current = true;
+        }
+      }
       return;
     }
 
@@ -194,7 +249,7 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
     if (shouldResetInitFlag) {
       hasInitializedRef.current = false;
     }
-  }, [open, isEditing, category, reset, editingLanguage, language]);
+  }, [open, isEditing, category, reset, translationsData, editingLanguage, language]);
 
   const createMutation = useMutation({
     mutationFn: (data: CategoryForm) => categoriesService.create(data),
@@ -228,6 +283,9 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
       }
       toast.success(t("categories.form.updateSuccess"));
       queryClient.invalidateQueries({ queryKey: addLanguagePrefix("categories") });
+      queryClient.invalidateQueries({
+        queryKey: addLanguagePrefix("category-translations", category?.id)
+      });
       onOpenChange(false);
     },
     onError: () => {
@@ -275,7 +333,7 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
         createMutation.mutate(finalData);
       }
     },
-    [isEditing, categoryId, createMutation, updateMutation, watch, editingLanguage, allTranslations, t]
+    [isEditing, categoryId, createMutation, updateMutation, editingLanguage, allTranslationsKey, t]
   );
 
   const translationNameError = errors.translations?.[0]?.name?.message;
@@ -303,7 +361,7 @@ function CategoryFormDialogRoot({ open, onOpenChange, category }: CategoryFormDi
           <LanguageSwitcher
             editingLanguage={editingLanguage}
             onLanguageChange={handleLanguageChange}
-            disabled={isPending}
+            disabled={isPending || isLoadingTranslations}
           />
 
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
