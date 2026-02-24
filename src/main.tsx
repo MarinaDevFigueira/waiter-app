@@ -7,16 +7,11 @@ import { DefaultNotFound } from "./components/default-not-found/default-not-foun
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
-const FIVE_MINUTES_MS = 5 * 60 * 1000;
-const TEN_MINUTES_MS = 10 * 60 * 1000;
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
-      staleTime: FIVE_MINUTES_MS,
-      gcTime: TEN_MINUTES_MS,
     },
   },
 });

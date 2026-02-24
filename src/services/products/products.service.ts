@@ -7,8 +7,9 @@ import { logger } from "@/lib/logger";
 import {
   apiProductListSchema,
   apiProductSchema,
+  apiProductTranslationsSchema,
 } from "./products.schema";
-import type { PaginatedProducts, ApiProduct, ProductQueryParams } from "./products.schema";
+import type { PaginatedProducts, ApiProduct, ProductQueryParams, ApiProductTranslations } from "./products.schema";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
@@ -44,39 +45,21 @@ function mapApiProductToProduct(raw: ApiProduct): Product {
 }
 
 
-function buildProductPayload(data: ProductForm, options?: { excludeImages?: boolean }): Record<string, unknown> {
-  const hasDescription = Boolean(data.description);
-  const shouldIncludeImages = !options?.excludeImages && Boolean(data.images?.length);
-
-  const { description: _desc, images: _imgs, ...rest } = data;
-  const payload: Record<string, unknown> = { ...rest };
-  if (hasDescription) payload.description = data.description;
-  if (shouldIncludeImages) {
-    const imageUrls = data.images.map((img) => img.url);
-    payload.images = imageUrls;
-  }
-
-  return payload;
-}
-
 function buildProductFormData(data: ProductForm, files: File[], options?: { excludeImages?: boolean }): FormData {
   const formData = new FormData();
 
-  formData.append("name", data.name);
+  const translationsJson = JSON.stringify(data.translations)
+  formData.append("translations", translationsJson);
+
   formData.append("categoryId", data.categoryId);
   formData.append("price", data.price.toString());
   formData.append("stock", data.stock.toString());
   formData.append("unit", data.unit);
-  formData.append("active", data.active.toString());
-
-  const hasDescription = Boolean(data.description);
-  if (hasDescription) {
-    formData.append("description", data.description!);
-  }
+  formData.append("active", data.active ? data.active.toString() : "true");
 
   const shouldIncludeImages = !options?.excludeImages && Boolean(data.images?.length);
   if (shouldIncludeImages) {
-    data.images.forEach((image) => {
+    data.images!.forEach((image) => {
       const imageUrl = image.url;
       formData.append("images", imageUrl);
     });
@@ -178,21 +161,8 @@ export const productsService = {
   async create(data: ProductForm, files?: File[]): Promise<ServiceResult<void>> {
     try {
       const hasFiles = Boolean(files?.length);
-
-      if (hasFiles) {
-        const formData = buildProductFormData(data, files!);
-        const result = await api.postFormData<unknown>("/products", formData);
-
-        const hasError = "error" in result;
-        if (hasError) {
-          return { error: result.error };
-        }
-
-        return { data: undefined };
-      }
-
-      const payload = buildProductPayload(data);
-      const result = await api.post<unknown>("/products", payload);
+      const formData = buildProductFormData(data, files ?? [], { excludeImages: !hasFiles });
+      const result = await api.postFormData<unknown>("/products", formData);
 
       const hasError = "error" in result;
       if (hasError) {
@@ -214,22 +184,8 @@ export const productsService = {
     files?: File[]
   ): Promise<ServiceResult<void>> {
     try {
-      const hasFiles = Boolean(files?.length);
-
-      if (hasFiles) {
-        const formData = buildProductFormData(data, files!, { excludeImages: true });
-        const result = await api.putFormData<unknown>(`/products/${productId}`, formData);
-
-        const hasError = "error" in result;
-        if (hasError) {
-          return { error: result.error };
-        }
-
-        return { data: undefined };
-      }
-
-      const payload = buildProductPayload(data, { excludeImages: true });
-      const result = await api.put<unknown>(`/products/${productId}`, payload);
+      const formData = buildProductFormData(data, files ?? [], { excludeImages: true });
+      const result = await api.putFormData<unknown>(`/products/${productId}`, formData);
 
       const hasError = "error" in result;
       if (hasError) {
@@ -283,6 +239,33 @@ export const productsService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao deletar produto";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async getTranslations(
+    productId: string
+  ): Promise<ServiceResult<ApiProductTranslations>> {
+    try {
+      const result = await api.get<unknown>(`/products/${productId}/translations`);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      const parsed = apiProductTranslationsSchema.safeParse(result.data);
+      if (!parsed.success) {
+        const zodMessage = formatZodError(parsed.error);
+        logger.error("[productsService.getTranslations] Erro de validação", new Error(zodMessage));
+        return { error: "Resposta inválida do servidor" };
+      }
+
+      return { data: parsed.data };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao buscar traduções";
       logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }

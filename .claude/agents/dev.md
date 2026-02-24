@@ -19,13 +19,41 @@ Specialized development agent following project specs and coding standards for t
 - Ensure consistency with established patterns
 - Follow security and performance guidelines
 
+## ⚠️ CRITICAL: useEffect Anti-Pattern
+
+**useEffect is an ANTI-PATTERN and creates confusing, hard-to-maintain code.**
+
+### Default to useMemo/useCallback
+
+Before using useEffect, ask:
+1. **Is this derived state?** → Use `useMemo`
+2. **Is this an event handler?** → Use `useCallback`
+3. **Is this initialization?** → Use `useRef` + minimal `useEffect`
+4. **Is this synchronization?** → OK to use `useEffect` (document why)
+
+### Problems with useEffect
+- Creates circular dependencies and infinite loops
+- Makes code hard to debug and understand
+- Causes performance issues with unnecessary re-renders
+- Scatters side effects throughout component
+
+### When useEffect is Actually Needed
+- Subscribing to external data sources (WebSocket, RxJS observables)
+- Setting up/cleaning up browser APIs (addEventListener, timers)
+- Synchronizing with non-React systems (DOM manipulation, third-party libraries)
+
+**See specs:**
+- `avoid-use-effect-anti-pattern.md` - Full anti-pattern guide
+- `prefer-use-memo.md` - Using useMemo for derived state
+- `prefer-use-callback.md` - Using useCallback for stable functions
+
 ## Specs Reference
 
 This agent follows the specifications defined in:
 
 ### Project Specs (./.specs/)
 
-66 specification files:
+72 specification files:
 
 **Code Style & Principles:**
 - `no-comments.spec.md` - Never add code comments
@@ -54,6 +82,9 @@ This agent follows the specifications defined in:
 - `use-memo-for-computed-values.spec.md` - useMemo for derived values
 - `use-callback-for-stable-references.spec.md` - useCallback for functions
 - `dependency-arrays.spec.md` - Only primitives/stable refs
+- `avoid-use-effect-anti-pattern.md` - **CRITICAL: Minimize useEffect usage**
+- `prefer-use-memo.md` - **Prefer useMemo for derived state**
+- `prefer-use-callback.md` - **Prefer useCallback for stable functions**
 
 **TypeScript/Interfaces:**
 - `no-interface-in-implementation.spec.md` - Sibling *.interface.ts files
@@ -82,6 +113,9 @@ This agent follows the specifications defined in:
 
 **Forms & Validation:**
 - `forms-rhf-tanstack-zod.spec.md` - React Hook Form + Zod v4
+- `product-form-translations.md` - Multi-language product translations
+- `product-form-structure.md` - Product form component organization
+- `product-form-state-management.md` - Product form state patterns
 
 **Data Fetching & Services:**
 - `error-handling-return-pattern.spec.md` - Return {data} or {error}
@@ -706,6 +740,47 @@ const onSubmit = (validData) => {
   mutation.mutate(validData);
 };
 ```
+
+#### Product Form Multi-Language Translations
+
+**Component Structure:**
+Product forms MUST follow this structure:
+- Main component file: `[component-name]/[component-name].tsx`
+- Interfaces file: `[component-name]/[component-name].interface.ts`
+- Sub-components: Separate files in same directory
+
+Example structure:
+```
+src/pages/products/components/product-form-dialog/
+├── product-form-dialog.tsx - Main form logic
+├── product-form-dialog.interface.ts - TypeScript interfaces
+├── language-switcher.tsx - Language selection UI
+├── unsaved-changes-dialog.tsx - Confirmation dialog
+├── fields.tsx - Form field wrappers
+└── footer.tsx - Form footer with buttons
+```
+
+**Translation Management:**
+- Use `allTranslations` state to store all language translations
+- Use `editingLanguage` to track current editing language
+- Implement `UnsavedChangesDialog` before allowing language switch
+- Use TanStack Query to fetch existing translations from backend
+
+**State Management Rules:**
+- Use `hasInitializedRef` to prevent re-initialization loops
+- NEVER add `language` to useEffect dependencies that call reset()
+- Use `setValue()` for language switching (not reset())
+- Validate at least one translation exists before submit
+
+**Backend Integration:**
+- Endpoint: GET /products/:id/translations
+- Returns: { translations: [{ locale, name, description }] }
+- Submit sends all translations in translations[] array
+
+**Specs Location:**
+- Translation specs: ./.specs/product-form-translations.md
+- Structure specs: ./.specs/product-form-structure.md
+- State management specs: ./.specs/product-form-state-management.md
 
 ### Data Fetching & Services
 
@@ -1533,6 +1608,6 @@ When project specs conflict with global specs:
   - 21 global specs in `~/.specs/`
 - Global specs for code style (no comments, named variables, no ESLint disable, i18n patterns, SwiperJS patterns) take highest priority
 - Last updated: 2026-02-22
-- Total specs loaded: 87
+- Total specs loaded: 90
 
 You can now use `@dev` in your conversations to apply these project-specific patterns and conventions with global best practices enforced.

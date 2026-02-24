@@ -5,8 +5,9 @@ import { logger } from "@/lib/logger";
 import {
   apiCategoryListSchema,
   apiCategorySchema,
+  apiCategoryTranslationsSchema,
 } from "./categories.schema";
-import type { PaginatedCategories, ApiCategory, CategoryQueryParams } from "./categories.schema";
+import type { PaginatedCategories, ApiCategory, CategoryQueryParams, ApiCategoryTranslations } from "./categories.schema";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
@@ -154,6 +155,33 @@ export const categoriesService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao deletar categoria";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async getTranslations(
+    categoryId: string
+  ): Promise<ServiceResult<ApiCategoryTranslations>> {
+    try {
+      const result = await api.get<unknown>(`/categories/${categoryId}/translations`);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      const parsed = apiCategoryTranslationsSchema.safeParse(result.data);
+      if (!parsed.success) {
+        const zodMessage = formatZodError(parsed.error);
+        logger.error("[categoriesService.getTranslations] Erro de validação", new Error(zodMessage));
+        return { error: "Resposta inválida do servidor" };
+      }
+
+      return { data: parsed.data };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao buscar traduções";
       logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }

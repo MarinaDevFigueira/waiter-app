@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { categorySchema } from "@/shared/schemas/category.schema";
+import { categorySchema, categoryTranslationSchema } from "@/shared/schemas/category.schema";
 import { CategoriesOrderByEnum } from "@/shared/enums/categories-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 
@@ -36,6 +36,11 @@ export const apiCategoryListSchema = z.object({
   hasPreviousPage: z.boolean(),
 });
 
+export const apiCategoryTranslationsSchema = z.object({
+  translations: z.array(categoryTranslationSchema),
+});
+
 export type CategoryQueryParams = z.infer<typeof categoryQueryParamsSchema>;
 export type PaginatedCategories = z.infer<typeof paginatedCategoriesSchema>;
 export type ApiCategory = z.infer<typeof apiCategorySchema>;
+export type ApiCategoryTranslations = z.infer<typeof apiCategoryTranslationsSchema>;

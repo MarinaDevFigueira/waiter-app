@@ -1,5 +1,6 @@
 {
   "common": {
+    "loading": "Loading",
     "buttons": {
       "search": "Search",
       "clear": "Clear",
@@ -92,7 +93,8 @@
     "pageTitle": "Products",
     "pageSubtitle": "Manage the restaurant's product catalog",
     "errors": {
-      "loadProducts": "Error loading products:"
+      "loadProducts": "Error loading products:",
+      "noTranslations": "Fill in at least one complete translation"
     },
     "emptyState": {
       "title": "No products registered"
@@ -134,6 +136,17 @@
       "updateError": "Error updating product",
       "imageDeleteSuccess": "Image removed successfully",
       "imageDeleteError": "Error removing image",
+      "translationsLoadError": "Error loading product translations",
+      "languageSelector": {
+        "label": "Translation Language",
+        "editing": "Editing in"
+      },
+      "unsavedChanges": {
+        "title": "Unsaved Changes",
+        "description": "You have unsaved changes in this language. If you switch languages, these changes will be discarded.",
+        "cancel": "Continue Editing",
+        "confirm": "Switch Language"
+      },
       "fields": {
         "name": "Name",
         "description": "Description",
@@ -189,7 +202,8 @@
     "pageTitle": "Categories",
     "pageSubtitle": "Manage the restaurant's product categories",
     "errors": {
-      "loadCategories": "Error loading categories:"
+      "loadCategories": "Error loading categories:",
+      "noTranslations": "Fill in at least one complete translation"
     },
     "emptyState": {
       "title": "No categories registered"
@@ -218,6 +232,17 @@
       "updateError": "Error updating category",
       "deleteSuccess": "Category removed successfully!",
       "deleteError": "Error removing category",
+      "translationsLoadError": "Error loading category translations",
+      "languageSelector": {
+        "label": "Translation Language",
+        "editing": "Editing in"
+      },
+      "unsavedChanges": {
+        "title": "Unsaved changes",
+        "description": "You have unsaved changes in this language. Switching languages will discard these changes.",
+        "cancel": "Continue Editing",
+        "confirm": "Switch Language"
+      },
       "fields": {
         "name": "Name",
         "description": "Description",

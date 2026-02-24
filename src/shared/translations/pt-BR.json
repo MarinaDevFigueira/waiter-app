@@ -1,5 +1,6 @@
 {
   "common": {
+    "loading": "Carregando",
     "buttons": {
       "search": "Buscar",
       "clear": "Limpar",
@@ -92,7 +93,8 @@
     "pageTitle": "Produtos",
     "pageSubtitle": "Gerencie o catálogo de produtos do restaurante",
     "errors": {
-      "loadProducts": "Erro ao carregar produtos:"
+      "loadProducts": "Erro ao carregar produtos:",
+      "noTranslations": "Preencha pelo menos uma tradução completa"
     },
     "emptyState": {
       "title": "Nenhum produto cadastrado"
@@ -134,6 +136,17 @@
       "updateError": "Erro ao atualizar produto",
       "imageDeleteSuccess": "Imagem removida com sucesso",
       "imageDeleteError": "Erro ao remover imagem",
+      "translationsLoadError": "Erro ao carregar traduções do produto",
+      "languageSelector": {
+        "label": "Idioma da Tradução",
+        "editing": "Editando em"
+      },
+      "unsavedChanges": {
+        "title": "Alterações não salvas",
+        "description": "Você possui alterações não salvas neste idioma. Ao trocar de idioma, essas alterações serão descartadas.",
+        "cancel": "Continuar Editando",
+        "confirm": "Trocar Idioma"
+      },
       "fields": {
         "name": "Nome",
         "description": "Descrição",
@@ -189,7 +202,8 @@
     "pageTitle": "Categorias",
     "pageSubtitle": "Gerencie as categorias de produtos do restaurante",
     "errors": {
-      "loadCategories": "Erro ao carregar categorias:"
+      "loadCategories": "Erro ao carregar categorias:",
+      "noTranslations": "Preencha pelo menos uma tradução completa"
     },
     "emptyState": {
       "title": "Nenhuma categoria cadastrada"
@@ -218,6 +232,17 @@
       "updateError": "Erro ao atualizar categoria",
       "deleteSuccess": "Categoria removida com sucesso!",
       "deleteError": "Erro ao remover categoria",
+      "translationsLoadError": "Erro ao carregar traduções da categoria",
+      "languageSelector": {
+        "label": "Idioma da Tradução",
+        "editing": "Editando em"
+      },
+      "unsavedChanges": {
+        "title": "Alterações não salvas",
+        "description": "Você possui alterações não salvas neste idioma. Ao trocar de idioma, essas alterações serão descartadas.",
+        "cancel": "Continuar Editando",
+        "confirm": "Trocar Idioma"
+      },
       "fields": {
         "name": "Nome",
         "description": "Descrição",

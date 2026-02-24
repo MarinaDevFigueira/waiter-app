@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { productSchema } from "@/shared/schemas/product.schema";
+import { productSchema, productTranslationSchema } from "@/shared/schemas/product.schema";
 import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
 import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
@@ -61,6 +61,11 @@ export const apiProductListSchema = z.object({
   hasPreviousPage: z.boolean(),
 });
 
+export const apiProductTranslationsSchema = z.object({
+  translations: z.array(productTranslationSchema),
+});
+
 export type ProductQueryParams = z.infer<typeof productQueryParamsSchema>;
 export type PaginatedProducts = z.infer<typeof paginatedProductsSchema>;
 export type ApiProduct = z.infer<typeof apiProductSchema>;
+export type ApiProductTranslations = z.infer<typeof apiProductTranslationsSchema>;
