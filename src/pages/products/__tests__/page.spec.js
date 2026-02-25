@@ -42,7 +42,10 @@ test.describe("ProductsPage", () => {
   });
 
   test("displays products filters section", async ({ page }) => {
-    const filtersContainer = page.locator('div[class*="space-y"]').first();
+    const heading = page.getByRole("heading", { name: /produtos/i });
+    await expect(heading).toBeVisible({ timeout: 10000 });
+
+    const filtersContainer = page.locator('[class*="flex"][class*="flex-col"]').first();
     await expect(filtersContainer).toBeVisible({ timeout: 10000 });
   });
 
@@ -52,14 +55,16 @@ test.describe("ProductsPage", () => {
   });
 
   test("page has correct layout structure", async ({ page }) => {
-    const mainContainer = page.locator('div[class*="space-y-6"]').first();
+    const mainContainer = page.locator('[class*="flex"][class*="flex-col"]').first();
     await expect(mainContainer).toBeVisible({ timeout: 10000 });
   });
 
   test("page layout has correct spacing", async ({ page }) => {
-    const mainContainer = page.locator('div[class*="space-y-6"]').first();
+    const mainContainer = page.locator('div.flex.flex-col.h-full').first();
+    await expect(mainContainer).toBeVisible({ timeout: 10000 });
     const classes = await mainContainer.getAttribute("class");
-    expect(classes).toContain("space-y-6");
+    const hasGapClass = classes.includes("gap-");
+    expect(hasGapClass).toBe(true);
   });
 
   test("displays product rows in table", async ({ page }) => {

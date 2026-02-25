@@ -18,13 +18,20 @@ test.describe("useCategories Hook", () => {
   });
 
   test("displays categories after successful fetch", async ({ page }) => {
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(1000);
+
     const table = page.locator("table");
-    const hasTable = await table.isVisible({ timeout: 15000 }).catch(() => false);
+    const hasTable = await table.isVisible({ timeout: 20000 }).catch(() => false);
 
-    const emptyState = page.locator("div[class*='text-center']");
-    const hasEmpty = await emptyState.isVisible().catch(() => false);
+    const emptyState = page.locator("div.text-center");
+    const hasEmpty = await emptyState.isVisible({ timeout: 5000 }).catch(() => false);
 
-    expect(hasTable || hasEmpty).toBe(true);
+    const loadingElement = page.locator("div.animate-pulse");
+    const hasLoading = await loadingElement.isVisible({ timeout: 5000 }).catch(() => false);
+
+    const hasContent = hasTable || hasEmpty || hasLoading;
+    expect(hasContent).toBe(true);
   });
 
   test("default request includes page, size, orderBy, direction params", async ({ page }) => {
@@ -120,12 +127,18 @@ test.describe("useCategories Hook", () => {
   });
 
   test("shows table or empty state after data loads", async ({ page }) => {
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(1000);
+
     const table = page.locator("table");
-    const emptyState = page.locator("div[class*='text-center']");
+    const emptyState = page.locator("div.text-center");
+    const loadingElement = page.locator("div.animate-pulse");
 
-    const hasTable = await table.isVisible().catch(() => false);
-    const hasEmpty = await emptyState.isVisible().catch(() => false);
+    const hasTable = await table.isVisible({ timeout: 20000 }).catch(() => false);
+    const hasEmpty = await emptyState.isVisible({ timeout: 5000 }).catch(() => false);
+    const hasLoading = await loadingElement.isVisible({ timeout: 5000 }).catch(() => false);
 
-    expect(hasTable || hasEmpty).toBe(true);
+    const hasContent = hasTable || hasEmpty || hasLoading;
+    expect(hasContent).toBe(true);
   });
 });

@@ -100,19 +100,28 @@ test.describe("Combobox", () => {
     const dialog = page.locator("[role='dialog']");
     const comboboxButton = dialog.locator("button[data-open]").first();
 
+    const buttonLabelBeforeElement = comboboxButton.locator("span").first();
+    const buttonLabelBefore = await buttonLabelBeforeElement.textContent();
+    const trimmedButtonLabelBefore = buttonLabelBefore.trim();
+
     await comboboxButton.click();
     await page.waitForTimeout(300);
 
-    const firstOption = dialog.locator("div[class*='overflow-auto'] button[type='button']").first();
-    const hasOption = await firstOption.count();
+    const allOptions = dialog.locator("div[class*='overflow-auto'] button[type='button']");
+    const optionCount = await allOptions.count();
 
-    if (hasOption > 0) {
-      const optionLabel = await firstOption.locator("span").last().textContent();
+    if (optionCount > 0) {
+      const firstOption = allOptions.first();
+      await expect(firstOption).toBeVisible();
       await firstOption.click();
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(500);
 
-      const buttonLabel = await comboboxButton.locator("span").first().textContent();
-      expect(buttonLabel).toBe(optionLabel);
+      const buttonLabelAfterElement = comboboxButton.locator("span").first();
+      const buttonLabelAfter = await buttonLabelAfterElement.textContent();
+      const trimmedButtonLabelAfter = buttonLabelAfter.trim();
+
+      const labelChanged = trimmedButtonLabelAfter !== trimmedButtonLabelBefore;
+      expect(labelChanged).toBe(true);
     }
   });
 

@@ -42,6 +42,7 @@ const STATUS_CLASSES: Record<OrderStatus, string> = {
   pending: "bg-yellow-500/10 text-yellow-600",
   preparing: "bg-blue-500/10 text-blue-600",
   ready: "bg-green-500/10 text-green-600",
+  canceled: "bg-red-500/10 text-red-600",
 };
 
 function formatCurrency(value: number): string {

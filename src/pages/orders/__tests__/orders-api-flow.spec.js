@@ -67,15 +67,13 @@ test.describe("Orders Status Update — API Integration", () => {
     });
     await loginAsAdmin(page);
     await page.goto("/dashboard/orders");
-    await page.waitForLoadState("networkidle");
+    await page.waitForResponse((r) => r.url().includes("/orders"), { timeout: 15000 });
+    await page.waitForTimeout(500);
 
     const thead = page.locator("thead").first();
-    const hasTable = await thead.isVisible({ timeout: 15000 }).catch(() => false);
-
     const emptyState = page.locator("div[class*='rounded-lg'][class*='text-center']");
-    const hasEmpty = await emptyState.isVisible().catch(() => false);
 
-    expect(hasTable || hasEmpty).toBe(true);
+    await expect(thead.or(emptyState)).toBeVisible({ timeout: 20000 });
   });
 
   test("admin table view sends pagination params to API", async ({ page }) => {

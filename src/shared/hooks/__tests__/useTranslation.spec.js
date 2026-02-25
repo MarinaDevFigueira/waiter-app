@@ -86,7 +86,7 @@ test.describe("useTranslation Hook", () => {
     const grid = page.getByTestId("kitchen-orders-grid");
     const statusElement = grid.getByTestId("order-status").first();
     const portugueseStatus = await statusElement.textContent();
-    expect(["Pendente", "Preparando", "Pronto"]).toContain(portugueseStatus);
+    expect(["Pendente", "Preparando", "Pronto", "Cancelado"]).toContain(portugueseStatus);
 
     const languageButton = page.getByTestId("language-selector");
     await languageButton.click();
@@ -97,7 +97,7 @@ test.describe("useTranslation Hook", () => {
     await page.waitForTimeout(500);
 
     const englishStatus = await statusElement.textContent();
-    expect(["Pending", "Preparing", "Ready"]).toContain(englishStatus);
+    expect(["Pending", "Preparing", "Ready", "Canceled"]).toContain(englishStatus);
   });
 
   test("should translate navigation menu items", async ({ page }) => {

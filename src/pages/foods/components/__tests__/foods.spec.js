@@ -77,8 +77,7 @@ test.describe("Foods Component", () => {
   });
 
   test("should update food list when category changes", async ({ page }) => {
-    const categoriesList = page.locator("ul").first();
-    const categoryTabs = categoriesList.locator("li");
+    const categoryTabs = page.locator("li[data-selected]");
     const count = await categoryTabs.count();
 
     const hasCategories = count > 1;
@@ -88,8 +87,7 @@ test.describe("Foods Component", () => {
       await page.waitForLoadState("networkidle");
       await page.waitForTimeout(500);
 
-      const secondCategorySpan = secondCategory.locator("span[data-selected]");
-      const selectedState = await secondCategorySpan.getAttribute("data-selected");
+      const selectedState = await secondCategory.getAttribute("data-selected");
       expect(selectedState).toBe("true");
 
       const hasProducts = await page.locator('[data-testid^="product-"]').count() > 0;

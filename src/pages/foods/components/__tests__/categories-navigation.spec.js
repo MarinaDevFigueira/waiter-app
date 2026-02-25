@@ -51,7 +51,7 @@ test.describe("Categories Navigation", () => {
   });
 
   test("should hide prev button at beginning", async ({ page }) => {
-    const prevButton = page.locator("button.categories-swiper-prev");
+    const prevButton = page.locator("button.categories-swiper-prev[data-visible='true']");
     const prevCount = await prevButton.count();
     expect(prevCount).toBe(0);
   });

@@ -47,11 +47,17 @@ test.describe("OrderCard Component", () => {
   });
 
   test("renders order card header section", async ({ page }) => {
-    const orderCard = page.locator('[data-testid^="kitchen-order-card-"]').first();
-    await expect(orderCard).toBeVisible({ timeout: 10000 });
+    const grid = page.getByTestId("kitchen-orders-grid");
+    await expect(grid).toBeVisible({ timeout: 10000 });
+
+    const orderCard = grid.locator('[data-testid^="kitchen-order-card-"]').first();
+    await expect(orderCard).toBeVisible();
+
     const tableName = orderCard.getByTestId("order-table-name");
     await expect(tableName).toBeVisible();
-    await expect(tableName).toContainText("Mesa");
+    const text = await tableName.textContent();
+    const lowerCaseText = text.toLowerCase();
+    expect(lowerCaseText).toContain("mesa");
   });
 
   test("renders order items list", async ({ page }) => {
