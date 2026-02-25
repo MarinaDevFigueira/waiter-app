@@ -33,7 +33,7 @@ function CategoryTab({ label, categoryId, selected, onSelect }: CategoryTabProps
     <li
       data-selected={selected}
       onClick={handleSelect}
-      className="flex flex-col items-center justify-center gap-1 cursor-pointer hover:cursor-pointer shrink-0"
+      className="flex flex-col select-none items-center justify-center gap-1 cursor-pointer hover:cursor-pointer shrink-0"
     >
       <span
         data-selected={selected}
@@ -72,19 +72,6 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
     const isAll = categoryId === ALL_CATEGORY_ID;
     onCategoryChange(isAll ? null : categoryId);
   }, [onCategoryChange]);
-
-  const handleSwiperInit = useCallback((swiper: SwiperType) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        swiper.update();
-
-        categoriesSwiperObservable.updateState({
-          isBeginning: swiper.isBeginning,
-          isEnd: swiper.isEnd,
-        });
-      });
-    });
-  }, []);
 
   const handleSlideChange = useCallback((swiper: SwiperType) => {
     categoriesSwiperObservable.updateState({
@@ -132,7 +119,6 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
           slidesPerView="auto"
           spaceBetween={SPACE_BETWEEN}
           grabCursor
-          onInit={handleSwiperInit}
           onSlideChange={handleSlideChange}
           className="w-full"
         >
