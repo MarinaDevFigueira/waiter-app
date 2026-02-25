@@ -154,6 +154,28 @@ Manter o código e commits como se fossem desenvolvidos manualmente pelo time.
 
 ## Workflow
 
+### Uso do Agente @dev (OBRIGATÓRIO)
+
+**SEMPRE use no mínimo 1 agente @dev** quando for implementar funcionalidades, corrigir bugs ou fazer refatorações. O agente @dev:
+- Segue automaticamente todos os specs do projeto (.specs/)
+- Aplica padrões de código consistentes
+- Executa testes automaticamente
+- Verifica ESLint antes de finalizar
+
+**Quando usar:**
+- Implementação de novas features
+- Correção de bugs
+- Refatorações de código
+- Criação de novos componentes
+- Mudanças arquiteturais
+
+**Exemplo:**
+```
+use 1 agente @dev, crie um componente de modal
+use 1 agente @dev, corrija o bug no slider de categorias
+use 1 agente @dev, refatore o hook useProducts
+```
+
 ### Ao alterar arquivos
 Sempre execute:
 1. `npm run lint` - Verificar erros de lint

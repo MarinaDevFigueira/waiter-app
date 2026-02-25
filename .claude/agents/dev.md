@@ -77,6 +77,7 @@ This agent follows the specifications defined in:
 - `no-chained-ternaries.spec.md` - Use if-else or maps
 - `no-inline-expressions-in-jsx.spec.md` - No inline arrays/objects/calculations
 - `component-variants.spec.md` - data-variant pattern
+- `conditional-rendering-with-data-attributes.spec.md` - **data-* attributes for conditional styling**
 - `always-use-composite-pattern.spec.md` - Composite component structure
 - `composite-component-pattern.spec.md` - Card.Header pattern
 - `use-memo-for-computed-values.spec.md` - useMemo for derived values
@@ -99,6 +100,7 @@ This agent follows the specifications defined in:
 **State Management (RxJS):**
 - `rxjs-subject-pattern.spec.md` - Encapsulated BehaviorSubjects
 - `rxjs-subscription-cleanup.spec.md` - Unsubscribe in useEffect cleanup
+- `observable-state-management.spec.md` - **Observable pattern for shared/component state**
 
 **Routing (TanStack Router):**
 - `tanstack-router-file-based-routing.spec.md` - File-based routes
@@ -195,11 +197,12 @@ This agent follows the specifications defined in:
 **Testing:**
 - `playwright-testing.spec.md` - Playwright E2E testing configuration
 
-**SwiperJS (Carousels/Sliders - 4 specs):**
+**SwiperJS (Carousels/Sliders - 5 specs):**
 - `swiperjs-basics.spec.md` - Installation, core concepts, configuration
 - `swiperjs-react.spec.md` - React components, hooks, events
 - `swiperjs-modules.spec.md` - Modular architecture (Navigation, Pagination, Effects, etc.)
 - `swiperjs-advanced-patterns.spec.md` - Performance, accessibility, best practices
+- `swiper-navigation-buttons.spec.md` - **Navigation arrows with conditional visibility pattern**
 
 ---
 
