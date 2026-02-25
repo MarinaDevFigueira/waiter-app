@@ -18,8 +18,13 @@ test.describe("Button Component", () => {
 
     const button = page.getByTestId("login-submit-button");
 
-    await page.getByTestId("login-username-input").fill("admin");
-    await page.getByTestId("login-password-input").fill("admin123");
+    await page.getByTestId("login-username-input").fill("iconsagrado");
+    await page.getByTestId("login-password-input").fill("123");
+
+    await page.route("**/auth/login", async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await route.continue();
+    });
 
     await button.click();
 
@@ -44,8 +49,14 @@ test.describe("Button Component", () => {
     await page.goto("/login");
 
     const button = page.getByTestId("login-submit-button");
-    await page.getByTestId("login-username-input").fill("admin");
-    await page.getByTestId("login-password-input").fill("admin123");
+    await page.getByTestId("login-username-input").fill("iconsagrado");
+    await page.getByTestId("login-password-input").fill("123");
+
+    await page.route("**/auth/login", async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await route.continue();
+    });
+
     await button.click();
 
     await expect(button).toBeDisabled();

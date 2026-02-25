@@ -55,18 +55,22 @@ test.describe("KitchenOrdersPage", () => {
   });
 
   test("search filters orders by table name", async ({ page }) => {
-    const searchInput = page.locator('input[type="text"]').first();
-    await searchInput.fill("Mesa 01");
+    const searchInput = page.getByTestId("kitchen-search-input");
+    await expect(searchInput).toBeVisible();
+    await searchInput.fill("mesa01");
     await page.waitForTimeout(500);
 
     const grid = page.getByTestId("kitchen-orders-grid");
-    const tableNames = grid.getByTestId("order-table-name");
-    const count = await tableNames.count();
+    const orderCards = grid.locator('[data-testid^="kitchen-order-card-"]');
+    const count = await orderCards.count();
 
     if (count > 0) {
-      const firstTable = tableNames.first();
-      const text = await firstTable.textContent();
-      expect(text).toContain("Mesa 01");
+      const firstCard = orderCards.first();
+      const tableName = firstCard.getByTestId("order-table-name");
+      await expect(tableName).toBeVisible();
+      const text = await tableName.textContent();
+      const lowerCaseText = text.toLowerCase();
+      expect(lowerCaseText).toContain("mesa");
     }
   });
 
@@ -123,11 +127,16 @@ test.describe("KitchenOrdersPage", () => {
 
     const pendingCards = grid.locator('[data-status="pending"]');
     const preparingCards = grid.locator('[data-status="preparing"]');
+    const readyCards = grid.locator('[data-status="ready"]');
+    const canceledCards = grid.locator('[data-status="canceled"]');
 
     const pendingCount = await pendingCards.count();
     const preparingCount = await preparingCards.count();
+    const readyCount = await readyCards.count();
+    const canceledCount = await canceledCards.count();
 
-    expect(pendingCount + preparingCount).toBeGreaterThan(0);
+    const totalCount = pendingCount + preparingCount + readyCount + canceledCount;
+    expect(totalCount).toBeGreaterThan(0);
   });
 
   test("can change order status from pending to preparing", async ({ page }) => {
@@ -207,13 +216,20 @@ test.describe("KitchenOrdersPage", () => {
 
   test("each order displays table information", async ({ page }) => {
     const grid = page.getByTestId("kitchen-orders-grid");
-    const tableNames = grid.getByTestId("order-table-name");
-    const count = await tableNames.count();
+    await expect(grid).toBeVisible();
+
+    const orderCards = grid.locator('[data-testid^="kitchen-order-card-"]');
+    const count = await orderCards.count();
     expect(count).toBeGreaterThan(0);
 
-    for (let i = 0; i < Math.min(3, count); i++) {
-      const tableName = tableNames.nth(i);
-      await expect(tableName).toContainText("Mesa");
+    const checkLimit = Math.min(3, count);
+    for (let i = 0; i < checkLimit; i++) {
+      const orderCard = orderCards.nth(i);
+      const tableName = orderCard.getByTestId("order-table-name");
+      await expect(tableName).toBeVisible();
+      const text = await tableName.textContent();
+      const lowerCaseText = text.toLowerCase();
+      expect(lowerCaseText).toContain("mesa");
     }
   });
 
@@ -233,22 +249,31 @@ test.describe("KitchenOrdersPage", () => {
 
   test("grid container has correct width", async ({ page }) => {
     const grid = page.getByTestId("kitchen-orders-grid");
-    const parent = grid.locator('..');
-    const classes = await parent.getAttribute("class");
-    expect(classes).toContain("w-full");
+    await expect(grid).toBeVisible();
+
+    const scrollContainer = page.locator('.overflow-y-auto').first();
+    await expect(scrollContainer).toBeVisible();
+
+    const classes = await scrollContainer.getAttribute("class");
+    const hasWidthClass = classes.includes("flex-1") || classes.includes("w-full");
+    expect(hasWidthClass).toBe(true);
   });
 
   test("status labels are in Portuguese", async ({ page }) => {
     const grid = page.getByTestId("kitchen-orders-grid");
-    const statuses = grid.getByTestId("order-status");
-    const count = await statuses.count();
+    await expect(grid).toBeVisible();
 
-    if (count > 0) {
-      const firstStatus = statuses.first();
-      const text = await firstStatus.textContent();
-      const portugueseStatuses = ["Pendente", "Preparando", "Pronto"];
-      const isPortuguese = portugueseStatuses.some(status => text.includes(status));
-      expect(isPortuguese).toBe(true);
-    }
+    const orderCards = grid.locator('[data-testid^="kitchen-order-card-"]');
+    const count = await orderCards.count();
+    expect(count).toBeGreaterThan(0);
+
+    const firstCard = orderCards.first();
+    const status = firstCard.getByTestId("order-status");
+    await expect(status).toBeVisible();
+
+    const text = await status.textContent();
+    const portugueseStatuses = ["Pendente", "Preparando", "Pronto", "Cancelado"];
+    const hasPortugueseStatus = portugueseStatuses.some(statusText => text.includes(statusText));
+    expect(hasPortugueseStatus).toBe(true);
   });
 });

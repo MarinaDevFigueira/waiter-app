@@ -1,11 +1,12 @@
 import { test, expect } from "@playwright/test";
-import { loginAsAdmin } from "@/components/__tests__/helpers";
+import { loginAsKitchen } from "@/components/__tests__/helpers";
 
 test.describe("SearchBar Component", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsAdmin(page);
+    await loginAsKitchen(page);
     await page.goto("/dashboard/orders");
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState("domcontentloaded");
+    await page.waitForSelector('[data-testid="kitchen-search-form"]', { state: 'visible', timeout: 15000 });
   });
 
   test("should render the search form", async ({ page }) => {

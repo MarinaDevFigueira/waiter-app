@@ -264,7 +264,7 @@ test.describe("ProductsTable Component", () => {
   });
 
   test("table is horizontally scrollable", async ({ page }) => {
-    const scrollContainer = page.locator('div.overflow-x-auto');
+    const scrollContainer = page.locator('div.overflow-auto');
     await expect(scrollContainer).toBeVisible({ timeout: 10000 });
   });
 

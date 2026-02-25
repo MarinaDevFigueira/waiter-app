@@ -62,7 +62,7 @@ export function OrdersGrid({
               <HoverCardTrigger asChild>
                 <span
                   data-status={order.status}
-                  className="inline-block text-xs font-medium px-2 py-1 rounded cursor-pointer mx-auto min-w-24 text-center data-[status=pending]:bg-muted data-[status=pending]:text-muted-foreground data-[status=preparing]:bg-yellow-500/10 data-[status=preparing]:text-yellow-600 data-[status=ready]:bg-green-500/10 data-[status=ready]:text-green-600"
+                  className="inline-block text-xs font-medium px-2 py-1 rounded cursor-pointer mx-auto min-w-24 text-center data-[status=pending]:bg-muted data-[status=pending]:text-muted-foreground data-[status=preparing]:bg-yellow-500/10 data-[status=preparing]:text-yellow-600 data-[status=ready]:bg-green-500/10 data-[status=ready]:text-green-600 data-[status=canceled]:bg-red-500 data-[status=canceled]:text-white"
                   data-testid="order-status"
                 >
                   {getStatusLabel(order.status)}

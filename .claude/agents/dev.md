@@ -148,11 +148,11 @@ This agent follows the specifications defined in:
 **Pagination:**
 - `pagination-hook-pattern.spec.md` - usePagination hook
 
-**Testing:**
+**Testing (MCP Playwright):**
 - `component-test-coverage.spec.md` - Minimum test coverage
 - `data-testid-pattern.spec.md` - data-testid selectors
 - `selective-test-execution.spec.md` - Run affected tests
-- `test-before-commit.spec.md` - Run tests before commit
+- `test-before-commit.spec.md` - Test before commit using MCP Playwright
 
 **Layout & Styling:**
 - `responsive-layout-constraints.spec.md` - w-screen, max-w-7xl
@@ -1261,77 +1261,54 @@ const pagination = usePagination({
 </Pagination>
 ```
 
-### Testing
+### Testing via MCP Playwright
 
-#### Playwright Testing Configuration (GLOBAL SPEC)
+#### MCP Playwright (OBRIGATÓRIO)
 
-**CRITICAL:** `slowMo` is NOT a CLI flag — it's a browser launch option configured in `playwright.config.js`.
+**CRITICAL:** Usar o MCP Playwright integrado ao Claude Code para testar implementações. **NUNCA** usar `npm run test` ou `npm run test:ui` para validar durante o desenvolvimento.
 
-##### Valid Configuration
+##### Ferramentas MCP Disponíveis
 
-```javascript
-// playwright.config.js
-export default defineConfig({
-  use: {
-    baseURL: "http://localhost:5173",
-    trace: "on-first-retry",
-    launchOptions: {
-      slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,
-    },
-  },
-});
-```
+- `browser_navigate` - Navegar para URL do app (`http://localhost:5173`)
+- `browser_snapshot` - Capturar snapshot de acessibilidade (preferir sobre screenshot)
+- `browser_click` - Clicar em elementos usando refs do snapshot
+- `browser_type` - Digitar texto em campos
+- `browser_fill_form` - Preencher múltiplos campos de formulário
+- `browser_take_screenshot` - Capturar screenshot visual
+- `browser_evaluate` - Executar JavaScript na página
+- `browser_console_messages` - Verificar erros no console
+- `browser_network_requests` - Monitorar requisições de rede
+- `browser_wait_for` - Aguardar texto aparecer/desaparecer
 
-##### Valid CLI Flags
+##### Fluxo de Teste
 
-```bash
-# UI Mode (interactive debugging)
-playwright test --ui
-
-# Debug Mode (step-by-step with inspector)
-playwright test --debug
-
-# Headed Mode (visible browser)
-playwright test --headed
-
-# WRONG - slowMo is NOT a CLI flag
-playwright test --slow-mo=1000
-
-# CORRECT - Use environment variable
-SLOW_MO=1000 playwright test --headed
-```
+1. Garantir que o dev server está rodando (`npm run dev`)
+2. Usar `browser_navigate` para acessar `http://localhost:5173`
+3. Usar `browser_snapshot` para verificar o estado da página
+4. Interagir com elementos via `browser_click`, `browser_type`, etc.
+5. Verificar resultados com `browser_snapshot` ou `browser_take_screenshot`
+6. Checar `browser_console_messages` para erros
 
 #### Data Test ID Pattern
 
-Use `data-testid` for Playwright selectors:
+Use `data-testid` para selecionar elementos:
 
 ```jsx
 <button data-testid="confirm-order-button">
   Confirm
 </button>
-
-// Test
-await page.getByTestId('confirm-order-button').click();
 ```
 
-#### Selective Test Execution
+No MCP Playwright, usar `browser_snapshot` para obter refs dos elementos e interagir via `browser_click`.
 
-After modifying code, run only affected tests:
+#### Validação Antes de Finalizar
 
-```bash
-# Changed logo component
-npm run test -- src/components/ui/logo/__tests__/logo.spec.js
-```
-
-**Before every commit:**
-1. Identify changed files
-2. Run tests for those files
-3. Fix all failing tests
-4. Never remove tests to make them pass
-
-#### Test Before Commit
-
-Run affected tests before every commit. Never commit with failing tests.
+**Antes de finalizar qualquer implementação:**
+1. Navegar até a página afetada via MCP Playwright
+2. Verificar que os elementos renderizam corretamente (snapshot)
+3. Testar interações (clicks, formulários, navegação)
+4. Checar console por erros
+5. Nunca finalizar com erros visuais ou de console
 
 ### Layout & Styling
 

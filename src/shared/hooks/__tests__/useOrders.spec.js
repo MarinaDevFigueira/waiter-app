@@ -21,13 +21,12 @@ test.describe("useOrders — admin table view", () => {
   });
 
   test("displays orders in table after API load", async ({ page }) => {
+    await page.waitForTimeout(500);
+
     const thead = page.locator("thead").first();
-    const hasTable = await thead.isVisible({ timeout: 15000 }).catch(() => false);
-
     const emptyState = page.locator("div[class*='rounded-lg'][class*='text-center']");
-    const hasEmpty = await emptyState.isVisible().catch(() => false);
 
-    expect(hasTable || hasEmpty).toBe(true);
+    await expect(thead.or(emptyState)).toBeVisible({ timeout: 20000 });
   });
 
   test("query params include page and size in API request", async ({ page }) => {

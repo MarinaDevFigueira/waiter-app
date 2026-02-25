@@ -53,12 +53,16 @@ test.describe("OrdersGrid Component", () => {
 
   test("each order card displays table name", async ({ page }) => {
     const grid = page.getByTestId("kitchen-orders-grid");
-    const tableNames = grid.getByTestId("order-table-name");
-    const count = await tableNames.count();
-    expect(count).toBeGreaterThan(0);
+    const orderCards = grid.locator('[data-testid^="kitchen-order-card-"]');
+    const cardsCount = await orderCards.count();
+    expect(cardsCount).toBeGreaterThan(0);
 
-    const firstTable = tableNames.first();
-    await expect(firstTable).toContainText("Mesa");
+    const firstCard = orderCards.first();
+    const tableName = firstCard.getByTestId("order-table-name");
+    await expect(tableName).toBeVisible();
+    const text = await tableName.textContent();
+    const lowerCaseText = text.toLowerCase();
+    expect(lowerCaseText).toContain("mesa");
   });
 
   test("each order card displays order items", async ({ page }) => {

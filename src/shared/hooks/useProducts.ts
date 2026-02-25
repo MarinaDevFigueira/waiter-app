@@ -36,6 +36,7 @@ interface UseProductsReturn {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
   error: Error | null;
   queryParams: QueryParams;
@@ -69,7 +70,7 @@ export function useProducts(): UseProductsReturn {
     return () => subscription.unsubscribe();
   }, []);
 
-  const { data, isLoading, error, isError } = useQuery<PaginatedProducts>({
+  const { data, isLoading, isFetching, error, isError } = useQuery<PaginatedProducts>({
     queryKey: addLanguagePrefix("products", queryParams),
     queryFn: async () => {
       const result = await productsService.getAll(queryParams) as { data?: PaginatedProducts; error?: string };
@@ -129,6 +130,7 @@ export function useProducts(): UseProductsReturn {
     hasNextPage: data?.hasNextPage ?? false,
     hasPreviousPage: data?.hasPreviousPage ?? false,
     isLoading,
+    isFetching,
     isError,
     error: error as Error | null,
     queryParams,

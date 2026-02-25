@@ -67,8 +67,7 @@ test.describe("FoodsPage", () => {
   });
 
   test("should filter foods when a category is clicked", async ({ page }) => {
-    const categoriesList = page.locator("ul").first();
-    const categoryTabs = categoriesList.locator("li");
+    const categoryTabs = page.locator("li[data-selected]");
     const count = await categoryTabs.count();
 
     const hasCategories = count > 1;
@@ -77,8 +76,7 @@ test.describe("FoodsPage", () => {
       await secondCategory.click();
       await page.waitForTimeout(800);
 
-      const secondCategorySpan = secondCategory.locator("span");
-      const selectedState = await secondCategorySpan.getAttribute("data-selected");
+      const selectedState = await secondCategory.getAttribute("data-selected");
       expect(selectedState).toBe("true");
     }
   });

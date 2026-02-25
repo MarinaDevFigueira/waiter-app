@@ -32,7 +32,7 @@ test.describe("ProductsTableSkeleton Component", () => {
   });
 
   test("should have overflow handling", async ({ page }) => {
-    const overflowContainer = page.locator("div.overflow-x-auto").first();
+    const overflowContainer = page.locator("div.overflow-auto").first();
     await expect(overflowContainer).toBeVisible();
   });
 

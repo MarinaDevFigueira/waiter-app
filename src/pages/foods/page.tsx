@@ -38,7 +38,7 @@ export const FoodsPage = () => {
     initialSize: 100,
   });
 
-  const { products, isLoading: isProductsLoading, setQueryParams } = useProducts();
+  const { products, isLoading: isProductsLoading, isFetching: isProductsFetching, setQueryParams } = useProducts();
 
   const { addItem, itemCount, cart } = useCart();
 
@@ -220,7 +220,10 @@ export const FoodsPage = () => {
   const hasActiveSession = sessionIdExists;
 
   const contentToRender = useMemo(() => {
-    if (isProductsLoading) {
+    const isLoadingProducts = isProductsLoading || isProductsFetching;
+    const shouldShowSkeleton = isLoadingProducts;
+
+    if (shouldShowSkeleton) {
       return (
         <FoodsLoadingSkeleton />
       );
@@ -233,7 +236,7 @@ export const FoodsPage = () => {
         showCategoryHeaders={!hasSelectedCategory}
       />
     );
-  }, [isProductsLoading, displayProducts, handleProductClick, activeCategories, hasSelectedCategory]);
+  }, [isProductsLoading, isProductsFetching, displayProducts, handleProductClick, activeCategories, hasSelectedCategory]);
 
   return (
     <div className="flex flex-col items-start justify-start w-full gap-4 animate-fade-in">
@@ -275,9 +278,9 @@ export const FoodsPage = () => {
 };
 
 function FoodsLoadingSkeleton() {
-  const skeletonRows = [0, 1, 2, 3, 4];
+  const skeletonRows = [0, 1, 2, 3, 4, 5];
   return (
-    <ul className="w-full flex flex-col items-start justify-start gap-3 sm:gap-4 animate-fade-in">
+    <ul className="w-full flex flex-col items-start justify-start gap-3 sm:grid sm:grid-cols-3 sm:items-stretch md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 sm:gap-4 animate-fade-in">
       {skeletonRows.map((i) => {
         const rowKey = i;
         const staggerDelay = i * 60;
@@ -285,14 +288,14 @@ function FoodsLoadingSkeleton() {
         return (
           <li
             key={rowKey}
-            className="w-full flex items-start gap-3 sm:gap-4 min-h-20 sm:h-24 animate-stagger-item"
+            className="w-full flex items-start justify-start gap-3 min-h-16 sm:flex-col sm:items-stretch sm:gap-0 sm:min-h-0 sm:border sm:rounded-lg sm:overflow-hidden sm:shadow-sm animate-stagger-item"
             style={skeletonStyle}
           >
-            <div className="h-20 sm:h-24 aspect-video rounded-md bg-muted animate-pulse shrink-0" />
-            <div className="flex-1 flex flex-col gap-2 py-1">
-              <div className="h-4 w-3/4 rounded bg-muted animate-pulse" />
-              <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
-              <div className="h-4 w-1/4 rounded bg-muted animate-pulse mt-auto" />
+            <div className="h-16 aspect-video rounded-md object-cover shrink-0 bg-muted animate-pulse sm:h-auto sm:aspect-4/3 sm:rounded-none sm:w-full" />
+            <div className="w-full flex flex-col items-start justify-between gap-1 py-0.5 h-16 sm:h-auto sm:py-3 sm:px-3 sm:gap-2">
+              <div className="h-3 w-3/4 rounded bg-muted animate-pulse sm:h-3.5" />
+              <div className="h-2.5 w-1/2 rounded bg-muted animate-pulse sm:h-3" />
+              <div className="h-3 w-1/4 rounded bg-muted animate-pulse mt-auto sm:h-3.5" />
             </div>
           </li>
         );

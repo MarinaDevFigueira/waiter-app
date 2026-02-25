@@ -10,22 +10,18 @@ test.describe("Products — API Integration", () => {
 
   test("fetches and displays products from API", async ({ page }) => {
     await page.waitForResponse((r) => r.url().includes("/products"), { timeout: 15000 });
+    await page.waitForTimeout(500);
 
-    const table = page.locator("table");
     const skeleton = page.locator("[data-testid='products-table-skeleton']");
-
     const skeletonVisible = await skeleton.isVisible().catch(() => false);
     if (skeletonVisible) {
       await skeleton.waitFor({ state: "hidden", timeout: 10000 });
     }
 
-    const hasTable = await table.isVisible().catch(() => false);
-    const hasEmptyState = await page
-      .locator("text=/Nenhum produto|No products/i")
-      .isVisible()
-      .catch(() => false);
+    const table = page.locator("table");
+    const emptyState = page.locator("text=/Nenhum produto|No products/i");
 
-    expect(hasTable || hasEmptyState).toBe(true);
+    await expect(table.or(emptyState)).toBeVisible({ timeout: 20000 });
   });
 
   test("products request hits /products endpoint", async ({ page }) => {
