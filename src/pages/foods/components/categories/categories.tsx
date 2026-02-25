@@ -73,7 +73,7 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
     onCategoryChange(isAll ? null : categoryId);
   }, [onCategoryChange]);
 
-  const handleSlideChange = useCallback((swiper: SwiperType) => {
+  const handleProgress = useCallback((swiper: SwiperType) => {
     categoriesSwiperObservable.updateState({
       isBeginning: swiper.isBeginning,
       isEnd: swiper.isEnd,
@@ -106,7 +106,7 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
       <button
         aria-label={scrollLeftLabel}
         data-visible={shouldShowPrevButton}
-        className={`${NAV_PREV_CLASS} shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-background/90 border border-border shadow-sm text-foreground hover:cursor-pointer hover:bg-muted active:scale-95 transition-all data-[visible=false]:opacity-0 data-[visible=false]:pointer-events-none data-[visible=false]:invisible`}
+        className={`${NAV_PREV_CLASS} shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-background/90 border border-border shadow-sm text-foreground hover:cursor-pointer hover:bg-muted active:scale-95 transition-all data-[visible=false]:hidden data-[visible=false]:pointer-events-none data-[visible=false]:invisible`}
       >
         <CaretLeftIcon size={iconSize} weight="bold" />
       </button>
@@ -119,7 +119,7 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
           slidesPerView="auto"
           spaceBetween={SPACE_BETWEEN}
           grabCursor
-          onSlideChange={handleSlideChange}
+          onProgress={handleProgress}
           className="w-full"
         >
           <SwiperSlide className="w-auto!">
@@ -150,7 +150,7 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
       <button
         aria-label={scrollRightLabel}
         data-visible={shouldShowNextButton}
-        className={`${NAV_NEXT_CLASS} shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-background/90 border border-border shadow-sm text-foreground hover:cursor-pointer hover:bg-muted active:scale-95 transition-all data-[visible=false]:opacity-0 data-[visible=false]:pointer-events-none data-[visible=false]:invisible`}
+        className={`${NAV_NEXT_CLASS} shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-background/90 border border-border shadow-sm text-foreground hover:cursor-pointer hover:bg-muted active:scale-95 transition-all data-[visible=false]:hidden data-[visible=false]:pointer-events-none data-[visible=false]:invisible`}
       >
         <CaretRightIcon size={iconSize} weight="bold" />
       </button>
