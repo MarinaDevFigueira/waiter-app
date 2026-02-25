@@ -3,7 +3,7 @@ import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, FreeMode } from "swiper/modules";
 import { useTranslation } from "@/shared/hooks/useTranslation";
-import { categoriesSwiperObservable } from "./categories/observables/categories-swiper.subject";
+import { categoriesSwiperObservable } from "./observables/categories-swiper.subject";
 import type { Category } from "@/shared/schemas/category.schema";
 import type { Swiper as SwiperType } from "swiper";
 
@@ -55,13 +55,10 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
   const [swiperState, setSwiperState] = useState(categoriesSwiperObservable.getValue());
 
   useEffect(() => {
-    console.log("[Categories useEffect] Subscribing to observable");
     const subscription = categoriesSwiperObservable.subscribe((newState) => {
-      console.log("[Categories Observable Update]", newState);
       setSwiperState(newState);
     });
     return () => {
-      console.log("[Categories useEffect] Unsubscribing");
       subscription.unsubscribe();
     };
   }, []);
@@ -77,27 +74,16 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
   }, [onCategoryChange]);
 
   const handleSwiperInit = useCallback((swiper: SwiperType) => {
-    setTimeout(() => {
-      swiper.update();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        swiper.update();
 
-      const wrapperEl = swiper.wrapperEl;
-      const scrollWidth = wrapperEl?.scrollWidth ?? 0;
-      const clientWidth = swiper.width;
-      const hasScroll = scrollWidth > clientWidth;
-
-      console.log("[Categories Swiper Init]", {
-        isBeginning: swiper.isBeginning,
-        isEnd: swiper.isEnd,
-        scrollWidth,
-        clientWidth,
-        hasScroll,
+        categoriesSwiperObservable.updateState({
+          isBeginning: swiper.isBeginning,
+          isEnd: swiper.isEnd,
+        });
       });
-
-      categoriesSwiperObservable.updateState({
-        isBeginning: swiper.isBeginning,
-        isEnd: swiper.isEnd,
-      });
-    }, 0);
+    });
   }, []);
 
   const handleSlideChange = useCallback((swiper: SwiperType) => {
@@ -115,13 +101,6 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
   const isEnd = swiperState.isEnd;
   const shouldShowPrevButton = !isBeginning;
   const shouldShowNextButton = !isEnd;
-
-  console.log("[Categories Render]", {
-    isBeginning,
-    isEnd,
-    shouldShowPrevButton,
-    shouldShowNextButton,
-  });
 
   const navigationConfig = {
     prevEl: `.${NAV_PREV_CLASS}`,

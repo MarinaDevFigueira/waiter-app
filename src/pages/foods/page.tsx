@@ -8,7 +8,7 @@ import { CartButton } from "./components/cart-button/cart-button";
 import { OrderSessionButton } from "./components/order-session-button/order-session-button";
 import { OrderSessionSummaryModal } from "./components/order-session-summary/order-session-summary";
 import { ProductDetailModal } from "./components/product-detail-modal/product-detail-modal";
-import Categories from "./components/categories";
+import Categories from "./components/categories/categories";
 import { useCategories } from "@/shared/hooks/useCategories";
 import { useProducts } from "@/shared/hooks/useProducts";
 import { useCart } from "@/shared/hooks/useCart";
