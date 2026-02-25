@@ -10,7 +10,7 @@ export const apiOrderItemSchema = z.object({
 export const apiOrderSchema = z.object({
   id: z.string(),
   userName: z.string(),
-  status: z.enum(["pending", "preparing", "ready"]),
+  status: z.enum(["pending", "preparing", "ready", "canceled"]),
   timestamp: z.string(),
   items: z.array(apiOrderItemSchema),
   createdAt: z.string(),
@@ -45,7 +45,7 @@ export const createOrderRequestSchema = z.object({
 });
 
 export const updateOrderStatusSchema = z.object({
-  status: z.enum(["pending", "preparing", "ready"]),
+  status: z.enum(["pending", "preparing", "ready", "canceled"]),
 });
 
 export type ApiOrder = z.infer<typeof apiOrderSchema>;

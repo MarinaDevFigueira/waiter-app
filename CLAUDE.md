@@ -93,12 +93,26 @@ Manter o código e commits como se fossem desenvolvidos manualmente pelo time.
 
 ## Testing
 
-### Playwright E2E Tests
-- **Config:** `playwright.config.js` com `testMatch: "**/__tests__/**/*.spec.js"`
-- **Estrutura:** Testes dentro de `__tests__/` na pasta do componente/rota
-- **Comandos:**
-  - `npm run test` - Executa todos os testes
-  - `npm run test:ui` - Interface visual do Playwright
+### Playwright MCP (Model Context Protocol)
+- **Método:** Usar o MCP Playwright integrado ao Claude Code para testar implementações
+- **NUNCA** usar `npm run test` ou `npm run test:ui` para validar implementações durante o desenvolvimento
+- **Ferramentas disponíveis via MCP:**
+  - `browser_navigate` - Navegar para URL do app (`http://localhost:5173`)
+  - `browser_snapshot` - Capturar snapshot de acessibilidade da página (preferir sobre screenshot)
+  - `browser_click` - Clicar em elementos usando refs do snapshot
+  - `browser_type` - Digitar texto em campos
+  - `browser_take_screenshot` - Capturar screenshot visual
+  - `browser_evaluate` - Executar JavaScript na página
+  - `browser_console_messages` - Verificar erros no console
+  - `browser_network_requests` - Monitorar requisições de rede
+
+### Fluxo de Teste com MCP Playwright
+1. Garantir que o dev server está rodando (`npm run dev`)
+2. Usar `browser_navigate` para acessar `http://localhost:5173`
+3. Usar `browser_snapshot` para verificar o estado da página
+4. Interagir com elementos via `browser_click`, `browser_type`, etc.
+5. Verificar resultados com `browser_snapshot` ou `browser_take_screenshot`
+6. Checar `browser_console_messages` para erros
 
 ### Padrões de Teste
 - Testes de componente devem ser **unitários e isolados** (não dependem de rotas)
@@ -179,4 +193,4 @@ use 1 agente @dev, refatore o hook useProducts
 ### Ao alterar arquivos
 Sempre execute:
 1. `npm run lint` - Verificar erros de lint
-2. `npm run test` - Executar testes Playwright
+2. Usar MCP Playwright para testar visualmente as implementações (navegar, snapshot, interagir)

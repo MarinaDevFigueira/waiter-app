@@ -19,7 +19,8 @@
       "deleted": "Eliminado",
       "pending": "Pendiente",
       "preparing": "Preparando",
-      "ready": "Listo"
+      "ready": "Listo",
+      "canceled": "Canceled"
     },
     "sort": {
       "ascending": "Ordenar ascendente",
