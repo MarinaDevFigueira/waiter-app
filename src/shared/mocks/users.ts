@@ -1,9 +1,9 @@
-import { UserProfileEnum, type UserProfile } from "@/shared/constants/user-profile";
+import { UserProfileEnum } from "@/shared/constants/user-profile";
 
 interface MockUser {
   username: string;
   password: string;
-  profile: UserProfile;
+  profile: UserProfileEnum;
   name: string;
 }
 
@@ -11,8 +11,14 @@ export const mockUsers: MockUser[] = [
   {
     username: "iconsagrado",
     password: "123",
+    profile: UserProfileEnum.OWNER,
+    name: "Dono do Negócio",
+  },
+  {
+    username: "sysadmin",
+    password: "123",
     profile: UserProfileEnum.ADMIN,
-    name: "Administrador",
+    name: "Administrador do Sistema",
   },
   {
     username: "mesa01",
