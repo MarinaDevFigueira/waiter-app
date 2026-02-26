@@ -1,0 +1,55 @@
+## Codebase Patterns
+- Use array + `.includes()` pattern for multi-role checks instead of chaining `===` with `||`
+- Always extract boolean conditions into named variables before `if` statements
+- UserProfileEnum values: OWNER, ADMIN, ATTENDANT, COZINHA, MESA, DELIVERY
+- Cast profile to `UserProfileEnum` when using `.includes()`: `dashboardProfiles.includes(profile as UserProfileEnum)`
+- Test helper `loginAsAdmin` logs in as `iconsagrado` which is OWNER profile, not ADMIN
+- E2E tests use Playwright (`npx playwright test`), NOT Vitest
+- Variable naming: use intention-based names (hasFullMenuAccess, hasOrdersAdminAccess) not implementation-based (isAdmin)
+---
+
+## 2026-02-25 - US-001
+- Implemented: Added OWNER to dashboard routing access check in src/routes/index.tsx
+- Refactored triple `===` chain to array + `.includes()` pattern
+- Files changed: src/routes/index.tsx
+- **Learnings for future iterations:**
+  - The `profile` variable may be `string | undefined`, so cast with `as UserProfileEnum` for `.includes()`
+  - Dashboard profiles array should be ordered: OWNER, ADMIN, ATTENDANT, COZINHA
+  - First commit on a new branch may include previously staged files from main - be careful
+---
+
+## 2026-02-25 - US-002
+- Implemented: Added OWNER to orders admin access check, renamed isAdmin to hasOrdersAdminAccess
+- Files changed: src/pages/orders/page.tsx
+- **Learnings for future iterations:**
+  - Orders page renders AdminOrdersPage (table view) or KitchenOrdersPage based on hasOrdersAdminAccess
+  - OWNER, ADMIN, ATTENDANT all get admin orders view; COZINHA gets kitchen-only view
+---
+
+## 2026-02-25 - US-003
+- Implemented: Simplified dashboard-layout menu visibility, removed intermediate variables
+- Replaced isOwner/isAdminProfile/isAdmin/shouldShowAdminItems with fullMenuProfiles array + hasFullMenuAccess
+- Files changed: src/components/layouts/dashboard-layout/dashboard-layout.tsx
+- **Learnings for future iterations:**
+  - useMemo dependencies must be updated when renaming variables used inside the memo
+  - fullMenuProfiles = [OWNER, ADMIN] controls visibility of categories, users, settings menu items
+---
+
+## 2026-02-25 - US-004
+- Implemented: Added ADMIN to full admin check on admin page, extracted userProfile variable
+- Files changed: src/pages/admin/page.tsx
+- **Learnings for future iterations:**
+  - Admin page shows extra sections (Configurações, Relatórios) only for fullAdminProfiles
+  - Always extract `auth?.profile` into a named variable per spec
+---
+
+## 2026-02-25 - US-005
+- Validated: All 9 test files reviewed - no changes needed for OWNER role migration
+- No test references old `UserProfile` type or hardcodes "Admin" string
+- Tests are E2E (Playwright) using real API login, so behavioral expectations unchanged
+- Files changed: none
+- **Learnings for future iterations:**
+  - E2E tests don't reference UserProfileEnum directly, they use login helpers
+  - `loginAsAdmin` actually logs in as OWNER user (iconsagrado) - naming is misleading but functional
+  - `npx playwright test` is the correct test runner, not `npx vitest`
+---
