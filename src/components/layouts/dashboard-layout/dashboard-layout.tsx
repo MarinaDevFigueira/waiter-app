@@ -66,9 +66,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const userProfile = auth?.profile;
-  const isOwner = userProfile === UserProfileEnum.OWNER;
-  const isAdminProfile = userProfile === UserProfileEnum.ADMIN;
-  const isAdmin = isOwner || isAdminProfile;
+  const fullMenuProfiles = [UserProfileEnum.OWNER, UserProfileEnum.ADMIN];
+  const hasFullMenuAccess = fullMenuProfiles.includes(
+    userProfile as UserProfileEnum,
+  );
 
   const menuItems = useMemo<MenuItem[]>(() => {
     const baseItems: MenuItem[] = [
@@ -88,13 +89,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       },
     ];
 
-    const shouldShowAdminItems = isAdmin;
-    if (shouldShowAdminItems) {
+    if (hasFullMenuAccess) {
       return [...baseItems, ...adminOnlyItems];
     }
 
     return baseItems;
-  }, [isAdmin, t]);
+  }, [hasFullMenuAccess, t]);
 
   const pathname = location.pathname;
   const normalizedPathname =
