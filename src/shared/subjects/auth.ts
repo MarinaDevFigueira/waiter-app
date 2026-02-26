@@ -1,10 +1,10 @@
 import { BehaviorSubject, type Subscription } from "rxjs";
 import { StorageKeys } from "@/shared/constants/storage-keys";
-import type { UserProfile } from "@/shared/constants/user-profile";
+import { UserProfileEnum } from "../constants/user-profile";
 
 interface AuthData {
   name: string;
-  profile: UserProfile;
+  profile: UserProfileEnum;
   username: string;
 }
 

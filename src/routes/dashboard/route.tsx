@@ -8,6 +8,7 @@ export const Route = createFileRoute("/dashboard")({
   component: () => (
     <ProtectedRoute
       allowedProfiles={[
+        UserProfileEnum.OWNER,
         UserProfileEnum.ADMIN,
         UserProfileEnum.ATTENDANT,
         UserProfileEnum.COZINHA,

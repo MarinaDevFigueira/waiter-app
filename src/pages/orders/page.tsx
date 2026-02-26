@@ -11,16 +11,23 @@ export function OrdersPage() {
 
   const profile = auth?.profile;
 
-  const isAdmin = profile === UserProfileEnum.ADMIN || profile === UserProfileEnum.ATTENDANT;
+  const ordersAdminProfiles = [
+    UserProfileEnum.OWNER,
+    UserProfileEnum.ADMIN,
+    UserProfileEnum.ATTENDANT,
+  ];
+  const hasOrdersAdminAccess = ordersAdminProfiles.includes(
+    profile as UserProfileEnum,
+  );
 
-  if (isAdmin) {
+  if (hasOrdersAdminAccess) {
     const isTableView = view === OrdersViewEnum.TABLE;
     if (isTableView) {
-      return <AdminOrdersPage canSwitchOrdersView={isAdmin} />;
+      return <AdminOrdersPage canSwitchOrdersView={hasOrdersAdminAccess} />;
     }
 
-    return <KitchenOrdersPage canSwitchOrdersView={isAdmin} />;
+    return <KitchenOrdersPage canSwitchOrdersView={hasOrdersAdminAccess} />;
   }
 
-  return <KitchenOrdersPage canSwitchOrdersView={isAdmin} />;
+  return <KitchenOrdersPage canSwitchOrdersView={hasOrdersAdminAccess} />;
 }

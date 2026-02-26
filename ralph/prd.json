@@ -1,0 +1,98 @@
+{
+  "project": "waiter-app",
+  "branchName": "feature/owner-role-migration",
+  "description": "Complete OWNER role migration across frontend - fix routing, menu visibility, admin views, and validate tests",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Fix profile-based routing to include OWNER",
+      "description": "As an OWNER user, I need to be redirected to /dashboard on login. Currently OWNER is missing from the dashboard access check in src/routes/index.tsx.",
+      "acceptanceCriteria": [
+        "Extract dashboard profiles into array: const dashboardProfiles = [UserProfileEnum.OWNER, UserProfileEnum.ADMIN, UserProfileEnum.ATTENDANT, UserProfileEnum.COZINHA]",
+        "Use .includes() for access check: const hasDashboardAccess = dashboardProfiles.includes(profile as UserProfileEnum)",
+        "Boolean variables extracted before if statement (spec: named-variables-in-conditionals)",
+        "No comments added to code (spec: no-comments)",
+        "Typecheck passes",
+        "Lint passes (npm run lint)"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "CRITICAL: OWNER users currently cannot reach /dashboard after login. File: src/routes/index.tsx lines 19-24"
+    },
+    {
+      "id": "US-002",
+      "title": "Fix orders page to include OWNER in admin access",
+      "description": "As an OWNER user, I need to see the admin orders view (table mode) in src/pages/orders/page.tsx. Currently only ADMIN and ATTENDANT are checked.",
+      "acceptanceCriteria": [
+        "Rename variable isAdmin to hasOrdersAdminAccess (describes INTENTION not implementation)",
+        "Extract array: const ordersAdminProfiles = [UserProfileEnum.OWNER, UserProfileEnum.ADMIN, UserProfileEnum.ATTENDANT]",
+        "Use includes: const hasOrdersAdminAccess = ordersAdminProfiles.includes(profile as UserProfileEnum)",
+        "Update all references of isAdmin to hasOrdersAdminAccess (lines 16, 19, 22, 25)",
+        "No comments added to code (spec: no-comments)",
+        "Typecheck passes",
+        "Lint passes (npm run lint)"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "HIGH: OWNER users see only kitchen grid view instead of admin table view. File: src/pages/orders/page.tsx lines 12-25"
+    },
+    {
+      "id": "US-003",
+      "title": "Fix dashboard layout menu visibility variable naming",
+      "description": "As a developer, I need the dashboard-layout.tsx to follow code standards. Rename isAdmin to hasFullMenuAccess and use array+includes pattern in src/components/layouts/dashboard-layout/dashboard-layout.tsx.",
+      "acceptanceCriteria": [
+        "Extract array: const fullMenuProfiles = [UserProfileEnum.OWNER, UserProfileEnum.ADMIN]",
+        "Use includes: const hasFullMenuAccess = fullMenuProfiles.includes(userProfile as UserProfileEnum)",
+        "Remove intermediate variables isOwner, isAdminProfile, shouldShowAdminItems",
+        "Update useMemo dependency from isAdmin to hasFullMenuAccess",
+        "OWNER and ADMIN see menu items: categories, users, settings",
+        "ATTENDANT and COZINHA see only base items",
+        "No comments added to code (spec: no-comments)",
+        "Typecheck passes",
+        "Lint passes (npm run lint)"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "MEDIUM: Logic is correct but variable names violate named-variables-in-conditionals spec. File: src/components/layouts/dashboard-layout/dashboard-layout.tsx lines 68-97"
+    },
+    {
+      "id": "US-004",
+      "title": "Fix admin page to include ADMIN in full admin check",
+      "description": "As an ADMIN user, I need to see extra sections (Configurações, Relatórios) on the admin page. Currently only OWNER is checked in src/pages/admin/page.tsx.",
+      "acceptanceCriteria": [
+        "Extract auth?.profile to named variable: const userProfile = auth?.profile (spec: always-named-variables-never-inline-code)",
+        "Extract array: const fullAdminProfiles = [UserProfileEnum.OWNER, UserProfileEnum.ADMIN]",
+        "Use includes: const isFullAdmin = fullAdminProfiles.includes(userProfile as UserProfileEnum)",
+        "Both OWNER and ADMIN see extra sections (Configurações, Relatórios)",
+        "No comments added to code (spec: no-comments)",
+        "Typecheck passes",
+        "Lint passes (npm run lint)"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": "MEDIUM: Currently only OWNER sees extra sections. PRD says both OWNER and ADMIN should. File: src/pages/admin/page.tsx lines 5-7"
+    },
+    {
+      "id": "US-005",
+      "title": "Validate and fix affected test files",
+      "description": "As a developer, I need to ensure all 9 test files that reference roles/profiles pass after the migration. Fix any tests that reference the old UserProfile type or assume ADMIN is the owner role.",
+      "acceptanceCriteria": [
+        "Test passes: src/pages/login/__tests__/auth-flow.spec.js",
+        "Test passes: src/components/auth/__tests__/protected-route.spec.js",
+        "Test passes: src/components/auth/__tests__/profile-routing.spec.js",
+        "Test passes: src/components/layouts/dashboard-layout/__tests__/dashboard-layout.spec.js",
+        "Test passes: src/pages/orders/__tests__/page.spec.js",
+        "Test passes: src/pages/orders/__tests__/orders-api-flow.spec.js",
+        "Test passes: src/shared/hooks/__tests__/useAuth.spec.js",
+        "Test passes: src/shared/hooks/__tests__/useOrders.spec.js",
+        "Test passes: src/pages/login/components/login-form/__tests__/login-form.spec.js",
+        "If any test references old type UserProfile or uses ADMIN where OWNER is expected, fix it",
+        "All 9 test files pass without errors",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": "Tests should be run via npm run test. Fix any failures related to OWNER role migration before marking complete."
+    }
+  ]
+}

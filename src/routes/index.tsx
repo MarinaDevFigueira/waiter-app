@@ -16,10 +16,15 @@ const HomePage = () => {
 
   const profile = auth?.profile;
 
-  const hasDashboardAccess =
-    profile === UserProfileEnum.ADMIN ||
-    profile === UserProfileEnum.ATTENDANT ||
-    profile === UserProfileEnum.COZINHA;
+  const dashboardProfiles = [
+    UserProfileEnum.OWNER,
+    UserProfileEnum.ADMIN,
+    UserProfileEnum.ATTENDANT,
+    UserProfileEnum.COZINHA,
+  ];
+  const hasDashboardAccess = dashboardProfiles.includes(
+    profile as UserProfileEnum,
+  );
   if (hasDashboardAccess) {
     return <Navigate to="/dashboard" />;
   }

@@ -3,7 +3,6 @@ import { authObservable } from "@/shared/subjects/auth";
 import { StorageKeys } from "@/shared/constants/storage-keys";
 import { UserProfileEnum } from "@/shared/constants/user-profile";
 import type { AuthData } from "@/shared/subjects/auth";
-import type { UserProfile } from "@/shared/constants/user-profile";
 
 type LoginSuccess = { data: AuthData };
 type LoginError = { error: string };
@@ -24,12 +23,13 @@ interface LoginApiResponse {
   refreshToken: string;
 }
 
-const roleToProfile: Record<string, UserProfile> = {
+const roleToProfile: Record<string, UserProfileEnum> = {
   admin: UserProfileEnum.ADMIN,
   table: UserProfileEnum.MESA,
   kitchen: UserProfileEnum.COZINHA,
   customer: UserProfileEnum.DELIVERY,
   attendant: UserProfileEnum.ATTENDANT,
+  owner: UserProfileEnum.OWNER
 };
 
 class AuthService {
