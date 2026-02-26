@@ -4,7 +4,7 @@ import { UserProfileEnum } from "@/shared/constants/user-profile";
 export function AdminPage() {
   const { auth } = useAuth();
 
-  const isFullAdmin = auth?.profile === UserProfileEnum.ADMIN;
+  const isFullAdmin = auth?.profile === UserProfileEnum.OWNER;
 
   return (
     <div className="flex flex-col items-start justify-start gap-6 w-full">

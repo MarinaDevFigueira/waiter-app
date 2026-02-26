@@ -1,10 +1,10 @@
 import { Navigate } from "@tanstack/react-router";
 import { useAuth } from "@/shared/hooks/useAuth";
-import type { UserProfile } from "@/shared/constants/user-profile";
+import { UserProfileEnum } from "@/shared/constants/user-profile";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedProfiles: UserProfile[];
+  allowedProfiles: UserProfileEnum[];
 }
 
 export function ProtectedRoute({ children, allowedProfiles }: ProtectedRouteProps) {
@@ -16,7 +16,7 @@ export function ProtectedRoute({ children, allowedProfiles }: ProtectedRouteProp
   }
 
   const userProfile = auth?.profile;
-  const isProfileAllowed = allowedProfiles.includes(userProfile as UserProfile);
+  const isProfileAllowed = allowedProfiles.includes(userProfile as UserProfileEnum);
 
   const userIsNotAllowed = !isProfileAllowed;
   if (userIsNotAllowed) {

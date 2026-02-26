@@ -66,7 +66,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const userProfile = auth?.profile;
-  const isAdmin = userProfile === UserProfileEnum.ADMIN;
+  const isOwner = userProfile === UserProfileEnum.OWNER;
+  const isAdminProfile = userProfile === UserProfileEnum.ADMIN;
+  const isAdmin = isOwner || isAdminProfile;
 
   const menuItems = useMemo<MenuItem[]>(() => {
     const baseItems: MenuItem[] = [

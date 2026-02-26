@@ -1,8 +1,8 @@
-import { UserProfileEnum, type UserProfile } from "./user-profile";
+import { UserProfileEnum } from "./user-profile";
 
 type RouteRecord = Record<string, string>;
 
-export const RouteMap: Record<UserProfile, RouteRecord> = {
+export const RouteMap: Record<UserProfileEnum, RouteRecord> = {
   [UserProfileEnum.MESA]: {
     home: "/",
     foods: "/waiter/foods",
@@ -15,7 +15,7 @@ export const RouteMap: Record<UserProfile, RouteRecord> = {
     orders: "/waiter/orders",
     deliveries: "/waiter/deliveries",
   },
-  [UserProfileEnum.ADMIN]: {
+  [UserProfileEnum.OWNER]: {
     home: "/",
     dashboard: "/dashboard",
     users: "/dashboard/users",
@@ -35,13 +35,20 @@ export const RouteMap: Record<UserProfile, RouteRecord> = {
     orders: "/kitchen/orders",
     inventory: "/kitchen/inventory",
   },
+  [UserProfileEnum.ADMIN]: {
+    home: "/",
+    dashboard: "/dashboard",
+    reports: "/dashboard/reports",
+    users: "/dashboard/users",
+    business: "/dashboard/business"
+  }
 };
 
-export const getRoutesForProfile = (profile: UserProfile): RouteRecord => {
+export const getRoutesForProfile = (profile: UserProfileEnum): RouteRecord => {
   return RouteMap[profile] ?? {};
 };
 
-export const canAccessRoute = (profile: UserProfile, route: string): boolean => {
+export const canAccessRoute = (profile: UserProfileEnum, route: string): boolean => {
   const routes = getRoutesForProfile(profile);
   return Object.values(routes).includes(route);
 };
