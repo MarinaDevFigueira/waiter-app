@@ -308,7 +308,8 @@
         "email": "Email",
         "role": "Role",
         "createdAt": "Created at",
-        "updatedAt": "Updated at"
+        "updatedAt": "Updated at",
+        "disabledAt": "Disabled at"
       }
     },
     "filters": {

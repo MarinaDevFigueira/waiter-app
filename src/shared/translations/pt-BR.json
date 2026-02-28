@@ -308,7 +308,8 @@
         "email": "E-mail",
         "role": "Perfil",
         "createdAt": "Criado em",
-        "updatedAt": "Atualizado em"
+        "updatedAt": "Atualizado em",
+        "disabledAt": "Desativado em"
       }
     },
     "filters": {
