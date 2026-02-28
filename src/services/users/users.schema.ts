@@ -21,6 +21,7 @@ export const apiUserSchema = z.object({
   updatedAt: z.string(),
   deletedAt: z.string().nullable().optional(),
   deletedBy: z.string().nullable().optional(),
+  permissions: z.array(z.string()).optional(),
 });
 
 export const userQueryParamsSchema = z.object({

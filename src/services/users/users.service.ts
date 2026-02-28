@@ -29,6 +29,7 @@ function mapApiUserToUser(apiUser: ApiUser): User {
     createdAt: new Date(apiUser.createdAt),
     updatedAt: new Date(apiUser.updatedAt),
     deletedAt: apiUser.deletedAt ? new Date(apiUser.deletedAt) : undefined,
+    permissions: apiUser.permissions,
   };
 }
 
@@ -128,6 +129,56 @@ export const usersService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao restaurar usuário";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async updateMe(data: {
+    name?: string;
+    email?: string;
+    password?: string;
+  }): Promise<ServiceResult<void>> {
+    try {
+      const result = await api.patch<unknown>("/users/me", data);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      return { data: undefined };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao atualizar usuário";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async update(
+    userId: string,
+    data: {
+      name?: string;
+      email?: string;
+      role?: string;
+      document?: string;
+      documentType?: "cpf" | "rg";
+      birthDate?: string;
+    }
+  ): Promise<ServiceResult<void>> {
+    try {
+      const result = await api.put<unknown>(`/users/${userId}`, data);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      return { data: undefined };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao atualizar usuário";
       logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }

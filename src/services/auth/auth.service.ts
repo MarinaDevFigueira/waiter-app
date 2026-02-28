@@ -1,7 +1,10 @@
 import { api } from "@/services/api";
 import { authObservable } from "@/shared/subjects/auth";
+import { permissionsObservable } from "@/shared/subjects/permissions.subject";
 import { StorageKeys } from "@/shared/constants/storage-keys";
 import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { permissionsService } from "@/services/permissions/permissions.service";
+import { logger } from "@/lib/logger";
 import type { AuthData } from "@/shared/subjects/auth";
 
 type LoginSuccess = { data: AuthData };
@@ -60,6 +63,21 @@ class AuthService {
 
       authObservable.setAuth(authData);
 
+      const permissionsResult = await permissionsService.getMyPermissions();
+      const hasPermissionsError = "error" in permissionsResult;
+      if (hasPermissionsError) {
+        logger.error(
+          "[authService.login] Erro ao carregar permissões",
+          new Error(permissionsResult.error)
+        );
+      } else {
+        permissionsObservable.setPermissions({
+          userId: permissionsResult.data.userId,
+          role: permissionsResult.data.role,
+          permissions: permissionsResult.data.permissions,
+        });
+      }
+
       return { data: authData };
     } catch (error) {
       const errorMessage =
@@ -71,9 +89,11 @@ class AuthService {
   async logout(): Promise<LogoutResult> {
     try {
       authObservable.clearAuth();
+      permissionsObservable.clear();
       return { data: { success: true } };
     } catch (error) {
       authObservable.clearAuth();
+      permissionsObservable.clear();
       return { data: { success: true } };
     }
   }

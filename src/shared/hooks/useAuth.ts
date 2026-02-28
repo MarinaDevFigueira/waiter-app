@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { authObservable, type AuthData } from "@/shared/subjects/auth";
+import { UserProfileEnum } from "../constants/user-profile";
 
 interface UseAuthReturn {
   auth: AuthData | null;
   isAuthenticated: boolean;
-  profile: string | null;
+  profile?: UserProfileEnum;
 }
 
 export function useAuth(): UseAuthReturn {
@@ -16,7 +17,7 @@ export function useAuth(): UseAuthReturn {
   }, []);
 
   const isAuthenticated = auth !== null;
-  const profile = auth?.profile ?? null;
+  const profile = auth?.profile;
 
   return { auth, isAuthenticated, profile };
 }

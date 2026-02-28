@@ -16,6 +16,7 @@ export const userSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   deletedAt: z.coerce.date().optional(),
+  permissions: z.array(z.string()).optional(),
 });
 
 export type User = z.infer<typeof userSchema>;

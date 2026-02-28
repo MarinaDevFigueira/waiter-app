@@ -307,6 +307,7 @@
         "username": "Username",
         "email": "Email",
         "role": "Role",
+        "customPermissions": "Custom Permissions",
         "createdAt": "Created at",
         "updatedAt": "Updated at",
         "disabledAt": "Disabled at"

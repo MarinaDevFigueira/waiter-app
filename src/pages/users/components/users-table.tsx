@@ -71,6 +71,22 @@ export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable 
     );
   }, [t]);
 
+  const getPermissionsBadge = useCallback((permissions?: string[]) => {
+    const hasNoPermissions = !permissions || permissions.length === 0;
+    if (hasNoPermissions) {
+      return <span className="text-muted-foreground text-xs">—</span>;
+    }
+
+    const permissionsCount = permissions.length;
+    const badgeText = `${permissionsCount} ${permissionsCount === 1 ? "permissão" : "permissões"}`;
+
+    return (
+      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-amber-500/10 text-amber-600">
+        {badgeText}
+      </span>
+    );
+  }, []);
+
   const columns = useMemo<ColumnDef<User>[]>(
     () => {
       return [
@@ -105,6 +121,15 @@ export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable 
         cell: (info) => {
           const role = info.getValue() as string;
           return getRoleBadge(role);
+        },
+      },
+      {
+        accessorKey: "permissions",
+        header: t("users.table.columns.customPermissions"),
+        enableSorting: false,
+        cell: (info) => {
+          const user = info.row.original;
+          return getPermissionsBadge(user.permissions);
         },
       },
       {
@@ -173,7 +198,7 @@ export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable 
       },
     ];
     },
-    [t, formatDate, getRoleBadge, onEdit, onDisable],
+    [t, formatDate, getRoleBadge, getPermissionsBadge, onEdit, onDisable],
   );
 
   const table = useReactTable({

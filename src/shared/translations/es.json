@@ -307,6 +307,7 @@
         "username": "Usuario",
         "email": "Correo electrónico",
         "role": "Perfil",
+        "customPermissions": "Permisos Personalizados",
         "createdAt": "Creado el",
         "updatedAt": "Actualizado el",
         "disabledAt": "Desactivado en"
