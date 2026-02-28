@@ -1,29 +1,16 @@
 import { api } from "@/services/api";
-import { formatZodError } from "@/lib/zod-errors";
 import { logger } from "@/lib/logger";
-import {
-  apiPaginatedBusinessSchema,
-  type BusinessQueryParams,
-  type ApiBusinessItem,
-} from "./schemas/get-all.schema";
-import {
-  apiBusinessDetailSchema,
-  type ApiBusinessDetail,
-} from "./schemas/get-by-id.schema";
-import type { BusinessUpdateForm } from "./schemas/update.schema";
 import type { Business } from "@/shared/schemas/business.schema";
+import type {
+  GetBusinessItemResponse,
+  GetBusinessesApiResponse,
+  GetBusinessDetailResponse,
+  GetBusinessesRequestQuery,
+  UpdateBusinessRequestBody,
+  GetBusinessesResponse,
+} from "./interfaces/business.interface";
 
-interface PaginatedBusinessResult {
-  items: Business[];
-  total: number;
-  page: number;
-  size: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
-function mapApiBusinessItemToBusiness(apiItem: ApiBusinessItem): Business {
+function mapApiBusinessItemToBusiness(apiItem: GetBusinessItemResponse): Business {
   return {
     id: apiItem.id,
     name: apiItem.name,
@@ -40,8 +27,8 @@ type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
 export const businessService = {
   async getAll(
-    queryParams: BusinessQueryParams
-  ): Promise<ServiceResult<PaginatedBusinessResult>> {
+    queryParams: GetBusinessesRequestQuery
+  ): Promise<ServiceResult<GetBusinessesResponse>> {
     try {
       const { page, size, filters = {} } = queryParams;
 
@@ -67,33 +54,24 @@ export const businessService = {
         return { error: result.error };
       }
 
-      const parsed = apiPaginatedBusinessSchema.safeParse(result.data);
-      const validationFailed = !parsed.success;
-      if (validationFailed) {
-        const zodMessage = formatZodError(parsed.error);
-        const error = new Error(zodMessage);
-        logger.error("[businessService.getAll] Validation error", error);
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      const apiData = parsed.data;
+      const apiData = result.data as GetBusinessesApiResponse;
       const totalPages = Math.ceil(apiData.total / apiData.limit);
       const hasNextPage = apiData.page < totalPages;
       const hasPreviousPage = apiData.page > 1;
 
       const mappedItems = apiData.items.map(mapApiBusinessItemToBusiness);
 
-      const mappedData: PaginatedBusinessResult = {
-        items: mappedItems,
-        total: apiData.total,
-        page: apiData.page,
-        size: apiData.limit,
-        totalPages,
-        hasNextPage,
-        hasPreviousPage,
+      return {
+        data: {
+          items: mappedItems,
+          total: apiData.total,
+          page: apiData.page,
+          size: apiData.limit,
+          totalPages,
+          hasNextPage,
+          hasPreviousPage,
+        },
       };
-
-      return { data: mappedData };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar empresas";
@@ -102,7 +80,7 @@ export const businessService = {
     }
   },
 
-  async getById(id: string): Promise<ServiceResult<ApiBusinessDetail>> {
+  async getById(id: string): Promise<ServiceResult<GetBusinessDetailResponse>> {
     try {
       const result = await api.get<unknown>(`/business/${id}`);
 
@@ -111,16 +89,7 @@ export const businessService = {
         return { error: result.error };
       }
 
-      const parsed = apiBusinessDetailSchema.safeParse(result.data);
-      const validationFailed = !parsed.success;
-      if (validationFailed) {
-        const zodMessage = formatZodError(parsed.error);
-        const error = new Error(zodMessage);
-        logger.error("[businessService.getById] Validation error", error);
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: parsed.data };
+      return { data: result.data as GetBusinessDetailResponse };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar empresa";
@@ -129,7 +98,7 @@ export const businessService = {
     }
   },
 
-  async update(id: string, data: BusinessUpdateForm): Promise<ServiceResult<void>> {
+  async update(id: string, data: UpdateBusinessRequestBody): Promise<ServiceResult<void>> {
     try {
       const result = await api.put<unknown>(`/business/${id}`, data);
 

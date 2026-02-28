@@ -9,18 +9,42 @@ src/services/
 ├── api.ts                    # Re-export do API client
 ├── auth/
 │   └── auth.service.ts       # Serviço de autenticação
-├── products/
-│   ├── products.service.ts   # Serviço de produtos
-│   └── products.schema.ts    # Schemas de API (co-located)
+├── business/
+│   ├── business.service.ts
+│   └── interfaces/
+│       └── business.interface.ts
+├── business-limits/
+│   ├── business-limits.service.ts
+│   └── interfaces/
+│       └── business-limits.interface.ts
+├── business-settings/
+│   ├── business-settings.service.ts
+│   └── interfaces/
+│       └── business-settings.interface.ts
 ├── categories/
-│   ├── categories.service.ts # Serviço de categorias
-│   └── categories.schema.ts  # Schemas de API
+│   ├── categories.service.ts
+│   └── interfaces/
+│       └── categories.interface.ts
 ├── orders/
-│   ├── orders.service.ts     # Serviço de pedidos
-│   └── orders.schema.ts      # Schemas de API
-└── order-sessions/
-    ├── order-sessions.service.ts # Serviço de sessões de pedido
-    └── order-sessions.schema.ts  # Schemas de API
+│   ├── orders.service.ts
+│   └── interfaces/
+│       └── orders.interface.ts
+├── order-sessions/
+│   ├── order-sessions.service.ts
+│   └── interfaces/
+│       └── order-sessions.interface.ts
+├── permissions/
+│   ├── permissions.service.ts
+│   └── interfaces/
+│       └── permissions.interface.ts
+├── products/
+│   ├── products.service.ts
+│   └── interfaces/
+│       └── products.interface.ts
+└── users/
+    ├── users.service.ts
+    └── interfaces/
+        └── users.interface.ts
 ```
 
 ## Padrões de Serviços
@@ -35,29 +59,79 @@ type ServiceError = { error: string };
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 ```
 
-### 2. Error Handling Pattern
+### 2. TypeScript Interfaces (No Zod)
+
+**SEMPRE** usar TypeScript interfaces para tipagem. **NUNCA** usar Zod na camada de services.
+
+Interfaces DEVEM seguir a convenção de nomenclatura:
+- `GetXxxResponse` - Resposta de GET
+- `GetXxxRequestQuery` - Query params de GET
+- `CreateXxxRequestBody` - Body de POST
+- `UpdateXxxRequestBody` - Body de PUT/PATCH
+- `DeleteXxxResponse` - Resposta de DELETE
+
+```typescript
+// src/services/products/interfaces/products.interface.ts
+export interface GetAllProductsRequestQuery {
+  page: number;
+  size: number;
+  orderBy: string;
+  direction: "asc" | "desc";
+  search?: string;
+  categoryId?: string;
+}
+
+export interface GetAllProductsResponse {
+  items: Product[];
+  total: number;
+  page: number;
+  size: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface GetProductByIdResponse {
+  id: string;
+  name: string;
+  description: string | null;
+  categoryId: string;
+  price: number;
+  stock: number;
+  unit: "un" | "kg" | "g" | "ml" | "l";
+  images: Array<{ id: string; url: string }>;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateProductRequestBody {
+  translations: Record<string, { name: string; description?: string }>;
+  categoryId: string;
+  price: number;
+  stock: number;
+  unit: string;
+  active: boolean;
+}
+```
+
+### 3. Error Handling Pattern
 
 **SEMPRE** isolar operações em try-catch e retornar `{ data }` ou `{ error }`:
 
 ```typescript
-async getAll(): Promise<ServiceResult<Product[]>> {
+import type { GetAllProductsResponse, GetAllProductsRequestQuery } from "./interfaces/products.interface";
+
+async getAll(params: GetAllProductsRequestQuery): Promise<ServiceResult<GetAllProductsResponse>> {
   try {
-    const result = await api.get<unknown>("/products");
+    const result = await api.get<GetAllProductsResponse>("/products", { params });
 
     const hasError = "error" in result;
     if (hasError) {
       return { error: result.error };
     }
 
-    // Validação com Zod
-    const parsed = apiProductListSchema.safeParse(result.data);
-    if (!parsed.success) {
-      const zodMessage = formatZodError(parsed.error);
-      logger.error("[productsService.getAll] Erro de validação", new Error(zodMessage));
-      return { error: "Resposta inválida do servidor" };
-    }
-
-    return { data: parsed.data };
+    return { data: result.data };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Erro ao buscar produtos";
     logger.error(errorMessage, error instanceof Error ? error : null);
@@ -66,14 +140,16 @@ async getAll(): Promise<ServiceResult<Product[]>> {
 }
 ```
 
-### 3. Write Operations Return Void
+### 4. Write Operations Return Void
 
 Operações create/update/delete DEVEM retornar `Promise<ServiceResult<void>>`:
 
 ```typescript
-async create(data: ProductForm): Promise<ServiceResult<void>> {
+import type { CreateProductRequestBody } from "./interfaces/products.interface";
+
+async create(data: CreateProductRequestBody): Promise<ServiceResult<void>> {
   try {
-    const result = await api.post<unknown>("/products", data);
+    const result = await api.post<void>("/products", data);
 
     const hasError = "error" in result;
     if (hasError) {
@@ -99,92 +175,19 @@ if (hasError) {
   return;
 }
 
-// Invalidar cache após sucesso
 queryClient.invalidateQueries({ queryKey: ["products"] });
 toast.success("Produto criado!");
 ```
 
-### 4. Service Schemas (Co-located)
+### 5. Interface File Structure
 
-Schemas de API DEVEM estar em arquivos `*.schema.ts` no mesmo diretório do service:
+Interfaces DEVEM estar em `interfaces/service-name.interface.ts`:
 
 ```
 src/services/products/
 ├── products.service.ts
-└── products.schema.ts       # Schemas específicos da API
-```
-
-```typescript
-// src/services/products/products.schema.ts
-import { z } from "zod";
-
-export const apiProductSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string().nullable(),
-  categoryId: z.string(),
-  price: z.number(),
-  stock: z.number(),
-  unit: z.enum(["un", "kg", "g", "ml", "l"]),
-  images: z.array(z.union([
-    z.string(),
-    z.object({ id: z.string(), url: z.string() }),
-  ])).optional(),
-  active: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
-export const apiProductListSchema = z.object({
-  items: z.array(apiProductSchema),
-  total: z.number(),
-  page: z.number(),
-  size: z.number(),
-  totalPages: z.number(),
-  hasNextPage: z.boolean(),
-  hasPreviousPage: z.boolean(),
-});
-
-export type ApiProduct = z.infer<typeof apiProductSchema>;
-export type PaginatedProducts = z.infer<typeof apiProductListSchema>;
-```
-
-### 5. Mapping API to Domain
-
-**SEMPRE** mapear responses da API para schemas de domínio:
-
-```typescript
-import type { Product } from "@/shared/schemas/product.schema";
-import { baseEntityDefaults } from "@/shared/schemas/base-entity.schema";
-
-function mapApiProductToProduct(raw: ApiProduct): Product {
-  return {
-    ...baseEntityDefaults,
-    id: raw.id,
-    name: raw.name,
-    description: raw.description ?? undefined,
-    categoryId: raw.categoryId,
-    price: raw.price,
-    stock: raw.stock,
-    unit: raw.unit as Product["unit"],
-    images: (raw.images ?? []).map((img) => {
-      const isString = typeof img === "string";
-      if (isString) {
-        const urlParts = img.split("/");
-        const fileId = urlParts[urlParts.length - 1];
-        return { id: fileId, url: img };
-      }
-      return { id: img.id, url: img.url };
-    }),
-    active: raw.active,
-    createdAt: new Date(raw.createdAt),
-    updatedAt: new Date(raw.updatedAt),
-    createdBy: "api",
-    updatedBy: "api",
-    deletedAt: null,
-    deletedBy: null,
-  };
-}
+└── interfaces/
+    └── products.interface.ts
 ```
 
 ## Products Service
@@ -195,53 +198,20 @@ Serviço de gerenciamento de produtos.
 
 ```typescript
 export const productsService = {
-  // Listar produtos com paginação e filtros
-  async getAll(queryParams: ProductQueryParams): Promise<ServiceResult<PaginatedProducts>>,
-
-  // Buscar produto por ID
-  async getById(productId: string): Promise<ServiceResult<Product>>,
-
-  // Criar produto
-  async create(data: ProductForm, files?: File[]): Promise<ServiceResult<void>>,
-
-  // Atualizar produto
-  async update(productId: string, data: ProductForm, files?: File[]): Promise<ServiceResult<void>>,
-
-  // Deletar produto
-  async delete(productId: string): Promise<ServiceResult<{ success: boolean; id: string }>>,
-
-  // Deletar imagem do produto
+  async getAll(params: GetAllProductsRequestQuery): Promise<ServiceResult<GetAllProductsResponse>>,
+  async getById(productId: string): Promise<ServiceResult<GetProductByIdResponse>>,
+  async create(data: CreateProductRequestBody, files?: File[]): Promise<ServiceResult<void>>,
+  async update(productId: string, data: UpdateProductRequestBody, files?: File[]): Promise<ServiceResult<void>>,
+  async delete(productId: string): Promise<ServiceResult<DeleteProductResponse>>,
   async deleteFile(productId: string, fileId: string): Promise<ServiceResult<void>>,
-
-  // Buscar traduções do produto
-  async getTranslations(productId: string): Promise<ServiceResult<ApiProductTranslations>>,
+  async getTranslations(productId: string): Promise<ServiceResult<GetProductTranslationsResponse>>,
 };
-```
-
-### Query Params Pattern
-
-```typescript
-export interface ProductQueryParams {
-  page: number;
-  size: number;
-  orderBy: string;
-  direction: "asc" | "desc";
-  filters?: {
-    search?: string;
-    categoria?: string[];
-    precoMin?: number;
-    precoMax?: number;
-    somenteEmEstoque?: boolean;
-    estoqueMin?: number;
-    status?: string[];
-  };
-}
 ```
 
 ### FormData para Upload
 
 ```typescript
-function buildProductFormData(data: ProductForm, files: File[]): FormData {
+function buildProductFormData(data: CreateProductRequestBody, files: File[]): FormData {
   const formData = new FormData();
 
   const translationsJson = JSON.stringify(data.translations);
@@ -253,7 +223,6 @@ function buildProductFormData(data: ProductForm, files: File[]): FormData {
   formData.append("unit", data.unit);
   formData.append("active", data.active.toString());
 
-  // Append files
   files.forEach((file) => {
     formData.append("files", file);
   });
@@ -261,9 +230,8 @@ function buildProductFormData(data: ProductForm, files: File[]): FormData {
   return formData;
 }
 
-// Uso
 const formData = buildProductFormData(data, files);
-const result = await api.postFormData<unknown>("/products", formData);
+const result = await api.postFormData<void>("/products", formData);
 ```
 
 ## Categories Service
@@ -274,23 +242,12 @@ Serviço de gerenciamento de categorias.
 
 ```typescript
 export const categoriesService = {
-  // Listar categorias com paginação
-  async getAll(queryParams: CategoryQueryParams): Promise<ServiceResult<PaginatedCategories>>,
-
-  // Buscar categoria por ID
-  async getById(categoryId: string): Promise<ServiceResult<Category>>,
-
-  // Criar categoria
-  async create(data: CategoryForm): Promise<ServiceResult<void>>,
-
-  // Atualizar categoria
-  async update(categoryId: string, data: CategoryForm): Promise<ServiceResult<void>>,
-
-  // Deletar categoria
-  async delete(categoryId: string): Promise<ServiceResult<{ success: boolean; id: string }>>,
-
-  // Buscar traduções da categoria
-  async getTranslations(categoryId: string): Promise<ServiceResult<ApiCategoryTranslations>>,
+  async getAll(params: GetAllCategoriesRequestQuery): Promise<ServiceResult<GetAllCategoriesResponse>>,
+  async getById(categoryId: string): Promise<ServiceResult<GetCategoryByIdResponse>>,
+  async create(data: CreateCategoryRequestBody): Promise<ServiceResult<void>>,
+  async update(categoryId: string, data: UpdateCategoryRequestBody): Promise<ServiceResult<void>>,
+  async delete(categoryId: string): Promise<ServiceResult<DeleteCategoryResponse>>,
+  async getTranslations(categoryId: string): Promise<ServiceResult<GetCategoryTranslationsResponse>>,
 };
 ```
 
@@ -323,7 +280,7 @@ function useCategories() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: CategoryForm) => {
+    mutationFn: async (data: CreateCategoryRequestBody) => {
       const result = await categoriesService.create(data);
       const hasError = "error" in result;
       if (hasError) {
@@ -348,13 +305,8 @@ Serviço de gerenciamento de pedidos.
 
 ```typescript
 export const ordersService = {
-  // Listar pedidos com paginação e filtros
-  async getAll(queryParams: OrderQueryParams): Promise<ServiceResult<PaginatedOrders>>,
-
-  // Buscar pedido por ID
-  async getById(orderId: string): Promise<ServiceResult<Order>>,
-
-  // Atualizar status do pedido
+  async getAll(params: GetAllOrdersRequestQuery): Promise<ServiceResult<GetAllOrdersResponse>>,
+  async getById(orderId: string): Promise<ServiceResult<GetOrderByIdResponse>>,
   async updateStatus(orderId: string, status: string): Promise<ServiceResult<void>>,
 };
 ```
@@ -367,53 +319,12 @@ Serviço de sessões de pedido (mesas).
 
 ```typescript
 export const orderSessionsService = {
-  // Criar sessão de pedido
-  async create(tableNumber: string): Promise<ServiceResult<{ sessionId: string }>>,
-
-  // Adicionar item à sessão
-  async addItem(sessionId: string, item: CartItem): Promise<ServiceResult<void>>,
-
-  // Confirmar pedido
+  async create(tableNumber: string): Promise<ServiceResult<CreateOrderSessionResponse>>,
+  async addItem(sessionId: string, item: AddItemRequestBody): Promise<ServiceResult<void>>,
   async confirmOrder(sessionId: string): Promise<ServiceResult<void>>,
-
-  // Listar pedidos da sessão
-  async getOrders(sessionId: string): Promise<ServiceResult<Order[]>>,
-
-  // Encerrar sessão
+  async getOrders(sessionId: string): Promise<ServiceResult<GetSessionOrdersResponse>>,
   async close(sessionId: string): Promise<ServiceResult<void>>,
 };
-```
-
-### Exemplo: Carrinho com Order Session
-
-```typescript
-import { orderSessionsService } from "@/services/order-sessions/order-sessions.service";
-import { cartObservable } from "@/shared/subjects/cart.subject";
-
-async function addToCart(item: CartItem) {
-  const cart = cartObservable.getValue();
-  const sessionId = cart.orderSessionId;
-  const noSession = !sessionId;
-
-  if (noSession) {
-    const createResult = await orderSessionsService.create("Mesa 1");
-    const hasError = "error" in createResult;
-    if (hasError) {
-      toast.error(createResult.error);
-      return;
-    }
-    cartObservable.setOrderSessionId(createResult.data.sessionId);
-  }
-
-  const addResult = await orderSessionsService.addItem(sessionId, item);
-  const hasError = "error" in addResult;
-  if (hasError) {
-    toast.error(addResult.error);
-    return;
-  }
-
-  toast.success("Item adicionado ao carrinho!");
-}
 ```
 
 ## Auth Service
@@ -424,17 +335,10 @@ Serviço de autenticação.
 
 ```typescript
 export const authService = {
-  // Login
-  async login(credentials: { email: string; password: string }): Promise<ServiceResult<AuthData>>,
-
-  // Logout
+  async login(credentials: LoginRequestBody): Promise<ServiceResult<LoginResponse>>,
   async logout(): Promise<ServiceResult<void>>,
-
-  // Refresh token
-  async refreshToken(): Promise<ServiceResult<{ token: string }>>,
-
-  // Verificar autenticação
-  async verify(): Promise<ServiceResult<AuthData>>,
+  async refreshToken(): Promise<ServiceResult<RefreshTokenResponse>>,
+  async verify(): Promise<ServiceResult<VerifyResponse>>,
 };
 ```
 
@@ -445,7 +349,7 @@ import { authService } from "@/services/auth/auth.service";
 import { authObservable } from "@/shared/subjects/auth";
 import { useNavigate } from "@tanstack/react-router";
 
-async function handleLogin(credentials: { email: string; password: string }) {
+async function handleLogin(credentials: LoginRequestBody) {
   const result = await authService.login(credentials);
   const hasError = "error" in result;
 
@@ -466,7 +370,6 @@ async function handleLogin(credentials: { email: string; password: string }) {
 Todos os services usam o API client de `@/services/api.ts`:
 
 ```typescript
-// src/services/api.ts
 export { api } from "@/shared/api/api-client";
 ```
 
@@ -494,7 +397,7 @@ async function refreshTokenIfNeeded() {
   if (!token) return;
 
   const decoded = jwt.decode(token);
-  const isExpiring = decoded.exp - Date.now() / 1000 < 300; // 5 minutos
+  const isExpiring = decoded.exp - Date.now() / 1000 < 300;
 
   if (isExpiring) {
     await authService.refreshToken();
@@ -508,26 +411,23 @@ Todas as requests enviam cookies automaticamente:
 
 ```typescript
 const response = await fetch(`${API_URL}${endpoint}`, {
-  credentials: "include", // Envia cookies (user_language, auth_token)
+  credentials: "include",
 });
 ```
 
 ## Padrões de Uso
 
-### 1. Sempre Validar com Zod
+### 1. Sempre Usar TypeScript Interfaces
 
 ```typescript
 // ✅ CORRETO
-const parsed = apiProductSchema.safeParse(result.data);
-if (!parsed.success) {
-  const zodMessage = formatZodError(parsed.error);
-  logger.error("Validação falhou", new Error(zodMessage));
-  return { error: "Resposta inválida do servidor" };
-}
-return { data: parsed.data };
+import type { GetAllProductsResponse } from "./interfaces/products.interface";
+const result = await api.get<GetAllProductsResponse>("/products");
+return { data: result.data };
 
-// ❌ INCORRETO
-return { data: result.data }; // Sem validação
+// ❌ INCORRETO - Nunca usar Zod na camada de services
+import { apiProductSchema } from "./products.schema";
+const parsed = apiProductSchema.safeParse(result.data);
 ```
 
 ### 2. Sempre Logar Erros
@@ -553,7 +453,6 @@ queryClient.invalidateQueries({ queryKey: ["products"] });
 
 // ❌ INCORRETO
 const result = await productsService.create(data);
-// Cache não é invalidado
 ```
 
 ### 4. No Client-Side Filtering
@@ -567,7 +466,7 @@ const filtered = allProducts.items.filter(p => p.name.includes(search));
 const result = await productsService.getAll({
   page: 1,
   size: 10,
-  filters: { search },
+  search,
 });
 ```
 
@@ -578,12 +477,10 @@ Services são testados indiretamente através dos hooks e páginas que os utiliz
 ## Dependências
 
 - **@/shared/api/api-client** - HTTP client com token refresh
-- **zod** - Schema validation
 - **@/lib/logger** - Logging estruturado
-- **@/lib/zod-errors** - Formatação de erros
 
 ## Referências
 
 - API Client: `src/shared/api/api-client.ts`
 - Logger: `src/lib/logger.ts`
-- Zod: https://zod.dev
+- API Docs: `http://localhost:3000/api/docs`

@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { businessLimitsService } from "@/services/business-limits/business-limits.service";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useBusiness } from "@/shared/hooks/useBusiness";
+import { useAuth } from "@/shared/hooks/useAuth";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { logger } from "@/lib/logger";
 
 function LimitField({ label, value }: { label: string; value: number }) {
@@ -18,8 +20,11 @@ function LimitField({ label, value }: { label: string; value: number }) {
 export function BusinessLimitsPage() {
   const { t } = useTranslation();
   const { selectedBusiness } = useBusiness();
+  const { profile } = useAuth();
 
-  const hasBusinessSelected = selectedBusiness !== null;
+  const rolesRequiringBusinessSelection = [UserRoleEnum.ADMIN, UserRoleEnum.SYSTEM_MANAGER];
+  const needsBusinessSelection = rolesRequiringBusinessSelection.includes(profile as UserRoleEnum);
+  const hasBusinessSelected = needsBusinessSelection ? selectedBusiness !== null : true;
   const businessId = selectedBusiness?.id;
 
   const queryKey = useMemo(() => ["business-limits", businessId], [businessId]);
@@ -83,7 +88,7 @@ export function BusinessLimitsPage() {
     );
   }, [limits, t]);
 
-  const shouldShowNoBusinessContent = !hasBusinessSelected;
+  const shouldShowNoBusinessContent = needsBusinessSelection && !selectedBusiness;
   const shouldShowLoading = hasBusinessSelected && isLoading;
   const shouldShowError = hasBusinessSelected && isError;
   const shouldShowViewContent = hasBusinessSelected && !isLoading && !isError;

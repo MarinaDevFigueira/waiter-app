@@ -1,38 +1,39 @@
 import { api } from "@/services/api";
+import { logger } from "@/lib/logger";
 import { type Product, type ProductForm } from "@/shared/schemas/product.schema";
 import { baseEntityDefaults } from "@/shared/schemas/base-entity.schema";
 import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
-import { formatZodError } from "@/lib/zod-errors";
-import { logger } from "@/lib/logger";
-import {
-  apiProductListSchema,
-  apiProductSchema,
-  apiProductTranslationsSchema,
-} from "./products.schema";
-import type { PaginatedProducts, ApiProduct, ProductQueryParams, ApiProductTranslations } from "./products.schema";
+import type {
+  GetProductResponse,
+  GetProductTranslationsResponse,
+  GetProductsRequestQuery,
+  GetProductsResponse,
+  GetProductsApiResponse,
+} from "./interfaces/products.interface";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
-function mapApiProductToProduct(raw: ApiProduct): Product {
+function mapApiProductToProduct(raw: GetProductResponse): Product {
   return {
     ...baseEntityDefaults,
     id: raw.id,
-    name: raw.name,
-    description: raw.description ?? undefined,
+    name: raw.name ?? "",
+    description: raw.description ?? "",
     categoryId: raw.categoryId,
     price: raw.price,
     stock: raw.stock,
     unit: raw.unit as Product["unit"],
-    images: (raw.images ?? []).map((img: any) => {
+    images: (raw.images ?? []).map((img) => {
       const isString = typeof img === "string";
       if (isString) {
-        const urlParts = img.split("/");
+        const urlParts = (img as string).split("/");
         const fileId = urlParts[urlParts.length - 1];
-        return { id: fileId, url: img };
+        return { id: fileId, url: img as string };
       }
-      return { id: img.id, url: img.url };
+      const imgObj = img as { id: string; url: string };
+      return { id: imgObj.id, url: imgObj.url };
     }),
     active: raw.active,
     createdAt: new Date(raw.createdAt),
@@ -44,11 +45,10 @@ function mapApiProductToProduct(raw: ApiProduct): Product {
   };
 }
 
-
 function buildProductFormData(data: ProductForm, files: File[], options?: { excludeImages?: boolean }): FormData {
   const formData = new FormData();
 
-  const translationsJson = JSON.stringify(data.translations)
+  const translationsJson = JSON.stringify(data.translations);
   formData.append("translations", translationsJson);
 
   formData.append("categoryId", data.categoryId);
@@ -60,8 +60,7 @@ function buildProductFormData(data: ProductForm, files: File[], options?: { excl
   const shouldIncludeImages = !options?.excludeImages && Boolean(data.images?.length);
   if (shouldIncludeImages) {
     data.images!.forEach((image) => {
-      const imageUrl = image.url;
-      formData.append("images", imageUrl);
+      formData.append("images", image.url);
     });
   }
 
@@ -74,8 +73,8 @@ function buildProductFormData(data: ProductForm, files: File[], options?: { excl
 
 export const productsService = {
   async getAll(
-    queryParams: ProductQueryParams
-  ): Promise<ServiceResult<PaginatedProducts>> {
+    queryParams: GetProductsRequestQuery
+  ): Promise<ServiceResult<GetProductsResponse>> {
     try {
       const { page, size, orderBy, direction, filters = {} } = queryParams;
 
@@ -105,27 +104,21 @@ export const productsService = {
         return { error: result.error };
       }
 
-      const parsed = apiProductListSchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error("[productsService.getAll] Erro de validação", new Error(zodMessage));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      const items = parsed.data.items.map(mapApiProductToProduct);
+      const apiData = result.data as GetProductsApiResponse;
+      const items = apiData.items.map(mapApiProductToProduct);
 
       return {
         data: {
           items,
-          total: parsed.data.total,
-          page: parsed.data.page,
-          size: parsed.data.size,
-          totalPages: parsed.data.totalPages,
-          hasNextPage: parsed.data.hasNextPage,
-          hasPreviousPage: parsed.data.hasPreviousPage,
+          total: apiData.total,
+          page: apiData.page,
+          size: apiData.size,
+          totalPages: apiData.totalPages,
+          hasNextPage: apiData.hasNextPage,
+          hasPreviousPage: apiData.hasPreviousPage,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar produtos";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -142,15 +135,8 @@ export const productsService = {
         return { error: result.error };
       }
 
-      const parsed = apiProductSchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error("[productsService.getById] Erro de validação", new Error(zodMessage));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiProductToProduct(parsed.data) };
-    } catch (error: any) {
+      return { data: mapApiProductToProduct(result.data as GetProductResponse) };
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar produto";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -170,7 +156,7 @@ export const productsService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao criar produto";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -193,7 +179,7 @@ export const productsService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar produto";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -216,7 +202,7 @@ export const productsService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao remover imagem";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -236,7 +222,7 @@ export const productsService = {
       }
 
       return { data: { success: true, id: productId } };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao deletar produto";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -246,7 +232,7 @@ export const productsService = {
 
   async getTranslations(
     productId: string
-  ): Promise<ServiceResult<ApiProductTranslations>> {
+  ): Promise<ServiceResult<GetProductTranslationsResponse>> {
     try {
       const result = await api.get<unknown>(`/products/${productId}/translations`);
 
@@ -255,15 +241,8 @@ export const productsService = {
         return { error: result.error };
       }
 
-      const parsed = apiProductTranslationsSchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error("[productsService.getTranslations] Erro de validação", new Error(zodMessage));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: parsed.data };
-    } catch (error) {
+      return { data: result.data as GetProductTranslationsResponse };
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar traduções";
       logger.error(errorMessage, error instanceof Error ? error : null);

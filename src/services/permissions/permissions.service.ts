@@ -1,21 +1,16 @@
 import { api } from "@/services/api";
-import { formatZodError } from "@/lib/zod-errors";
 import { logger } from "@/lib/logger";
-import {
-  userPermissionsResponseSchema,
-  permissionsCatalogResponseSchema,
-} from "@/shared/schemas/permission.schema";
 import type {
-  UserPermissionsResponse,
-  PermissionsCatalogResponse,
-} from "@/shared/schemas/permission.schema";
+  GetMyPermissionsResponse,
+  GetPermissionsCatalogResponse,
+} from "./interfaces/permissions.interface";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
 export const permissionsService = {
-  async getMyPermissions(): Promise<ServiceResult<UserPermissionsResponse>> {
+  async getMyPermissions(): Promise<ServiceResult<GetMyPermissionsResponse>> {
     try {
       const result = await api.get<unknown>("/users/permissions");
 
@@ -24,17 +19,7 @@ export const permissionsService = {
         return { error: result.error };
       }
 
-      const parsed = userPermissionsResponseSchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error(
-          "[permissionsService.getMyPermissions] Erro de validação",
-          new Error(zodMessage)
-        );
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: parsed.data };
+      return { data: result.data as GetMyPermissionsResponse };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
@@ -45,7 +30,7 @@ export const permissionsService = {
     }
   },
 
-  async getCatalog(): Promise<ServiceResult<PermissionsCatalogResponse>> {
+  async getCatalog(): Promise<ServiceResult<GetPermissionsCatalogResponse>> {
     try {
       const result = await api.get<unknown>("/permissions");
 
@@ -54,17 +39,7 @@ export const permissionsService = {
         return { error: result.error };
       }
 
-      const parsed = permissionsCatalogResponseSchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error(
-          "[permissionsService.getCatalog] Erro de validação",
-          new Error(zodMessage)
-        );
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: parsed.data };
+      return { data: result.data as GetPermissionsCatalogResponse };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error

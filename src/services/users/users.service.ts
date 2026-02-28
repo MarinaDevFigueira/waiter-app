@@ -1,21 +1,20 @@
 import { api } from "@/services/api";
-import { formatZodError } from "@/lib/zod-errors";
 import { logger } from "@/lib/logger";
-import { apiPaginatedUsersSchema } from "./users.schema";
-import type { ApiUser, UserQueryParams } from "./users.schema";
 import type { User } from "@/shared/schemas/user.schema";
+import type {
+  GetUserResponse,
+  GetUsersApiResponse,
+  GetUsersRequestQuery,
+  GetUsersResponse,
+  UpdateMeRequestBody,
+  UpdateUserRequestBody,
+} from "./interfaces/users.interface";
 
-interface PaginatedUsersResult {
-  items: User[];
-  total: number;
-  page: number;
-  size: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
+type ServiceSuccess<T> = { data: T };
+type ServiceError = { error: string };
+type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
-function mapApiUserToUser(apiUser: ApiUser): User {
+function mapApiUserToUser(apiUser: GetUserResponse): User {
   return {
     id: apiUser.id,
     name: apiUser.name,
@@ -33,14 +32,10 @@ function mapApiUserToUser(apiUser: ApiUser): User {
   };
 }
 
-type ServiceSuccess<T> = { data: T };
-type ServiceError = { error: string };
-type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
-
 export const usersService = {
   async getAll(
-    queryParams: UserQueryParams
-  ): Promise<ServiceResult<PaginatedUsersResult>> {
+    queryParams: GetUsersRequestQuery
+  ): Promise<ServiceResult<GetUsersResponse>> {
     try {
       const { page, size, filters = {} } = queryParams;
 
@@ -65,31 +60,24 @@ export const usersService = {
         return { error: result.error };
       }
 
-      const parsed = apiPaginatedUsersSchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error("[usersService.getAll] Erro de validação", new Error(zodMessage));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      const apiData = parsed.data;
+      const apiData = result.data as GetUsersApiResponse;
       const totalPages = Math.ceil(apiData.total / apiData.limit);
       const hasNextPage = apiData.page < totalPages;
       const hasPreviousPage = apiData.page > 1;
 
       const mappedItems = apiData.items.map(mapApiUserToUser);
 
-      const mappedData: PaginatedUsersResult = {
-        items: mappedItems,
-        total: apiData.total,
-        page: apiData.page,
-        size: apiData.limit,
-        totalPages,
-        hasNextPage,
-        hasPreviousPage,
+      return {
+        data: {
+          items: mappedItems,
+          total: apiData.total,
+          page: apiData.page,
+          size: apiData.limit,
+          totalPages,
+          hasNextPage,
+          hasPreviousPage,
+        },
       };
-
-      return { data: mappedData };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar usuários";
@@ -108,7 +96,7 @@ export const usersService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao desabilitar usuário";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -126,7 +114,7 @@ export const usersService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao restaurar usuário";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -134,11 +122,7 @@ export const usersService = {
     }
   },
 
-  async updateMe(data: {
-    name?: string;
-    email?: string;
-    password?: string;
-  }): Promise<ServiceResult<void>> {
+  async updateMe(data: UpdateMeRequestBody): Promise<ServiceResult<void>> {
     try {
       const result = await api.patch<unknown>("/users/me", data);
 
@@ -148,7 +132,7 @@ export const usersService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar usuário";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -158,14 +142,7 @@ export const usersService = {
 
   async update(
     userId: string,
-    data: {
-      name?: string;
-      email?: string;
-      role?: string;
-      document?: string;
-      documentType?: "cpf" | "rg";
-      birthDate?: string;
-    }
+    data: UpdateUserRequestBody
   ): Promise<ServiceResult<void>> {
     try {
       const result = await api.put<unknown>(`/users/${userId}`, data);
@@ -176,7 +153,7 @@ export const usersService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar usuário";
       logger.error(errorMessage, error instanceof Error ? error : null);

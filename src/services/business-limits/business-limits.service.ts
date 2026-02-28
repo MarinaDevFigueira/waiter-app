@@ -1,17 +1,13 @@
 import { api } from "@/services/api";
-import { formatZodError } from "@/lib/zod-errors";
 import { logger } from "@/lib/logger";
-import {
-  apiBusinessLimitsSchema,
-  type ApiBusinessLimits,
-} from "./schemas/get.schema";
+import type { GetBusinessLimitsResponse } from "./interfaces/business-limits.interface";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
 export const businessLimitsService = {
-  async get(): Promise<ServiceResult<ApiBusinessLimits>> {
+  async get(): Promise<ServiceResult<GetBusinessLimitsResponse>> {
     try {
       const result = await api.get<unknown>("/business-limits");
 
@@ -20,16 +16,7 @@ export const businessLimitsService = {
         return { error: result.error };
       }
 
-      const parsed = apiBusinessLimitsSchema.safeParse(result.data);
-      const validationFailed = !parsed.success;
-      if (validationFailed) {
-        const zodMessage = formatZodError(parsed.error);
-        const error = new Error(zodMessage);
-        logger.error("[businessLimitsService.get] Validation error", error);
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: parsed.data };
+      return { data: result.data as GetBusinessLimitsResponse };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar limites";

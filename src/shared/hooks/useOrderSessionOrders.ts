@@ -3,13 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { logger } from "@/lib/logger";
 import { ordersService } from "@/services/orders/orders.service";
-import type { PaginatedOrders } from "@/services/orders/orders.service";
+import type { GetOrdersResponse } from "@/services/orders/interfaces/orders.interface";
 import { useLanguage } from "@/shared/hooks/useLanguage";
 
 export function useOrderSessionOrders(orderSessionId: string | null) {
   const { addLanguagePrefix } = useLanguage();
 
-  const query = useQuery<PaginatedOrders>({
+  const query = useQuery<GetOrdersResponse>({
     queryKey: addLanguagePrefix("orders", { orderSessionId }),
     queryFn: async () => {
       const result = await ordersService.getAll({

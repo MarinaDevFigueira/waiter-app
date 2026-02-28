@@ -16,7 +16,7 @@ import { useAuth } from "@/shared/hooks/useAuth";
 import { PermissionEnum } from "@/shared/enums/permission.enum";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { logger } from "@/lib/logger";
-import type { ApiBusinessDetail } from "@/services/business/schemas/get-by-id.schema";
+import type { GetBusinessDetailResponse } from "@/services/business/interfaces/business.interface";
 
 const businessInfoFormSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -32,7 +32,7 @@ const businessInfoFormSchema = z.object({
 
 type BusinessInfoFormValues = z.infer<typeof businessInfoFormSchema>;
 
-function buildDefaultValues(business: ApiBusinessDetail): BusinessInfoFormValues {
+function buildDefaultValues(business: GetBusinessDetailResponse): BusinessInfoFormValues {
   return {
     name: business.name,
     street: business.street ?? "",
@@ -88,8 +88,10 @@ export function BusinessInfoPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const rolesRequiringBusinessSelection = [UserRoleEnum.ADMIN, UserRoleEnum.SYSTEM_MANAGER];
+  const needsBusinessSelection = rolesRequiringBusinessSelection.includes(profile as UserRoleEnum);
+  const hasBusinessSelected = needsBusinessSelection ? selectedBusiness !== null : true;
   const businessId = selectedBusiness?.id;
-  const hasBusinessSelected = businessId !== undefined;
 
   const isAdmin = profile === UserRoleEnum.ADMIN;
   const hasEditPermission = hasPermissionTo(PermissionEnum.EDIT_BUSINESS);
@@ -296,7 +298,7 @@ export function BusinessInfoPage() {
     );
   }, [isEditing, form, handleSubmit, handleCancel, isSaving, t, nameError, saveButtonLabel]);
 
-  const shouldShowNoBusinessContent = !hasBusinessSelected;
+  const shouldShowNoBusinessContent = needsBusinessSelection && !selectedBusiness;
   const shouldShowLoading = hasBusinessSelected && isLoading;
   const shouldShowError = hasBusinessSelected && isError;
   const shouldShowEditContent = hasBusinessSelected && !isLoading && !isError && isEditing;
