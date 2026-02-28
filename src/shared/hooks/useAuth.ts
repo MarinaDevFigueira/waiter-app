@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { authObservable, type AuthData } from "@/shared/subjects/auth";
-import { UserProfileEnum } from "../constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 
 interface UseAuthReturn {
   auth: AuthData | null;
   isAuthenticated: boolean;
-  profile?: UserProfileEnum;
+  profile?: UserRoleEnum;
 }
 
 export function useAuth(): UseAuthReturn {

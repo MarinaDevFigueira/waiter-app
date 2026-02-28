@@ -1,6 +1,6 @@
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useOrdersView } from "@/shared/hooks/useOrdersView";
-import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { OrdersViewEnum } from "@/shared/enums/orders-view.enum";
 import { AdminOrdersPage } from "@/pages/orders/admin-orders/page";
 import { KitchenOrdersPage } from "@/pages/orders/kitchen-orders/page";
@@ -12,12 +12,12 @@ export function OrdersPage() {
   const profile = auth?.profile;
 
   const ordersAdminProfiles = [
-    UserProfileEnum.OWNER,
-    UserProfileEnum.ADMIN,
-    UserProfileEnum.ATTENDANT,
+    UserRoleEnum.OWNER,
+    UserRoleEnum.ADMIN,
+    UserRoleEnum.ATTENDANT,
   ];
   const hasOrdersAdminAccess = ordersAdminProfiles.includes(
-    profile as UserProfileEnum,
+    profile as UserRoleEnum,
   );
 
   if (hasOrdersAdminAccess) {

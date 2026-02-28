@@ -178,7 +178,7 @@ import { useAuth } from "@/shared/hooks/useAuth";
 import { FoodsPage } from "@/pages/foods/page";
 import { KitchenPage } from "@/pages/kitchen/page";
 import { DashboardPage } from "@/pages/dashboard/page";
-import { USER_PROFILES } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -187,15 +187,15 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const { profile } = useAuth();
 
-  if (profile === USER_PROFILES.CUSTOMER) {
+  if (profile === UserRoleEnum.CUSTOMER) {
     return <FoodsPage />;
   }
 
-  if (profile === USER_PROFILES.KITCHEN) {
+  if (profile === UserRoleEnum.KITCHEN) {
     return <KitchenPage />;
   }
 
-  if (profile === USER_PROFILES.ADMIN) {
+  if (profile === UserRoleEnum.ADMIN) {
     return <DashboardPage />;
   }
 
@@ -208,12 +208,12 @@ function HomePage() {
 ```tsx
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { authObservable } from "@/shared/subjects/auth";
-import { USER_PROFILES } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: ({ context }) => {
     const auth = authObservable.getValue();
-    const isAdmin = auth?.profile === USER_PROFILES.ADMIN;
+    const isAdmin = auth?.profile === UserRoleEnum.ADMIN;
     const notAdmin = !isAdmin;
 
     if (notAdmin) {
@@ -446,13 +446,13 @@ export default defineConfig({
 // src/routes/dashboard/products.tsx
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { authObservable } from "@/shared/subjects/auth";
-import { USER_PROFILES } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { ProductsPage } from "@/pages/products/page";
 
 export const Route = createFileRoute("/dashboard/products")({
   beforeLoad: () => {
     const auth = authObservable.getValue();
-    const isAdmin = auth?.profile === USER_PROFILES.ADMIN;
+    const isAdmin = auth?.profile === UserRoleEnum.ADMIN;
     const notAdmin = !isAdmin;
 
     if (notAdmin) {

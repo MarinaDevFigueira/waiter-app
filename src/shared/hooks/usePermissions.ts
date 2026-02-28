@@ -3,7 +3,7 @@ import { permissionsObservable } from "@/shared/subjects/permissions.subject";
 import { PermissionEnum } from "@/shared/enums/permission.enum";
 import type { Permission } from "@/shared/schemas/permission.schema";
 import { useAuth } from "./useAuth";
-import { UserProfileEnum } from "../constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 
 interface UsePermissionsReturn {
   permissions: Permission[];
@@ -43,7 +43,7 @@ export function usePermissions(): UsePermissionsReturn {
 
   const hasPermissionTo = useCallback(
     (permission: PermissionEnum): boolean => {
-      const isAdmin = role === UserProfileEnum.ADMIN;
+      const isAdmin = role === UserRoleEnum.ADMIN;
 
       const hasToBypassPermission = isAdmin;
 

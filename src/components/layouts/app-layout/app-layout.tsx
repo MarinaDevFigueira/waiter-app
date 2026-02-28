@@ -10,7 +10,7 @@ import { LogoutConfirmationModal } from "@/components/logout-confirmation-modal/
 import { authService } from "@/services/auth/auth.service";
 import { orderSessionsService } from "@/services/order-sessions/order-sessions.service";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { cartObservable } from "@/shared/subjects/cart.subject";
 import { logger } from "@/lib/logger";
 import { useTranslation } from "@/shared/hooks/useTranslation";
@@ -26,12 +26,12 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const isMesaProfile = auth?.profile === UserProfileEnum.MESA;
+  const isTableProfile = auth?.profile === UserRoleEnum.TABLE;
 
   const handleLogoutClick = useCallback(() => {
     const currentCart = cartObservable.getValue();
     const hasActiveSession = Boolean(currentCart.orderSessionId);
-    const shouldConfirm = isMesaProfile && hasActiveSession;
+    const shouldConfirm = isTableProfile && hasActiveSession;
 
     if (shouldConfirm) {
       setIsLogoutModalOpen(true);
@@ -41,7 +41,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     authService.logout().then(() => {
       navigate({ to: "/" });
     });
-  }, [isMesaProfile, navigate]);
+  }, [isTableProfile, navigate]);
 
   const handleConfirmLogout = useCallback(async () => {
     setIsLoggingOut(true);

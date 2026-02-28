@@ -6,4 +6,5 @@ export enum UserRoleEnum {
   CUSTOMER = "customer",
   ATTENDANT = "attendant",
   WAITER = "waiter",
+  SYSTEM_MANAGER = "system_manager"
 }
