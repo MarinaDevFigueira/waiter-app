@@ -297,5 +297,65 @@
     "errorCode": "404",
     "title": "Página no encontrada",
     "description": "La página que estás buscando no existe o ha sido eliminada."
+  },
+  "users": {
+    "pageTitle": "Usuarios",
+    "pageSubtitle": "Gestiona los usuarios del sistema",
+    "table": {
+      "columns": {
+        "name": "Nombre",
+        "username": "Usuario",
+        "email": "Correo electrónico",
+        "role": "Perfil",
+        "createdAt": "Creado el",
+        "updatedAt": "Actualizado el"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar por nombre, usuario o correo...",
+      "title": "Filtros",
+      "role": "Perfil",
+      "selectRoles": "Seleccionar perfiles...",
+      "includeDeleted": "Incluir deshabilitados",
+      "clear": "Limpiar",
+      "apply": "Aplicar"
+    },
+    "form": {
+      "editTitle": "Editar Usuario",
+      "fields": {
+        "name": "Nombre",
+        "username": "Usuario",
+        "email": "Correo electrónico",
+        "role": "Perfil"
+      },
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "disable": "Deshabilitar"
+    },
+    "confirmDisable": {
+      "title": "Deshabilitar Usuario",
+      "description": "¿Estás seguro de que deseas deshabilitar este usuario? Ya no podrá acceder al sistema.",
+      "confirm": "Deshabilitar"
+    },
+    "emptyState": "No se encontraron usuarios",
+    "success": {
+      "disable": "Usuario deshabilitado con éxito"
+    },
+    "errors": {
+      "loadFailed": "Error al cargar usuarios",
+      "disableFailed": "Error al deshabilitar usuario"
+    },
+    "roles": {
+      "owner": "Propietario",
+      "admin": "Administrador",
+      "table": "Mesa",
+      "kitchen": "Cocina",
+      "customer": "Cliente",
+      "attendant": "Asistente",
+      "waiter": "Camarero"
+    }
   }
 }

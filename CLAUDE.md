@@ -138,6 +138,22 @@ Manter o código e commits como se fossem desenvolvidos manualmente pelo time.
   import { SplashScreen } from "@/components/splash-screen"; // via index.js
   ```
 
+### When to Use Intermediate Variables
+A decisão de extrair para variáveis intermediárias depende de: (1) complexidade da expressão e (2) significado semântico.
+
+**USAR quando:**
+- Expressão envolve múltiplas operações (decomposição melhora leitura)
+- O nome adiciona contexto ao propósito do valor
+- Cache de operação lenta/externa
+- Melhorar mensagens de erro ou facilitar debug
+
+**NÃO USAR quando:**
+- Nome repete o nome da função: `return getProductPrice();`
+- Propriedade já é contextualmente clara: `sendTo(customer.address);`
+- Cálculo intermediário não faz sentido semântico
+
+**Regra de ouro:** Se não consegue nomear a variável de forma significativa, ela não deveria existir.
+
 ### Colors and Values
 - **NUNCA usar valores hardcoded** (cores, espaçamentos, tamanhos, etc.)
 - **Exceções permitidas:** apenas `width` e `height` podem ser hardcoded (ex: `w-[120px]`, `h-[200px]`)

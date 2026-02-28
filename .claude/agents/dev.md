@@ -204,6 +204,9 @@ This agent follows the specifications defined in:
 - `swiperjs-advanced-patterns.spec.md` - Performance, accessibility, best practices
 - `swiper-navigation-buttons.spec.md` - **Navigation arrows with conditional visibility pattern**
 
+**Intermediate Variables:**
+- `when-to-use-intermediate-variables.spec.md` - When intermediate variables add semantic value vs when they are unnecessary
+
 ---
 
 ## Consolidated Instructions
@@ -414,6 +417,32 @@ const buttonProps = { variant };
 ```
 
 **Rationale:** Named variables make code self-documenting, easier to debug, and prevent deeply nested expressions. They act as self-documenting assertions about what conditions and values mean.
+
+#### 7. When to Use Intermediate Variables (GLOBAL SPEC)
+
+A decisão de extrair para variáveis intermediárias depende de: (1) complexidade da expressão e (2) significado semântico da variável.
+
+**USAR variável intermediária quando:**
+- Expressão envolve múltiplas operações (decomposição melhora leitura)
+- O nome adiciona contexto ao propósito do valor (ex: `trainingImage` vs `readImage('car1.png')`)
+- Cache de operação lenta/externa (evitar múltiplas chamadas)
+- Melhorar mensagens de erro (tratamento granular)
+- Facilitar debug (breakpoints e inspeção)
+
+```typescript
+// CORRETO — cada componente nomeado semanticamente
+const price = product.getPrice();
+const tax = calculateTax(jurisdiction, product);
+const discount = session.getActiveDiscount();
+const total = price + tax - discount;
+```
+
+**NÃO usar variável intermediária quando:**
+- Nome repete o nome da função (sem informação nova): `return getProductPrice();`
+- Propriedade já é contextualmente clara: `sendTo(customer.address);`
+- Cálculo intermediário não faz sentido semântico (ex: `taxMinusDiscount` não é um conceito real)
+
+**Regra de ouro:** Se não consegue nomear a variável de forma significativa, ela não deveria existir — ou a lógica precisa ser repensada.
 
 ### React Patterns
 
@@ -1585,9 +1614,9 @@ When project specs conflict with global specs:
 
 - These specs are consolidated from:
   - 66 project specs in `./.specs/`
-  - 21 global specs in `~/.specs/`
-- Global specs for code style (no comments, named variables, no ESLint disable, i18n patterns, SwiperJS patterns) take highest priority
-- Last updated: 2026-02-22
-- Total specs loaded: 90
+  - 22 global specs in `~/.specs/`
+- Global specs for code style (no comments, named variables, no ESLint disable, i18n patterns, SwiperJS patterns, intermediate variables) take highest priority
+- Last updated: 2026-02-27
+- Total specs loaded: 91
 
 You can now use `@dev` in your conversations to apply these project-specific patterns and conventions with global best practices enforced.

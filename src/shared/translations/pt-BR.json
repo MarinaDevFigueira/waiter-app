@@ -297,5 +297,65 @@
     "errorCode": "404",
     "title": "Página não encontrada",
     "description": "A página que você está procurando não existe ou foi removida."
+  },
+  "users": {
+    "pageTitle": "Usuários",
+    "pageSubtitle": "Gerencie os usuários do sistema",
+    "table": {
+      "columns": {
+        "name": "Nome",
+        "username": "Usuário",
+        "email": "E-mail",
+        "role": "Perfil",
+        "createdAt": "Criado em",
+        "updatedAt": "Atualizado em"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar por nome, usuário ou e-mail...",
+      "title": "Filtros",
+      "role": "Perfil",
+      "selectRoles": "Selecionar perfis...",
+      "includeDeleted": "Incluir desabilitados",
+      "clear": "Limpar",
+      "apply": "Aplicar"
+    },
+    "form": {
+      "editTitle": "Editar Usuário",
+      "fields": {
+        "name": "Nome",
+        "username": "Usuário",
+        "email": "E-mail",
+        "role": "Perfil"
+      },
+      "save": "Salvar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "disable": "Desabilitar"
+    },
+    "confirmDisable": {
+      "title": "Desabilitar Usuário",
+      "description": "Tem certeza que deseja desabilitar este usuário? Ele não poderá mais acessar o sistema.",
+      "confirm": "Desabilitar"
+    },
+    "emptyState": "Nenhum usuário encontrado",
+    "success": {
+      "disable": "Usuário desabilitado com sucesso"
+    },
+    "errors": {
+      "loadFailed": "Erro ao carregar usuários",
+      "disableFailed": "Erro ao desabilitar usuário"
+    },
+    "roles": {
+      "owner": "Proprietário",
+      "admin": "Administrador",
+      "table": "Mesa",
+      "kitchen": "Cozinha",
+      "customer": "Cliente",
+      "attendant": "Atendente",
+      "waiter": "Garçom"
+    }
   }
 }
