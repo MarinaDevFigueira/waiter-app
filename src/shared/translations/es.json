@@ -276,7 +276,10 @@
       "products": "Productos",
       "categories": "Categorías",
       "edit": "Editar",
-      "new": "Nuevo"
+      "new": "Nuevo",
+      "business": "Empresa",
+      "info": "Información",
+      "limits": "Límites"
     }
   },
   "orderSession": {
@@ -310,6 +313,53 @@
       "placeholder": "Seleccionar empresa",
       "searchPlaceholder": "Buscar empresa...",
       "emptyMessage": "Ninguna empresa encontrada"
+    },
+    "menu": {
+      "title": "Empresa",
+      "info": "Información",
+      "settings": "Configuración",
+      "limits": "Límites"
+    },
+    "actions": {
+      "edit": "Editar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "saving": "Guardando..."
+    },
+    "info": {
+      "title": "Información de la Empresa",
+      "name": "Nombre",
+      "logo": "Logo",
+      "address": "Dirección",
+      "street": "Calle",
+      "number": "Número",
+      "complement": "Complemento",
+      "neighborhood": "Barrio",
+      "city": "Ciudad",
+      "state": "Estado",
+      "country": "País",
+      "zipCode": "Código Postal",
+      "updateSuccess": "¡Información de la empresa actualizada con éxito!",
+      "updateError": "Error al actualizar la información de la empresa",
+      "loadError": "Error al cargar la información de la empresa",
+      "noBusinessSelected": "Ninguna empresa seleccionada"
+    },
+    "settings": {
+      "title": "Configuración de la Empresa",
+      "primaryColor": "Color Primario",
+      "secondaryColor": "Color Secundario",
+      "enabledLanguages": "Idiomas Habilitados",
+      "updateSuccess": "¡Configuración de la empresa actualizada con éxito!",
+      "updateError": "Error al actualizar la configuración de la empresa",
+      "loadError": "Error al cargar la configuración de la empresa"
+    },
+    "limits": {
+      "title": "Límites de la Empresa",
+      "maxTableUsers": "Usuarios de Mesa",
+      "maxWaiterUsers": "Meseros",
+      "maxKitchenUsers": "Usuarios de Cocina",
+      "maxAttendantUsers": "Atendientes",
+      "loadError": "Error al cargar los límites de la empresa"
     }
   },
   "users": {

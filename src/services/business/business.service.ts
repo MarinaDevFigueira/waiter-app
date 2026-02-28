@@ -5,7 +5,12 @@ import {
   apiPaginatedBusinessSchema,
   type BusinessQueryParams,
   type ApiBusinessItem,
-} from "./business.schema";
+} from "./schemas/get-all.schema";
+import {
+  apiBusinessDetailSchema,
+  type ApiBusinessDetail,
+} from "./schemas/get-by-id.schema";
+import type { BusinessUpdateForm } from "./schemas/update.schema";
 import type { Business } from "@/shared/schemas/business.schema";
 
 interface PaginatedBusinessResult {
@@ -92,6 +97,51 @@ export const businessService = {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar empresas";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async getById(id: string): Promise<ServiceResult<ApiBusinessDetail>> {
+    try {
+      const result = await api.get<unknown>(`/business/${id}`);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      const parsed = apiBusinessDetailSchema.safeParse(result.data);
+      const validationFailed = !parsed.success;
+      if (validationFailed) {
+        const zodMessage = formatZodError(parsed.error);
+        const error = new Error(zodMessage);
+        logger.error("[businessService.getById] Validation error", error);
+        return { error: "Resposta inválida do servidor" };
+      }
+
+      return { data: parsed.data };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao buscar empresa";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async update(id: string, data: BusinessUpdateForm): Promise<ServiceResult<void>> {
+    try {
+      const result = await api.put<unknown>(`/business/${id}`, data);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      return { data: undefined };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao atualizar empresa";
       logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }

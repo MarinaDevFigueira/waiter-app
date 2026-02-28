@@ -276,7 +276,10 @@
       "products": "Products",
       "categories": "Categories",
       "edit": "Edit",
-      "new": "New"
+      "new": "New",
+      "business": "Business",
+      "info": "Information",
+      "limits": "Limits"
     }
   },
   "orderSession": {
@@ -310,6 +313,53 @@
       "placeholder": "Select business",
       "searchPlaceholder": "Search business...",
       "emptyMessage": "No business found"
+    },
+    "menu": {
+      "title": "Business",
+      "info": "Information",
+      "settings": "Settings",
+      "limits": "Limits"
+    },
+    "actions": {
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    },
+    "info": {
+      "title": "Business Information",
+      "name": "Name",
+      "logo": "Logo",
+      "address": "Address",
+      "street": "Street",
+      "number": "Number",
+      "complement": "Complement",
+      "neighborhood": "Neighborhood",
+      "city": "City",
+      "state": "State",
+      "country": "Country",
+      "zipCode": "Zip Code",
+      "updateSuccess": "Business information updated successfully!",
+      "updateError": "Error updating business information",
+      "loadError": "Error loading business information",
+      "noBusinessSelected": "No business selected"
+    },
+    "settings": {
+      "title": "Business Settings",
+      "primaryColor": "Primary Color",
+      "secondaryColor": "Secondary Color",
+      "enabledLanguages": "Enabled Languages",
+      "updateSuccess": "Business settings updated successfully!",
+      "updateError": "Error updating business settings",
+      "loadError": "Error loading business settings"
+    },
+    "limits": {
+      "title": "Business Limits",
+      "maxTableUsers": "Table Users",
+      "maxWaiterUsers": "Waiters",
+      "maxKitchenUsers": "Kitchen Users",
+      "maxAttendantUsers": "Attendants",
+      "loadError": "Error loading business limits"
     }
   },
   "users": {

@@ -276,7 +276,10 @@
       "products": "Produtos",
       "categories": "Categorias",
       "edit": "Editar",
-      "new": "Novo"
+      "new": "Novo",
+      "business": "Empresa",
+      "info": "Informações",
+      "limits": "Limites"
     }
   },
   "orderSession": {
@@ -310,6 +313,53 @@
       "placeholder": "Selecionar empresa",
       "searchPlaceholder": "Buscar empresa...",
       "emptyMessage": "Nenhuma empresa encontrada"
+    },
+    "menu": {
+      "title": "Empresa",
+      "info": "Informações",
+      "settings": "Configurações",
+      "limits": "Limites"
+    },
+    "actions": {
+      "edit": "Editar",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "saving": "Salvando..."
+    },
+    "info": {
+      "title": "Informações da Empresa",
+      "name": "Nome",
+      "logo": "Logo",
+      "address": "Endereço",
+      "street": "Rua",
+      "number": "Número",
+      "complement": "Complemento",
+      "neighborhood": "Bairro",
+      "city": "Cidade",
+      "state": "Estado",
+      "country": "País",
+      "zipCode": "CEP",
+      "updateSuccess": "Informações da empresa atualizadas com sucesso!",
+      "updateError": "Erro ao atualizar informações da empresa",
+      "loadError": "Erro ao carregar informações da empresa",
+      "noBusinessSelected": "Nenhuma empresa selecionada"
+    },
+    "settings": {
+      "title": "Configurações da Empresa",
+      "primaryColor": "Cor Primária",
+      "secondaryColor": "Cor Secundária",
+      "enabledLanguages": "Idiomas Habilitados",
+      "updateSuccess": "Configurações da empresa atualizadas com sucesso!",
+      "updateError": "Erro ao atualizar configurações da empresa",
+      "loadError": "Erro ao carregar configurações da empresa"
+    },
+    "limits": {
+      "title": "Limites da Empresa",
+      "maxTableUsers": "Usuários de Mesa",
+      "maxWaiterUsers": "Garçons",
+      "maxKitchenUsers": "Usuários da Cozinha",
+      "maxAttendantUsers": "Atendentes",
+      "loadError": "Erro ao carregar limites da empresa"
     }
   },
   "users": {
