@@ -276,7 +276,10 @@
       "products": "Produtos",
       "categories": "Categorias",
       "edit": "Editar",
-      "new": "Novo"
+      "new": "Novo",
+      "business": "Empresa",
+      "info": "Informações",
+      "limits": "Limites"
     }
   },
   "orderSession": {
@@ -297,5 +300,129 @@
     "errorCode": "404",
     "title": "Página não encontrada",
     "description": "A página que você está procurando não existe ou foi removida."
+  },
+  "business": {
+    "selector": {
+      "select": "Selecionar Empresa",
+      "selected": "Empresa selecionada: {{name}}",
+      "search": "Buscar empresa...",
+      "searchLabel": "Buscar",
+      "noResults": "Nenhuma empresa encontrada",
+      "title": "Selecionar Empresa",
+      "description": "Escolha a empresa para visualizar os dados",
+      "placeholder": "Selecionar empresa",
+      "searchPlaceholder": "Buscar empresa...",
+      "emptyMessage": "Nenhuma empresa encontrada"
+    },
+    "menu": {
+      "title": "Empresa",
+      "info": "Informações",
+      "settings": "Configurações",
+      "limits": "Limites"
+    },
+    "actions": {
+      "edit": "Editar",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "saving": "Salvando..."
+    },
+    "info": {
+      "title": "Informações da Empresa",
+      "name": "Nome",
+      "logo": "Logo",
+      "address": "Endereço",
+      "street": "Rua",
+      "number": "Número",
+      "complement": "Complemento",
+      "neighborhood": "Bairro",
+      "city": "Cidade",
+      "state": "Estado",
+      "country": "País",
+      "zipCode": "CEP",
+      "updateSuccess": "Informações da empresa atualizadas com sucesso!",
+      "updateError": "Erro ao atualizar informações da empresa",
+      "loadError": "Erro ao carregar informações da empresa",
+      "noBusinessSelected": "Nenhuma empresa selecionada"
+    },
+    "settings": {
+      "title": "Configurações da Empresa",
+      "primaryColor": "Cor Primária",
+      "secondaryColor": "Cor Secundária",
+      "enabledLanguages": "Idiomas Habilitados",
+      "updateSuccess": "Configurações da empresa atualizadas com sucesso!",
+      "updateError": "Erro ao atualizar configurações da empresa",
+      "loadError": "Erro ao carregar configurações da empresa"
+    },
+    "limits": {
+      "title": "Limites da Empresa",
+      "maxTableUsers": "Usuários de Mesa",
+      "maxWaiterUsers": "Garçons",
+      "maxKitchenUsers": "Usuários da Cozinha",
+      "maxAttendantUsers": "Atendentes",
+      "loadError": "Erro ao carregar limites da empresa"
+    }
+  },
+  "users": {
+    "pageTitle": "Usuários",
+    "pageSubtitle": "Gerencie os usuários do sistema",
+    "table": {
+      "columns": {
+        "name": "Nome",
+        "username": "Usuário",
+        "email": "E-mail",
+        "role": "Perfil",
+        "customPermissions": "Permissões Customizadas",
+        "createdAt": "Criado em",
+        "updatedAt": "Atualizado em",
+        "disabledAt": "Desativado em"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar por nome, usuário ou e-mail...",
+      "title": "Filtros",
+      "role": "Perfil",
+      "selectRoles": "Selecionar perfis...",
+      "includeDeleted": "Incluir desabilitados",
+      "clear": "Limpar",
+      "apply": "Aplicar"
+    },
+    "form": {
+      "editTitle": "Editar Usuário",
+      "fields": {
+        "name": "Nome",
+        "username": "Usuário",
+        "email": "E-mail",
+        "role": "Perfil"
+      },
+      "save": "Salvar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "disable": "Desabilitar"
+    },
+    "confirmDisable": {
+      "title": "Desabilitar Usuário",
+      "description": "Tem certeza que deseja desabilitar este usuário? Ele não poderá mais acessar o sistema.",
+      "confirm": "Desabilitar"
+    },
+    "emptyState": "Nenhum usuário encontrado",
+    "success": {
+      "disable": "Usuário desabilitado com sucesso"
+    },
+    "errors": {
+      "loadFailed": "Erro ao carregar usuários",
+      "disableFailed": "Erro ao desabilitar usuário"
+    },
+    "roles": {
+      "owner": "Proprietário",
+      "admin": "Administrador",
+      "table": "Mesa",
+      "kitchen": "Cozinha",
+      "customer": "Cliente",
+      "attendant": "Atendente",
+      "waiter": "Garçom",
+      "system_manager": "Gerenciador de sistema"
+    }
   }
 }

@@ -1,7 +1,10 @@
 import { api } from "@/services/api";
 import { authObservable } from "@/shared/subjects/auth";
+import { permissionsObservable } from "@/shared/subjects/permissions.subject";
 import { StorageKeys } from "@/shared/constants/storage-keys";
-import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { permissionsService } from "@/services/permissions/permissions.service";
+import { logger } from "@/lib/logger";
 import type { AuthData } from "@/shared/subjects/auth";
 
 type LoginSuccess = { data: AuthData };
@@ -23,13 +26,14 @@ interface LoginApiResponse {
   refreshToken: string;
 }
 
-const roleToProfile: Record<string, UserProfileEnum> = {
-  admin: UserProfileEnum.ADMIN,
-  table: UserProfileEnum.MESA,
-  kitchen: UserProfileEnum.COZINHA,
-  customer: UserProfileEnum.DELIVERY,
-  attendant: UserProfileEnum.ATTENDANT,
-  owner: UserProfileEnum.OWNER
+const roleToProfile: Record<string, UserRoleEnum> = {
+  admin: UserRoleEnum.ADMIN,
+  table: UserRoleEnum.TABLE,
+  kitchen: UserRoleEnum.KITCHEN,
+  customer: UserRoleEnum.CUSTOMER,
+  attendant: UserRoleEnum.ATTENDANT,
+  owner: UserRoleEnum.OWNER,
+  system_manager: UserRoleEnum.SYSTEM_MANAGER
 };
 
 class AuthService {
@@ -50,7 +54,7 @@ class AuthService {
       sessionStorage.setItem(StorageKeys.ACCESS_TOKEN, accessToken);
       sessionStorage.setItem(StorageKeys.REFRESH_TOKEN, refreshToken);
 
-      const profile = roleToProfile[user.role] ?? UserProfileEnum.ATTENDANT;
+      const profile = roleToProfile[user.role] ?? UserRoleEnum.ATTENDANT;
 
       const authData: AuthData = {
         username: user.email ?? username,
@@ -59,6 +63,21 @@ class AuthService {
       };
 
       authObservable.setAuth(authData);
+
+      const permissionsResult = await permissionsService.getMyPermissions();
+      const hasPermissionsError = "error" in permissionsResult;
+      if (hasPermissionsError) {
+        logger.error(
+          "[authService.login] Erro ao carregar permissões",
+          new Error(permissionsResult.error)
+        );
+      } else {
+        permissionsObservable.setPermissions({
+          userId: permissionsResult.data.userId,
+          role: permissionsResult.data.role,
+          permissions: permissionsResult.data.permissions,
+        });
+      }
 
       return { data: authData };
     } catch (error) {
@@ -71,9 +90,11 @@ class AuthService {
   async logout(): Promise<LogoutResult> {
     try {
       authObservable.clearAuth();
+      permissionsObservable.clear();
       return { data: { success: true } };
     } catch (error) {
       authObservable.clearAuth();
+      permissionsObservable.clear();
       return { data: { success: true } };
     }
   }

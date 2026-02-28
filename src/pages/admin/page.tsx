@@ -1,13 +1,13 @@
 import { useAuth } from "@/shared/hooks/useAuth";
-import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 
 export function AdminPage() {
   const { auth } = useAuth();
 
   const userProfile = auth?.profile;
-  const fullAdminProfiles = [UserProfileEnum.OWNER, UserProfileEnum.ADMIN];
+  const fullAdminProfiles = [UserRoleEnum.OWNER, UserRoleEnum.ADMIN];
   const isFullAdmin = fullAdminProfiles.includes(
-    userProfile as UserProfileEnum,
+    userProfile as UserRoleEnum,
   );
 
   return (

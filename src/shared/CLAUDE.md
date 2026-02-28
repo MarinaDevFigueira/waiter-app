@@ -220,8 +220,7 @@ Constantes compartilhadas do projeto.
 ### Constantes Disponíveis
 
 - **storage-keys.ts** - Chaves do localStorage
-- **route-map.ts** - Mapeamento de rotas
-- **user-profile.ts** - Perfis de usuário (CUSTOMER, KITCHEN, ADMIN)
+- **route-map.ts** - Mapeamento de rotas (usa UserRoleEnum de @/shared/enums/user-role.enum)
 - **splash.ts** - Configurações da splash screen
 
 ### Exemplo: Storage Keys

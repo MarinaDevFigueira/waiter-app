@@ -276,7 +276,10 @@
       "products": "Products",
       "categories": "Categories",
       "edit": "Edit",
-      "new": "New"
+      "new": "New",
+      "business": "Business",
+      "info": "Information",
+      "limits": "Limits"
     }
   },
   "orderSession": {
@@ -297,5 +300,129 @@
     "errorCode": "404",
     "title": "Page not found",
     "description": "The page you are looking for does not exist or has been removed."
+  },
+  "business": {
+    "selector": {
+      "select": "Select Business",
+      "selected": "Business selected: {{name}}",
+      "search": "Search business...",
+      "searchLabel": "Search",
+      "noResults": "No business found",
+      "title": "Select Business",
+      "description": "Choose the business to view data",
+      "placeholder": "Select business",
+      "searchPlaceholder": "Search business...",
+      "emptyMessage": "No business found"
+    },
+    "menu": {
+      "title": "Business",
+      "info": "Information",
+      "settings": "Settings",
+      "limits": "Limits"
+    },
+    "actions": {
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    },
+    "info": {
+      "title": "Business Information",
+      "name": "Name",
+      "logo": "Logo",
+      "address": "Address",
+      "street": "Street",
+      "number": "Number",
+      "complement": "Complement",
+      "neighborhood": "Neighborhood",
+      "city": "City",
+      "state": "State",
+      "country": "Country",
+      "zipCode": "Zip Code",
+      "updateSuccess": "Business information updated successfully!",
+      "updateError": "Error updating business information",
+      "loadError": "Error loading business information",
+      "noBusinessSelected": "No business selected"
+    },
+    "settings": {
+      "title": "Business Settings",
+      "primaryColor": "Primary Color",
+      "secondaryColor": "Secondary Color",
+      "enabledLanguages": "Enabled Languages",
+      "updateSuccess": "Business settings updated successfully!",
+      "updateError": "Error updating business settings",
+      "loadError": "Error loading business settings"
+    },
+    "limits": {
+      "title": "Business Limits",
+      "maxTableUsers": "Table Users",
+      "maxWaiterUsers": "Waiters",
+      "maxKitchenUsers": "Kitchen Users",
+      "maxAttendantUsers": "Attendants",
+      "loadError": "Error loading business limits"
+    }
+  },
+  "users": {
+    "pageTitle": "Users",
+    "pageSubtitle": "Manage system users",
+    "table": {
+      "columns": {
+        "name": "Name",
+        "username": "Username",
+        "email": "Email",
+        "role": "Role",
+        "customPermissions": "Custom Permissions",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "disabledAt": "Disabled at"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Search by name, username or email...",
+      "title": "Filters",
+      "role": "Role",
+      "selectRoles": "Select roles...",
+      "includeDeleted": "Include disabled",
+      "clear": "Clear",
+      "apply": "Apply"
+    },
+    "form": {
+      "editTitle": "Edit User",
+      "fields": {
+        "name": "Name",
+        "username": "Username",
+        "email": "Email",
+        "role": "Role"
+      },
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "edit": "Edit",
+      "disable": "Disable"
+    },
+    "confirmDisable": {
+      "title": "Disable User",
+      "description": "Are you sure you want to disable this user? They will no longer be able to access the system.",
+      "confirm": "Disable"
+    },
+    "emptyState": "No users found",
+    "success": {
+      "disable": "User disabled successfully"
+    },
+    "errors": {
+      "loadFailed": "Error loading users",
+      "disableFailed": "Error disabling user"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Administrator",
+      "table": "Table",
+      "kitchen": "Kitchen",
+      "customer": "Customer",
+      "attendant": "Attendant",
+      "waiter": "Waiter",
+      "system_manager": "System Manager"
+    }
   }
 }

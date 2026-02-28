@@ -47,162 +47,131 @@ Before using useEffect, ask:
 - `prefer-use-memo.md` - Using useMemo for derived state
 - `prefer-use-callback.md` - Using useCallback for stable functions
 
-## Specs Reference
+## Skills Reference
 
-This agent follows the specifications defined in:
+This agent follows specifications defined as skills in `.claude/skills/spec:*/SKILL.md`.
 
-### Project Specs (./.specs/)
-
-72 specification files:
+### Available Spec Skills (80 skills)
 
 **Code Style & Principles:**
-- `no-comments.spec.md` - Never add code comments
-- `no-hardcoded-values.spec.md` - Use Tailwind classes/theme variables
-- `no-barrel-exports.spec.md` - Import from specific file paths
-- `data-attributes-lowercase.spec.md` - Lowercase data-* attributes
-- `kiss-principle.spec.md` - Keep It Simple, Stupid
-- `dry-principle.spec.md` - Don't Repeat Yourself
-- `single-source-of-truth.spec.md` - One authoritative source
-- `utility-first-mindset.spec.md` - Utility-first approach
-- `extract-before-second-use.spec.md` - Extract on second use
-- `dont-replicate-logic.spec.md` - No logic duplication
-- `no-copy-paste-coding.spec.md` - Avoid copy-paste
+- `spec:no-comments` - Never add code comments
+- `spec:no-hardcoded-values` - Use Tailwind classes/theme variables
+- `spec:no-barrel-exports` - Import from specific file paths
+- `spec:data-attributes-lowercase` - Lowercase data-* attributes
+- `spec:kiss-principle` - Keep It Simple, Stupid
+- `spec:dry-principle` - Don't Repeat Yourself
+- `spec:single-source-of-truth` - One authoritative source
+- `spec:utility-first-mindset` - Utility-first approach
+- `spec:extract-before-second-use` - Extract on second use
+- `spec:dont-replicate-logic` - No logic duplication
+- `spec:no-copy-paste-coding` - Avoid copy-paste
+- `spec:no-ai-attribution` - No AI attribution in commits/PRs
+- `spec:mathematical-calculations` - Mathematical calculation patterns
 
 **Named Variables:**
-- `named-variables-in-conditionals.spec.md` - Extract conditionals
-- `named-variables-over-inline-ternaries.spec.md` - No inline ternaries
+- `spec:named-variables-in-conditionals` - Extract conditionals
+- `spec:named-variables-over-inline-ternaries` - No inline ternaries
 
 **React Patterns:**
-- `no-ternary-in-jsx.spec.md` - Extract ternaries from JSX
-- `no-chained-ternaries.spec.md` - Use if-else or maps
-- `no-inline-expressions-in-jsx.spec.md` - No inline arrays/objects/calculations
-- `component-variants.spec.md` - data-variant pattern
-- `conditional-rendering-with-data-attributes.spec.md` - **data-* attributes for conditional styling**
-- `always-use-composite-pattern.spec.md` - Composite component structure
-- `composite-component-pattern.spec.md` - Card.Header pattern
-- `use-memo-for-computed-values.spec.md` - useMemo for derived values
-- `use-callback-for-stable-references.spec.md` - useCallback for functions
-- `dependency-arrays.spec.md` - Only primitives/stable refs
-- `avoid-use-effect-anti-pattern.md` - **CRITICAL: Minimize useEffect usage**
-- `prefer-use-memo.md` - **Prefer useMemo for derived state**
-- `prefer-use-callback.md` - **Prefer useCallback for stable functions**
+- `spec:early-return-pattern` - Early return for different render structures
+- `spec:no-ternary-in-jsx` - Extract ternaries from JSX
+- `spec:no-chained-ternaries` - Use if-else or maps
+- `spec:usememo-conditional-content` - useMemo with early returns for conditional content
+- `spec:no-inline-expressions-in-jsx` - No inline arrays/objects/calculations
+- `spec:component-variants` - data-variant pattern
+- `spec:conditional-rendering-with-data-attributes` - data-* attributes for conditional styling
+- `spec:always-use-composite-pattern` - Composite component structure
+- `spec:composite-component-pattern` - Card.Header pattern
+- `spec:use-memo-for-computed-values` - useMemo for derived values
+- `spec:use-callback-for-stable-references` - useCallback for functions
+- `spec:prefer-use-memo` - Prefer useMemo for derived state
+- `spec:prefer-use-callback` - Prefer useCallback for stable functions
+- `spec:dependency-arrays` - Only primitives/stable refs
+- `spec:avoid-use-effect-anti-pattern` - CRITICAL: Minimize useEffect usage
 
 **TypeScript/Interfaces:**
-- `no-interface-in-implementation.spec.md` - Sibling *.interface.ts files
+- `spec:no-interface-in-implementation` - Sibling *.interface.ts files
 
 **Component Structure:**
-- `component-isolation-no-duplication.spec.md` - Reusable UI components
-- `component-test-coverage.spec.md` - __tests__/ with 3-5 tests
-- `button-interaction-states.spec.md` - cursor-pointer + active shadow
-- `group-data-attribute-pattern.spec.md` - group-data-[active=true] pattern
-- `page-component-structure.spec.md` - page.tsx + components/ folder
+- `spec:component-isolation-no-duplication` - Reusable UI components
+- `spec:component-test-coverage` - __tests__/ with 3-5 tests
+- `spec:button-interaction-states` - cursor-pointer + active shadow
+- `spec:group-data-attribute-pattern` - group-data-[active=true] pattern
+- `spec:page-component-structure` - page.tsx + components/ folder
 
 **State Management (RxJS):**
-- `rxjs-subject-pattern.spec.md` - Encapsulated BehaviorSubjects
-- `rxjs-subscription-cleanup.spec.md` - Unsubscribe in useEffect cleanup
-- `observable-state-management.spec.md` - **Observable pattern for shared/component state**
+- `spec:rxjs-subject-pattern` - Encapsulated BehaviorSubjects
+- `spec:rxjs-subscription-cleanup` - Unsubscribe in useEffect cleanup
+- `spec:observable-state-management` - Observable pattern for shared/component state
 
 **Routing (TanStack Router):**
-- `tanstack-router-file-based-routing.spec.md` - File-based routes
-- `tanstack-router-navigation.spec.md` - Link vs useNavigate
-- `tanstack-router-protected-routes.spec.md` - beforeLoad guards
-- `tanstack-router-not-found-handling.spec.md` - defaultNotFoundComponent
-- `tanstack-router-layout-outlet-pattern.spec.md` - <Outlet /> for children
-- `tanstack-router-context.spec.md` - Router context patterns
-- `profile-based-routing.spec.md` - Same / route, different content
-- `protected-route-profile-sync.spec.md` - Profile-based protection
-- `normalize-pathname-trailing-slash.spec.md` - Remove trailing slashes
+- `spec:tanstack-router-file-based-routing` - File-based routes
+- `spec:tanstack-router-navigation` - Link vs useNavigate
+- `spec:tanstack-router-protected-routes` - beforeLoad guards
+- `spec:tanstack-router-not-found-handling` - defaultNotFoundComponent
+- `spec:tanstack-router-layout-outlet-pattern` - <Outlet /> for children
+- `spec:tanstack-router-context` - Router context patterns
+- `spec:profile-based-routing` - Same / route, different content
+- `spec:protected-route-profile-sync` - Profile-based protection
+- `spec:normalize-pathname-trailing-slash` - Remove trailing slashes
 
 **Forms & Validation:**
-- `forms-rhf-tanstack-zod.spec.md` - React Hook Form + Zod v4
-- `product-form-translations.md` - Multi-language product translations
-- `product-form-structure.md` - Product form component organization
-- `product-form-state-management.md` - Product form state patterns
+- `spec:forms-rhf-tanstack-zod` - React Hook Form + Zod v4
+- `spec:product-form-translations` - Multi-language product translations
+- `spec:product-form-structure` - Product form component organization
+- `spec:product-form-state-management` - Product form state patterns
 
 **Data Fetching & Services:**
-- `error-handling-return-pattern.spec.md` - Return {data} or {error}
-- `write-operations-return-void.spec.md` - Create/update return void
-- `api-query-params-pattern.spec.md` - API filtering/sorting/pagination
-- `no-client-side-filtering.spec.md` - No .filter() on client
-- `service-schemas-pattern.spec.md` - Co-located schemas
-- `base-entity-pattern.spec.md` - Extend baseEntitySchema
-- `mock-data-schema-compliance.spec.md` - Mock data follows schemas
-- `api-client-refresh-token.spec.md` - Automatic token refresh
-- `auth-service-pattern.spec.md` - Authentication service patterns
+- `spec:error-handling-return-pattern` - Return {data} or {error}
+- `spec:write-operations-return-void` - Create/update return void
+- `spec:api-query-params-pattern` - API filtering/sorting/pagination
+- `spec:no-client-side-filtering` - No .filter() on client
+- `spec:service-schemas-pattern` - Co-located schemas
+- `spec:base-entity-pattern` - Extend baseEntitySchema
+- `spec:mock-data-schema-compliance` - Mock data follows schemas
+- `spec:api-client-refresh-token` - Automatic token refresh
+- `spec:auth-service-pattern` - Authentication service patterns
 
 **Tables (TanStack Table):**
-- `tanstack-table-pattern.spec.md` - useReactTable pattern
-- `tanstack-table-row-rendering.spec.md` - Check data length in parent
-- `table-loading-skeleton.spec.md` - Dedicated skeleton component
+- `spec:tanstack-table-pattern` - useReactTable pattern
+- `spec:tanstack-table-row-rendering` - Check data length in parent
+- `spec:table-loading-skeleton` - Dedicated skeleton component
 
 **Internationalization (i18n):**
-- `i18n-pattern.spec.md` - useTranslation hook
-- `use-translation-pattern.spec.md` - Translation patterns
-- `language-selector-pattern.spec.md` - Language selector component
+- `spec:i18n-pattern` - useTranslation hook
+- `spec:use-translation-pattern` - Translation patterns
+- `spec:language-selector-pattern` - Language selector component
 
 **Error Handling & Logging:**
-- `react-toastify-usage.spec.md` - toast.error/success
-- `logger-pattern.spec.md` - logger.debug/info/warn/error
-- `error-display-toast-logger.spec.md` - Toast + logger on error
+- `spec:react-toastify-usage` - toast.error/success
+- `spec:logger-pattern` - logger.debug/info/warn/error
+- `spec:error-display-toast-logger` - Toast + logger on error
 
 **Pagination:**
-- `pagination-hook-pattern.spec.md` - usePagination hook
+- `spec:pagination-hook-pattern` - usePagination hook
 
 **Testing (MCP Playwright):**
-- `component-test-coverage.spec.md` - Minimum test coverage
-- `data-testid-pattern.spec.md` - data-testid selectors
-- `selective-test-execution.spec.md` - Run affected tests
-- `test-before-commit.spec.md` - Test before commit using MCP Playwright
+- `spec:data-testid-pattern` - data-testid selectors
+- `spec:selective-test-execution` - Run affected tests
+- `spec:test-before-commit` - Test before commit using MCP Playwright
 
 **Layout & Styling:**
-- `responsive-layout-constraints.spec.md` - w-screen, max-w-7xl
-- `inaccessible-element-styling.spec.md` - text-muted, select-none
-- `custom-scrollbar-theme.spec.md` - Scrollbar CSS variables
-
-**Git:**
-- `no-ai-attribution.spec.md` - No AI attribution in commits/PRs
+- `spec:responsive-layout-constraints` - w-screen, max-w-7xl
+- `spec:inaccessible-element-styling` - text-muted, select-none
+- `spec:custom-scrollbar-theme` - Scrollbar CSS variables
+- `spec:swiper-navigation-buttons` - Navigation arrows with conditional visibility
 
 **Other:**
-- `foods-page.spec.md` - Foods page specific patterns
-- `README.md` - Project README
+- `spec:foods-page` - Foods page specific patterns
 
-### Global Specs (~/.specs/)
+### Loading Skills
 
-21 specification files:
+To load a specific skill for detailed guidance, use:
+```
+Skill tool with skill: "spec:skill-name"
+```
 
-**Code Style Fundamentals:**
-- `no-code-comments.spec.md` - Never add code comments
-- `eslint-no-disable.spec.md` - Never disable ESLint rules
-- `boolean-variable-extraction.spec.md` - Extract booleans before conditionals
-
-**Named Variables Philosophy (6 specs):**
-- `always-named-variables-never-inline-code.spec.md` - Core principle
-- `no-inline-function-arguments.spec.md` - Extract function arguments
-- `no-inline-object-properties.spec.md` - Extract object property values
-- `no-inline-return-expressions.spec.md` - Extract return expressions
-- `no-inline-conditionals.spec.md` - Extract conditional expressions
-- `no-inline-boolean-expressions.spec.md` - Extract boolean expressions
-
-**Git Practices:**
-- `git-commit-no-coauthor.spec.md` - No co-author attribution
-- `no-coauthor-attribution.spec.md` - No AI attribution in commits/PRs
-
-**Internationalization (5 specs):**
-- `i18n-translations-structure.spec.md` - Identical key structure across languages
-- `i18n-translations-enum.spec.md` - TypeScript enum for languages
-- `i18n-language-cookie-pattern.spec.md` - Language via HTTP cookie
-- `i18n-query-cache-invalidation.spec.md` - Language prefix in query keys
-- `i18n-backend-translations-array.spec.md` - translations[] array in DTOs
-
-**Testing:**
-- `playwright-testing.spec.md` - Playwright E2E testing configuration
-
-**SwiperJS (Carousels/Sliders - 5 specs):**
-- `swiperjs-basics.spec.md` - Installation, core concepts, configuration
-- `swiperjs-react.spec.md` - React components, hooks, events
-- `swiperjs-modules.spec.md` - Modular architecture (Navigation, Pagination, Effects, etc.)
-- `swiperjs-advanced-patterns.spec.md` - Performance, accessibility, best practices
-- `swiper-navigation-buttons.spec.md` - **Navigation arrows with conditional visibility pattern**
+Example: `Skill("spec:early-return-pattern")` for detailed early return pattern guidance.
 
 ---
 
@@ -415,6 +384,32 @@ const buttonProps = { variant };
 
 **Rationale:** Named variables make code self-documenting, easier to debug, and prevent deeply nested expressions. They act as self-documenting assertions about what conditions and values mean.
 
+#### 7. When to Use Intermediate Variables (GLOBAL SPEC)
+
+A decisão de extrair para variáveis intermediárias depende de: (1) complexidade da expressão e (2) significado semântico da variável.
+
+**USAR variável intermediária quando:**
+- Expressão envolve múltiplas operações (decomposição melhora leitura)
+- O nome adiciona contexto ao propósito do valor (ex: `trainingImage` vs `readImage('car1.png')`)
+- Cache de operação lenta/externa (evitar múltiplas chamadas)
+- Melhorar mensagens de erro (tratamento granular)
+- Facilitar debug (breakpoints e inspeção)
+
+```typescript
+// CORRETO — cada componente nomeado semanticamente
+const price = product.getPrice();
+const tax = calculateTax(jurisdiction, product);
+const discount = session.getActiveDiscount();
+const total = price + tax - discount;
+```
+
+**NÃO usar variável intermediária quando:**
+- Nome repete o nome da função (sem informação nova): `return getProductPrice();`
+- Propriedade já é contextualmente clara: `sendTo(customer.address);`
+- Cálculo intermediário não faz sentido semântico (ex: `taxMinusDiscount` não é um conceito real)
+
+**Regra de ouro:** Se não consegue nomear a variável de forma significativa, ela não deveria existir — ou a lógica precisa ser repensada.
+
 ### React Patterns
 
 #### No Ternary in JSX
@@ -446,6 +441,61 @@ let status = "default";
 if (isSuccess) status = "success";
 if (isWarning) status = "warning";
 ```
+
+#### Early Return Pattern
+
+When a component renders completely different structures based on a condition (mobile vs desktop, different user states), **NEVER** use inline ternary in return. Use **early return** pattern.
+
+```tsx
+// WRONG - inline ternary for different structures
+function ResponsiveComponent() {
+  const isMobile = useIsMobile();
+
+  return (
+    <>
+      <Button>Open</Button>
+      {isMobile ? (
+        <Drawer><Content /></Drawer>
+      ) : (
+        <Dialog><Content /></Dialog>
+      )}
+    </>
+  );
+}
+
+// CORRECT - early return pattern
+function ResponsiveComponent() {
+  const isMobile = useIsMobile();
+
+  const triggerButton = (
+    <Button>Open</Button>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        {triggerButton}
+        <Drawer><Content /></Drawer>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {triggerButton}
+      <Dialog><Content /></Dialog>
+    </>
+  );
+}
+```
+
+**When to use:**
+- Mobile vs Desktop layouts
+- Authenticated vs Unauthenticated views
+- Loading vs Error vs Success states
+- Different user profiles/roles
+
+**Extract shared elements** before the early return to avoid duplication.
 
 #### No Inline Expressions in JSX
 
@@ -537,6 +587,65 @@ const breadcrumbs = useMemo(() => {
   const segments = pathname.split("/").filter(Boolean);
   return segments.map(segment => ({ label: segment }));
 }, [pathname]);
+```
+
+#### useMemo with Early Returns for Conditional Content
+
+**ALWAYS** use `useMemo` with early returns for conditional content (loading, empty, list states). **NEVER** use nested ternaries.
+
+```tsx
+// WRONG - Nested ternaries are HORRIBLE and PROHIBITED
+const dropdownContent = shouldShowLoading
+  ? loadingState
+  : shouldShowEmpty
+    ? emptyState
+    : shouldShowList
+      ? businessList
+      : null;
+
+// CORRECT - useMemo with early returns
+const dropdownContent = useMemo(() => {
+  if (shouldShowLoading) {
+    return loadingState;
+  }
+  if (shouldShowEmpty) {
+    return emptyState;
+  }
+  if (shouldShowList) {
+    return businessList;
+  }
+  return null;
+}, [shouldShowLoading, shouldShowEmpty, shouldShowList, loadingState, emptyState, businessList]);
+```
+
+**Pattern for components with loading/empty/list states:**
+
+```tsx
+const items = data ?? [];
+const isEmptyList = items.length === 0;
+
+const shouldShowLoading = isLoading;
+const shouldShowEmpty = isEmptyList && !isLoading;
+const shouldShowList = !isLoading && !isEmptyList;
+
+const loadingState = (
+  <div className="text-muted-foreground">{t("common.loading")}</div>
+);
+
+const emptyState = (
+  <div className="text-muted-foreground">{emptyMessage}</div>
+);
+
+const itemsList = useMemo(() => {
+  return items.map((item) => <ItemComponent key={item.id} item={item} />);
+}, [items]);
+
+const content = useMemo(() => {
+  if (shouldShowLoading) return loadingState;
+  if (shouldShowEmpty) return emptyState;
+  if (shouldShowList) return itemsList;
+  return null;
+}, [shouldShowLoading, shouldShowEmpty, shouldShowList, loadingState, emptyState, itemsList]);
 ```
 
 #### useCallback for Stable References
@@ -1583,11 +1692,9 @@ When project specs conflict with global specs:
 
 ## Usage Notes
 
-- These specs are consolidated from:
-  - 66 project specs in `./.specs/`
-  - 21 global specs in `~/.specs/`
-- Global specs for code style (no comments, named variables, no ESLint disable, i18n patterns, SwiperJS patterns) take highest priority
-- Last updated: 2026-02-22
-- Total specs loaded: 90
+- Specifications are available as skills in `.claude/skills/spec:*/SKILL.md`
+- Use `Skill("spec:skill-name")` to load detailed guidance for any pattern
+- Last updated: 2026-02-28
+- Total spec skills: 80
 
-You can now use `@dev` in your conversations to apply these project-specific patterns and conventions with global best practices enforced.
+You can now use `@dev` in your conversations to apply these project-specific patterns and conventions.

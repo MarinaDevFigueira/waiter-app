@@ -1,17 +1,18 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useNavigate, useLocation, Link } from "@tanstack/react-router";
 import {
   SignOutIcon,
   HouseIcon,
   UsersIcon,
   ChartBarIcon,
-  GearIcon,
   PackageIcon,
   CaretLeftIcon,
   CaretRightIcon,
+  CaretDownIcon,
   CookingPotIcon,
-  List,
+  ListIcon,
   FolderIcon,
+  BuildingsIcon,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
@@ -21,14 +22,27 @@ import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
 import { LanguageSelector } from "@/components/ui/language-selector/language-selector";
 import { authService } from "@/services/auth/auth.service";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { StorageKeys } from "@/shared/constants/storage-keys";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import { BusinessSelectorButton } from "@/components/ui/business-selector-button/business-selector-button";
+import { DeviceTypeEnum } from "@/components/ui/business-selector-button/business-selector-button.interface";
 
 interface MenuItem {
   icon: Icon;
   label: string;
   path: string;
+}
+
+interface SubMenuItem {
+  label: string;
+  path: string;
+}
+
+interface MenuGroupItem {
+  icon: Icon;
+  label: string;
+  subItems: SubMenuItem[];
 }
 
 interface Breadcrumb {
@@ -51,6 +65,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return stored === "true";
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isBusinessExpanded, setIsBusinessExpanded] = useState(false);
 
   const handleLogout = async () => {
     await authService.logout();
@@ -65,11 +80,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     });
   };
 
+  const toggleBusinessMenu = useCallback(() => {
+    setIsBusinessExpanded((prev) => !prev);
+  }, []);
+
   const userProfile = auth?.profile;
-  const fullMenuProfiles = [UserProfileEnum.OWNER, UserProfileEnum.ADMIN];
+  const fullMenuProfiles = [UserRoleEnum.OWNER, UserRoleEnum.ADMIN];
   const hasFullMenuAccess = fullMenuProfiles.includes(
-    userProfile as UserProfileEnum,
+    userProfile as UserRoleEnum,
   );
+
+  const adminProfiles = [UserRoleEnum.ADMIN, UserRoleEnum.SYSTEM_MANAGER];
+  const shouldShowBusinessSelector = adminProfiles.includes(userProfile as UserRoleEnum);
 
   const menuItems = useMemo<MenuItem[]>(() => {
     const baseItems: MenuItem[] = [
@@ -82,11 +104,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     const adminOnlyItems: MenuItem[] = [
       { icon: FolderIcon, label: t("dashboard.navigation.categories"), path: "/dashboard/categories" },
       { icon: UsersIcon, label: t("dashboard.navigation.users"), path: "/dashboard/users" },
-      {
-        icon: GearIcon,
-        label: t("dashboard.navigation.settings"),
-        path: "/dashboard/settings",
-      },
     ];
 
     if (hasFullMenuAccess) {
@@ -96,9 +113,25 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return baseItems;
   }, [hasFullMenuAccess, t]);
 
+  const businessMenuGroup = useMemo<MenuGroupItem>(() => {
+    const subItems: SubMenuItem[] = [
+      { label: t("business.menu.info"), path: "/dashboard/business/info" },
+      { label: t("business.menu.settings"), path: "/dashboard/business/settings" },
+      { label: t("business.menu.limits"), path: "/dashboard/business/limits" },
+    ];
+
+    return {
+      icon: BuildingsIcon,
+      label: t("business.menu.title"),
+      subItems,
+    };
+  }, [t]);
+
   const pathname = location.pathname;
   const normalizedPathname =
     pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
+
+  const isBusinessSubpathActive = normalizedPathname.startsWith("/dashboard/business");
 
   const breadcrumbs = useMemo<Breadcrumb[]>(() => {
     const isExactlyDashboard = normalizedPathname === "/dashboard";
@@ -124,6 +157,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       categories: t("dashboard.breadcrumbs.categories"),
       edit: t("dashboard.breadcrumbs.edit"),
       new: t("dashboard.breadcrumbs.new"),
+      business: t("dashboard.breadcrumbs.business"),
+      info: t("dashboard.breadcrumbs.info"),
+      limits: t("dashboard.breadcrumbs.limits"),
     };
 
     return segments.map((segment, index) => {
@@ -134,6 +170,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     });
   }, [normalizedPathname, t]);
 
+  const businessSubItems = businessMenuGroup.subItems;
+  const BusinessIcon = businessMenuGroup.icon;
+
   return (
     <div className="w-screen h-screen flex bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
       <aside
@@ -141,10 +180,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         className="hidden md:flex flex-col bg-background border-r border-border data-[minimized=false]:w-64 data-[minimized=true]:w-16 transition-all duration-300 shadow-lg"
       >
         <div className="flex items-center justify-center h-14 sm:h-16 px-4 sm:px-6 md:px-8 border-b border-border relative">
-          <Logo
-            data-minimized={isMinimized}
-            className="text-lg data-[minimized=true]:hidden"
-          />
+          {shouldShowBusinessSelector ? (
+            <BusinessSelectorButton deviceType={DeviceTypeEnum.DESKTOP} />
+          ) : (
+            <Logo
+              data-minimized={isMinimized}
+              className="text-lg data-[minimized=true]:hidden"
+            />
+          )}
           <Button
             variant="ghost"
             size="icon-sm"
@@ -182,6 +225,57 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               </Link>
             );
           })}
+
+          {hasFullMenuAccess && (
+            <div>
+              <button
+                type="button"
+                onClick={toggleBusinessMenu}
+                data-active={isBusinessSubpathActive}
+                data-expanded={isBusinessExpanded}
+                className="group w-full flex items-center gap-3 px-3 py-2 rounded-md mb-1 transition-colors text-foreground hover:bg-secondary data-[active=true]:bg-sidebar-primary cursor-pointer"
+              >
+                <BusinessIcon
+                  size={20}
+                  className="shrink-0 group-data-[active=true]:text-white"
+                />
+                <span
+                  data-minimized={isMinimized}
+                  className="flex-1 text-sm text-left data-[minimized=true]:hidden group-data-[active=true]:text-white"
+                >
+                  {businessMenuGroup.label}
+                </span>
+                <CaretDownIcon
+                  size={16}
+                  data-expanded={isBusinessExpanded}
+                  data-minimized={isMinimized}
+                  className="shrink-0 transition-transform data-[expanded=true]:rotate-180 data-[minimized=true]:hidden group-data-[active=true]:text-white"
+                />
+              </button>
+
+              <div
+                data-expanded={isBusinessExpanded}
+                data-minimized={isMinimized}
+                className="overflow-hidden data-[expanded=false]:hidden data-[minimized=true]:hidden"
+              >
+                {businessSubItems.map((subItem) => {
+                  const isSubActive = normalizedPathname === subItem.path;
+                  return (
+                    <Link
+                      key={subItem.path}
+                      to={subItem.path}
+                      data-active={isSubActive}
+                      className="group flex items-center gap-3 pl-9 pr-3 py-2 rounded-md mb-1 transition-colors data-[active=false]:text-foreground data-[active=false]:hover:bg-secondary data-[active=true]:bg-sidebar-primary"
+                    >
+                      <span className="text-sm group-data-[active=true]:text-white">
+                        {subItem.label}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </nav>
 
         <div className="p-4 border-t border-border">
@@ -215,7 +309,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <Sheet.Content className="flex flex-col">
           <div className="flex items-center justify-center h-14 px-4 border-b border-border">
-            <Logo className="text-lg" />
+            {shouldShowBusinessSelector ? (
+              <BusinessSelectorButton deviceType={DeviceTypeEnum.MOBILE} />
+            ) : (
+              <Logo className="text-lg" />
+            )}
           </div>
 
           <nav className="flex-1 p-2">
@@ -240,6 +338,53 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               );
             })}
+
+            {hasFullMenuAccess && (
+              <div>
+                <button
+                  type="button"
+                  onClick={toggleBusinessMenu}
+                  data-active={isBusinessSubpathActive}
+                  data-expanded={isBusinessExpanded}
+                  className="group w-full flex items-center gap-3 px-3 py-2 rounded-md mb-1 transition-colors text-foreground hover:bg-secondary data-[active=true]:bg-sidebar-primary cursor-pointer"
+                >
+                  <BusinessIcon
+                    size={20}
+                    className="shrink-0 group-data-[active=true]:text-white"
+                  />
+                  <span className="flex-1 text-sm text-left group-data-[active=true]:text-white">
+                    {businessMenuGroup.label}
+                  </span>
+                  <CaretDownIcon
+                    size={16}
+                    data-expanded={isBusinessExpanded}
+                    className="shrink-0 transition-transform data-[expanded=true]:rotate-180 group-data-[active=true]:text-white"
+                  />
+                </button>
+
+                <div
+                  data-expanded={isBusinessExpanded}
+                  className="overflow-hidden data-[expanded=false]:hidden"
+                >
+                  {businessSubItems.map((subItem) => {
+                    const isSubActive = normalizedPathname === subItem.path;
+                    return (
+                      <Link
+                        key={subItem.path}
+                        to={subItem.path}
+                        data-active={isSubActive}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="group flex items-center gap-3 pl-9 pr-3 py-2 rounded-md mb-1 transition-colors data-[active=false]:text-foreground data-[active=false]:hover:bg-secondary data-[active=true]:bg-sidebar-primary"
+                      >
+                        <span className="text-sm group-data-[active=true]:text-white">
+                          {subItem.label}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </nav>
 
           <div className="p-4 border-t border-border">
@@ -273,7 +418,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 data-testid="mobile-menu-button"
                 className="md:hidden"
               >
-                <List size={20} />
+                <ListIcon size={20} />
               </Button>
               <Link
                 to="/dashboard"

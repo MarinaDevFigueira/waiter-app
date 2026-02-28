@@ -19,6 +19,9 @@ import { Route as DashboardReportsRouteImport } from './routes/dashboard/reports
 import { Route as DashboardOrdersRouteImport } from './routes/dashboard/orders'
 import { Route as DashboardProductsRouteRouteImport } from './routes/dashboard/products/route'
 import { Route as DashboardCategoriesIndexRouteImport } from './routes/dashboard/categories/index'
+import { Route as DashboardBusinessSettingsRouteImport } from './routes/dashboard/business/settings'
+import { Route as DashboardBusinessLimitsRouteImport } from './routes/dashboard/business/limits'
+import { Route as DashboardBusinessInfoRouteImport } from './routes/dashboard/business/info'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -71,6 +74,22 @@ const DashboardCategoriesIndexRoute =
     path: '/categories/',
     getParentRoute: () => DashboardRouteRoute,
   } as any)
+const DashboardBusinessSettingsRoute =
+  DashboardBusinessSettingsRouteImport.update({
+    id: '/business/settings',
+    path: '/business/settings',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardBusinessLimitsRoute = DashboardBusinessLimitsRouteImport.update({
+  id: '/business/limits',
+  path: '/business/limits',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardBusinessInfoRoute = DashboardBusinessInfoRouteImport.update({
+  id: '/business/info',
+  path: '/business/info',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +101,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/business/info': typeof DashboardBusinessInfoRoute
+  '/dashboard/business/limits': typeof DashboardBusinessLimitsRoute
+  '/dashboard/business/settings': typeof DashboardBusinessSettingsRoute
   '/dashboard/categories': typeof DashboardCategoriesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +115,9 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/business/info': typeof DashboardBusinessInfoRoute
+  '/dashboard/business/limits': typeof DashboardBusinessLimitsRoute
+  '/dashboard/business/settings': typeof DashboardBusinessSettingsRoute
   '/dashboard/categories': typeof DashboardCategoriesIndexRoute
 }
 export interface FileRoutesById {
@@ -106,6 +131,9 @@ export interface FileRoutesById {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/business/info': typeof DashboardBusinessInfoRoute
+  '/dashboard/business/limits': typeof DashboardBusinessLimitsRoute
+  '/dashboard/business/settings': typeof DashboardBusinessSettingsRoute
   '/dashboard/categories/': typeof DashboardCategoriesIndexRoute
 }
 export interface FileRouteTypes {
@@ -120,6 +148,9 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/users'
     | '/dashboard/'
+    | '/dashboard/business/info'
+    | '/dashboard/business/limits'
+    | '/dashboard/business/settings'
     | '/dashboard/categories'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -131,6 +162,9 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/users'
     | '/dashboard'
+    | '/dashboard/business/info'
+    | '/dashboard/business/limits'
+    | '/dashboard/business/settings'
     | '/dashboard/categories'
   id:
     | '__root__'
@@ -143,6 +177,9 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/users'
     | '/dashboard/'
+    | '/dashboard/business/info'
+    | '/dashboard/business/limits'
+    | '/dashboard/business/settings'
     | '/dashboard/categories/'
   fileRoutesById: FileRoutesById
 }
@@ -224,6 +261,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCategoriesIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/business/settings': {
+      id: '/dashboard/business/settings'
+      path: '/business/settings'
+      fullPath: '/dashboard/business/settings'
+      preLoaderRoute: typeof DashboardBusinessSettingsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/business/limits': {
+      id: '/dashboard/business/limits'
+      path: '/business/limits'
+      fullPath: '/dashboard/business/limits'
+      preLoaderRoute: typeof DashboardBusinessLimitsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/business/info': {
+      id: '/dashboard/business/info'
+      path: '/business/info'
+      fullPath: '/dashboard/business/info'
+      preLoaderRoute: typeof DashboardBusinessInfoRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
   }
 }
 
@@ -234,6 +292,9 @@ interface DashboardRouteRouteChildren {
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardBusinessInfoRoute: typeof DashboardBusinessInfoRoute
+  DashboardBusinessLimitsRoute: typeof DashboardBusinessLimitsRoute
+  DashboardBusinessSettingsRoute: typeof DashboardBusinessSettingsRoute
   DashboardCategoriesIndexRoute: typeof DashboardCategoriesIndexRoute
 }
 
@@ -244,6 +305,9 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardBusinessInfoRoute: DashboardBusinessInfoRoute,
+  DashboardBusinessLimitsRoute: DashboardBusinessLimitsRoute,
+  DashboardBusinessSettingsRoute: DashboardBusinessSettingsRoute,
   DashboardCategoriesIndexRoute: DashboardCategoriesIndexRoute,
 }
 

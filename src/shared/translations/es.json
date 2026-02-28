@@ -276,7 +276,10 @@
       "products": "Productos",
       "categories": "Categorías",
       "edit": "Editar",
-      "new": "Nuevo"
+      "new": "Nuevo",
+      "business": "Empresa",
+      "info": "Información",
+      "limits": "Límites"
     }
   },
   "orderSession": {
@@ -297,5 +300,129 @@
     "errorCode": "404",
     "title": "Página no encontrada",
     "description": "La página que estás buscando no existe o ha sido eliminada."
+  },
+  "business": {
+    "selector": {
+      "select": "Seleccionar Empresa",
+      "selected": "Empresa seleccionada: {{name}}",
+      "search": "Buscar empresa...",
+      "searchLabel": "Buscar",
+      "noResults": "Ninguna empresa encontrada",
+      "title": "Seleccionar Empresa",
+      "description": "Elija la empresa para ver los datos",
+      "placeholder": "Seleccionar empresa",
+      "searchPlaceholder": "Buscar empresa...",
+      "emptyMessage": "Ninguna empresa encontrada"
+    },
+    "menu": {
+      "title": "Empresa",
+      "info": "Información",
+      "settings": "Configuración",
+      "limits": "Límites"
+    },
+    "actions": {
+      "edit": "Editar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "saving": "Guardando..."
+    },
+    "info": {
+      "title": "Información de la Empresa",
+      "name": "Nombre",
+      "logo": "Logo",
+      "address": "Dirección",
+      "street": "Calle",
+      "number": "Número",
+      "complement": "Complemento",
+      "neighborhood": "Barrio",
+      "city": "Ciudad",
+      "state": "Estado",
+      "country": "País",
+      "zipCode": "Código Postal",
+      "updateSuccess": "¡Información de la empresa actualizada con éxito!",
+      "updateError": "Error al actualizar la información de la empresa",
+      "loadError": "Error al cargar la información de la empresa",
+      "noBusinessSelected": "Ninguna empresa seleccionada"
+    },
+    "settings": {
+      "title": "Configuración de la Empresa",
+      "primaryColor": "Color Primario",
+      "secondaryColor": "Color Secundario",
+      "enabledLanguages": "Idiomas Habilitados",
+      "updateSuccess": "¡Configuración de la empresa actualizada con éxito!",
+      "updateError": "Error al actualizar la configuración de la empresa",
+      "loadError": "Error al cargar la configuración de la empresa"
+    },
+    "limits": {
+      "title": "Límites de la Empresa",
+      "maxTableUsers": "Usuarios de Mesa",
+      "maxWaiterUsers": "Meseros",
+      "maxKitchenUsers": "Usuarios de Cocina",
+      "maxAttendantUsers": "Atendientes",
+      "loadError": "Error al cargar los límites de la empresa"
+    }
+  },
+  "users": {
+    "pageTitle": "Usuarios",
+    "pageSubtitle": "Gestiona los usuarios del sistema",
+    "table": {
+      "columns": {
+        "name": "Nombre",
+        "username": "Usuario",
+        "email": "Correo electrónico",
+        "role": "Perfil",
+        "customPermissions": "Permisos Personalizados",
+        "createdAt": "Creado el",
+        "updatedAt": "Actualizado el",
+        "disabledAt": "Desactivado en"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar por nombre, usuario o correo...",
+      "title": "Filtros",
+      "role": "Perfil",
+      "selectRoles": "Seleccionar perfiles...",
+      "includeDeleted": "Incluir deshabilitados",
+      "clear": "Limpiar",
+      "apply": "Aplicar"
+    },
+    "form": {
+      "editTitle": "Editar Usuario",
+      "fields": {
+        "name": "Nombre",
+        "username": "Usuario",
+        "email": "Correo electrónico",
+        "role": "Perfil"
+      },
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "disable": "Deshabilitar"
+    },
+    "confirmDisable": {
+      "title": "Deshabilitar Usuario",
+      "description": "¿Estás seguro de que deseas deshabilitar este usuario? Ya no podrá acceder al sistema.",
+      "confirm": "Deshabilitar"
+    },
+    "emptyState": "No se encontraron usuarios",
+    "success": {
+      "disable": "Usuario deshabilitado con éxito"
+    },
+    "errors": {
+      "loadFailed": "Error al cargar usuarios",
+      "disableFailed": "Error al deshabilitar usuario"
+    },
+    "roles": {
+      "owner": "Propietario",
+      "admin": "Administrador",
+      "table": "Mesa",
+      "kitchen": "Cocina",
+      "customer": "Cliente",
+      "attendant": "Asistente",
+      "waiter": "Camarero",
+      "system_manager": "Administrador del sistema"
+    }
   }
 }

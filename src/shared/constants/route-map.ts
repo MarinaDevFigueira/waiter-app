@@ -1,21 +1,21 @@
-import { UserProfileEnum } from "./user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 
 type RouteRecord = Record<string, string>;
 
-export const RouteMap: Record<UserProfileEnum, RouteRecord> = {
-  [UserProfileEnum.MESA]: {
+export const RouteMap: Record<UserRoleEnum, RouteRecord> = {
+  [UserRoleEnum.TABLE]: {
     home: "/",
     foods: "/waiter/foods",
     orders: "/waiter/orders",
     newOrder: "/waiter/new-order",
   },
-  [UserProfileEnum.DELIVERY]: {
+  [UserRoleEnum.CUSTOMER]: {
     home: "/",
     foods: "/waiter/foods",
     orders: "/waiter/orders",
     deliveries: "/waiter/deliveries",
   },
-  [UserProfileEnum.OWNER]: {
+  [UserRoleEnum.OWNER]: {
     home: "/",
     dashboard: "/dashboard",
     users: "/dashboard/users",
@@ -23,32 +23,48 @@ export const RouteMap: Record<UserProfileEnum, RouteRecord> = {
     settings: "/dashboard/settings",
     products: "/dashboard/products",
   },
-  [UserProfileEnum.ATTENDANT]: {
+  [UserRoleEnum.ATTENDANT]: {
     home: "/",
     dashboard: "/dashboard",
     reports: "/dashboard/reports",
     orders: "/dashboard/orders",
   },
-  [UserProfileEnum.COZINHA]: {
+  [UserRoleEnum.KITCHEN]: {
     home: "/",
     kitchen: "/kitchen",
     orders: "/kitchen/orders",
     inventory: "/kitchen/inventory",
   },
-  [UserProfileEnum.ADMIN]: {
+  [UserRoleEnum.ADMIN]: {
     home: "/",
     dashboard: "/dashboard",
     reports: "/dashboard/reports",
     users: "/dashboard/users",
-    business: "/dashboard/business"
-  }
+    business: "/dashboard/business",
+  },
+  [UserRoleEnum.SYSTEM_MANAGER]: {
+    home: "/",
+    dashboard: "/dashboard",
+    reports: "/dashboard/reports",
+    users: "/dashboard/users",
+    business: "/dashboard/business",
+  },
+  [UserRoleEnum.WAITER]: {
+    home: "/",
+    foods: "/waiter/foods",
+    orders: "/waiter/orders",
+    newOrder: "/waiter/new-order",
+  },
 };
 
-export const getRoutesForProfile = (profile: UserProfileEnum): RouteRecord => {
+export const getRoutesForProfile = (profile: UserRoleEnum): RouteRecord => {
   return RouteMap[profile] ?? {};
 };
 
-export const canAccessRoute = (profile: UserProfileEnum, route: string): boolean => {
+export const canAccessRoute = (
+  profile: UserRoleEnum,
+  route: string,
+): boolean => {
   const routes = getRoutesForProfile(profile);
   return Object.values(routes).includes(route);
 };

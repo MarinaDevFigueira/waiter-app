@@ -27,14 +27,11 @@ This agent **NEVER** writes or edits source code files. It only:
 - Reads and edits planning documents (`tasks/`, PRDs, etc.)
 - Provides recommendations and validates plans
 
-## ⚠️ CRITICAL: Always Read Specs First
+## ⚠️ CRITICAL: Always Load Spec Skills First
 
-**BEFORE** validating or creating any plan, ALWAYS read the spec files:
+**BEFORE** validating or creating any plan, load relevant spec skills from `.claude/skills/spec:*/SKILL.md`.
 
-1. **Global specs:** Read all files matching `~/.specs/*.spec.md`
-2. **Project specs:** Read all files matching `.specs/*.spec.md`
-
-These specs define the coding standards, patterns, and conventions that ALL plans must follow. Never skip this step.
+These skills define the coding standards, patterns, and conventions that ALL plans must follow. Use `Skill("spec:skill-name")` to load detailed guidance when needed.
 
 ## Specs Summary
 
@@ -72,22 +69,24 @@ Variable naming prefixes:
 For 3+ comparisons with `||`, ALWAYS use array + `.includes()`:
 
 ```typescript
-const adminProfiles = [UserProfileEnum.OWNER, UserProfileEnum.ADMIN, UserProfileEnum.ATTENDANT];
-const hasAdminAccess = adminProfiles.includes(profile as UserProfileEnum);
+const adminProfiles = [UserRoleEnum.OWNER, UserRoleEnum.ADMIN, UserRoleEnum.ATTENDANT];
+const hasAdminAccess = adminProfiles.includes(profile as UserRoleEnum);
 ```
 
 NEVER suggest chained `||` comparisons:
 
 ```typescript
-const isAdmin = profile === UserProfileEnum.OWNER || profile === UserProfileEnum.ADMIN || profile === UserProfileEnum.ATTENDANT;
+const isAdmin = profile === UserRoleEnum.OWNER || profile === UserRoleEnum.ADMIN || profile === UserRoleEnum.ATTENDANT;
 ```
 
 ### React Patterns
 
+- **Early return pattern** — For different render structures (mobile/desktop, auth states), use early return instead of inline ternary
 - **No ternary in JSX** — Extract to named variables or useMemo
 - **No logical AND (&&) in JSX** — Use useMemo with early return null
 - **No nullish coalescing (??) in JSX** — Extract to named variable
 - **No chained ternaries** — Use if-else or object maps
+- **useMemo with early returns** — For conditional content (loading/empty/list), use useMemo with if-statements, NEVER nested ternaries
 - **No inline expressions in JSX** — Extract arrays, objects, functions, calculations
 - **Named variables in conditionals** — Always extract before if statements
 - **Component variants** — Use data-variant pattern with data-* attributes
@@ -161,14 +160,11 @@ const isAdmin = profile === UserProfileEnum.OWNER || profile === UserProfileEnum
 
 ## Planning Workflow
 
-### Step 1: Read Specs
+### Step 1: Load Relevant Spec Skills
 
-```
-Glob pattern="*.spec.md" path="~/.specs"
-Glob pattern="*.spec.md" path=".specs"
-```
+Load spec skills relevant to the task domain using `Skill("spec:skill-name")`.
 
-Read relevant spec files based on the task domain.
+Available spec skills are in `.claude/skills/spec:*/SKILL.md`.
 
 ### Step 2: Analyze Current State
 
@@ -220,5 +216,20 @@ When validating a plan, output:
 
 When specs conflict:
 
-1. **Global specs (~/.specs/) ALWAYS take precedence** for: no comments, no AI attribution, never disable ESLint, named variables philosophy (6 specs), boolean variable extraction, i18n patterns
-2. **Project specs (.specs/) take precedence** for: architecture patterns, component structure, API patterns, business logic, domain rules
+1. **Critical specs ALWAYS take precedence** for: no comments, no AI attribution, never disable ESLint, named variables philosophy, boolean variable extraction, i18n patterns
+2. **Project-specific specs take precedence** for: architecture patterns, component structure, API patterns, business logic, domain rules
+
+## Available Spec Skills
+
+All specs are available as skills in `.claude/skills/spec:*/SKILL.md`. Key skills include:
+
+- `spec:no-comments` - No code comments
+- `spec:no-ai-attribution` - No AI attribution
+- `spec:named-variables-in-conditionals` - Named variables philosophy
+- `spec:early-return-pattern` - Early return for conditional rendering
+- `spec:usememo-conditional-content` - useMemo with early returns
+- `spec:composite-component-pattern` - Composite component structure
+- `spec:error-handling-return-pattern` - Service Result Pattern
+- `spec:i18n-pattern` - Internationalization patterns
+
+Use `Skill("spec:skill-name")` to load detailed guidance for any pattern.

@@ -5,7 +5,7 @@ import { cartObservable, type CartData, type CartItem } from "@/shared/subjects/
 import { orderSessionsService } from "@/services/order-sessions/order-sessions.service";
 import { ordersService } from "@/services/orders/orders.service";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { logger } from "@/lib/logger";
 import { useLanguage } from "@/shared/hooks/useLanguage";
 
@@ -33,7 +33,7 @@ export function useCart(): UseCartReturn {
   }, []);
 
   useEffect(() => {
-    const isMesaProfile = auth?.profile === UserProfileEnum.MESA;
+    const isMesaProfile = auth?.profile === UserRoleEnum.TABLE;
     if (!isMesaProfile) return;
 
     const initializeSession = async (): Promise<void> => {
@@ -72,7 +72,7 @@ export function useCart(): UseCartReturn {
   }, [auth]);
 
   const ensureOrderSession = async (): Promise<boolean> => {
-    const isMesaProfile = auth?.profile === UserProfileEnum.MESA;
+    const isMesaProfile = auth?.profile === UserRoleEnum.TABLE;
     if (!isMesaProfile) return true;
 
     const currentCart = cartObservable.getValue();
@@ -167,7 +167,7 @@ export function useCart(): UseCartReturn {
     try {
       const currentCart = cartObservable.getValue();
       const hasSessionId = Boolean(currentCart.orderSessionId);
-      const isMesaProfile = auth?.profile === UserProfileEnum.MESA;
+      const isMesaProfile = auth?.profile === UserRoleEnum.TABLE;
 
       if (hasSessionId && isMesaProfile) {
         const result = await orderSessionsService.close(currentCart.orderSessionId as string);
@@ -188,7 +188,7 @@ export function useCart(): UseCartReturn {
     setIsLoading(true);
     try {
       const currentCart = cartObservable.getValue();
-      const isMesaProfile = auth?.profile === UserProfileEnum.MESA;
+      const isMesaProfile = auth?.profile === UserRoleEnum.TABLE;
 
       const orderItems = currentCart.items.map((item) => ({
         name: item.productName,
