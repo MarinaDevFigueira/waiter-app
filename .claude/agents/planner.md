@@ -72,22 +72,24 @@ Variable naming prefixes:
 For 3+ comparisons with `||`, ALWAYS use array + `.includes()`:
 
 ```typescript
-const adminProfiles = [UserProfileEnum.OWNER, UserProfileEnum.ADMIN, UserProfileEnum.ATTENDANT];
-const hasAdminAccess = adminProfiles.includes(profile as UserProfileEnum);
+const adminProfiles = [UserRoleEnum.OWNER, UserRoleEnum.ADMIN, UserRoleEnum.ATTENDANT];
+const hasAdminAccess = adminProfiles.includes(profile as UserRoleEnum);
 ```
 
 NEVER suggest chained `||` comparisons:
 
 ```typescript
-const isAdmin = profile === UserProfileEnum.OWNER || profile === UserProfileEnum.ADMIN || profile === UserProfileEnum.ATTENDANT;
+const isAdmin = profile === UserRoleEnum.OWNER || profile === UserRoleEnum.ADMIN || profile === UserRoleEnum.ATTENDANT;
 ```
 
 ### React Patterns
 
+- **Early return pattern** — For different render structures (mobile/desktop, auth states), use early return instead of inline ternary
 - **No ternary in JSX** — Extract to named variables or useMemo
 - **No logical AND (&&) in JSX** — Use useMemo with early return null
 - **No nullish coalescing (??) in JSX** — Extract to named variable
 - **No chained ternaries** — Use if-else or object maps
+- **useMemo with early returns** — For conditional content (loading/empty/list), use useMemo with if-statements, NEVER nested ternaries
 - **No inline expressions in JSX** — Extract arrays, objects, functions, calculations
 - **Named variables in conditionals** — Always extract before if statements
 - **Component variants** — Use data-variant pattern with data-* attributes

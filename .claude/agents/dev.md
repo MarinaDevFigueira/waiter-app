@@ -53,7 +53,7 @@ This agent follows the specifications defined in:
 
 ### Project Specs (./.specs/)
 
-72 specification files:
+73 specification files:
 
 **Code Style & Principles:**
 - `no-comments.spec.md` - Never add code comments
@@ -73,8 +73,10 @@ This agent follows the specifications defined in:
 - `named-variables-over-inline-ternaries.spec.md` - No inline ternaries
 
 **React Patterns:**
+- `early-return-pattern.spec.md` - **Early return for different render structures**
 - `no-ternary-in-jsx.spec.md` - Extract ternaries from JSX
 - `no-chained-ternaries.spec.md` - Use if-else or maps
+- `usememo-conditional-content.spec.md` - **useMemo with early returns for conditional content (loading/empty/list states)**
 - `no-inline-expressions-in-jsx.spec.md` - No inline arrays/objects/calculations
 - `component-variants.spec.md` - data-variant pattern
 - `conditional-rendering-with-data-attributes.spec.md` - **data-* attributes for conditional styling**
@@ -476,6 +478,61 @@ if (isSuccess) status = "success";
 if (isWarning) status = "warning";
 ```
 
+#### Early Return Pattern
+
+When a component renders completely different structures based on a condition (mobile vs desktop, different user states), **NEVER** use inline ternary in return. Use **early return** pattern.
+
+```tsx
+// WRONG - inline ternary for different structures
+function ResponsiveComponent() {
+  const isMobile = useIsMobile();
+
+  return (
+    <>
+      <Button>Open</Button>
+      {isMobile ? (
+        <Drawer><Content /></Drawer>
+      ) : (
+        <Dialog><Content /></Dialog>
+      )}
+    </>
+  );
+}
+
+// CORRECT - early return pattern
+function ResponsiveComponent() {
+  const isMobile = useIsMobile();
+
+  const triggerButton = (
+    <Button>Open</Button>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        {triggerButton}
+        <Drawer><Content /></Drawer>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {triggerButton}
+      <Dialog><Content /></Dialog>
+    </>
+  );
+}
+```
+
+**When to use:**
+- Mobile vs Desktop layouts
+- Authenticated vs Unauthenticated views
+- Loading vs Error vs Success states
+- Different user profiles/roles
+
+**Extract shared elements** before the early return to avoid duplication.
+
 #### No Inline Expressions in JSX
 
 - **NEVER** create arrays inline (`[...Array(n)]`)
@@ -566,6 +623,65 @@ const breadcrumbs = useMemo(() => {
   const segments = pathname.split("/").filter(Boolean);
   return segments.map(segment => ({ label: segment }));
 }, [pathname]);
+```
+
+#### useMemo with Early Returns for Conditional Content
+
+**ALWAYS** use `useMemo` with early returns for conditional content (loading, empty, list states). **NEVER** use nested ternaries.
+
+```tsx
+// WRONG - Nested ternaries are HORRIBLE and PROHIBITED
+const dropdownContent = shouldShowLoading
+  ? loadingState
+  : shouldShowEmpty
+    ? emptyState
+    : shouldShowList
+      ? businessList
+      : null;
+
+// CORRECT - useMemo with early returns
+const dropdownContent = useMemo(() => {
+  if (shouldShowLoading) {
+    return loadingState;
+  }
+  if (shouldShowEmpty) {
+    return emptyState;
+  }
+  if (shouldShowList) {
+    return businessList;
+  }
+  return null;
+}, [shouldShowLoading, shouldShowEmpty, shouldShowList, loadingState, emptyState, businessList]);
+```
+
+**Pattern for components with loading/empty/list states:**
+
+```tsx
+const items = data ?? [];
+const isEmptyList = items.length === 0;
+
+const shouldShowLoading = isLoading;
+const shouldShowEmpty = isEmptyList && !isLoading;
+const shouldShowList = !isLoading && !isEmptyList;
+
+const loadingState = (
+  <div className="text-muted-foreground">{t("common.loading")}</div>
+);
+
+const emptyState = (
+  <div className="text-muted-foreground">{emptyMessage}</div>
+);
+
+const itemsList = useMemo(() => {
+  return items.map((item) => <ItemComponent key={item.id} item={item} />);
+}, [items]);
+
+const content = useMemo(() => {
+  if (shouldShowLoading) return loadingState;
+  if (shouldShowEmpty) return emptyState;
+  if (shouldShowList) return itemsList;
+  return null;
+}, [shouldShowLoading, shouldShowEmpty, shouldShowList, loadingState, emptyState, itemsList]);
 ```
 
 #### useCallback for Stable References
@@ -1617,6 +1733,6 @@ When project specs conflict with global specs:
   - 22 global specs in `~/.specs/`
 - Global specs for code style (no comments, named variables, no ESLint disable, i18n patterns, SwiperJS patterns, intermediate variables) take highest priority
 - Last updated: 2026-02-27
-- Total specs loaded: 91
+- Total specs loaded: 92
 
 You can now use `@dev` in your conversations to apply these project-specific patterns and conventions with global best practices enforced.
