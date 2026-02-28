@@ -298,6 +298,20 @@
     "title": "Page not found",
     "description": "The page you are looking for does not exist or has been removed."
   },
+  "business": {
+    "selector": {
+      "select": "Select Business",
+      "selected": "Business selected: {{name}}",
+      "search": "Search business...",
+      "searchLabel": "Search",
+      "noResults": "No business found",
+      "title": "Select Business",
+      "description": "Choose the business to view data",
+      "placeholder": "Select business",
+      "searchPlaceholder": "Search business...",
+      "emptyMessage": "No business found"
+    }
+  },
   "users": {
     "pageTitle": "Users",
     "pageSubtitle": "Manage system users",
@@ -357,7 +371,8 @@
       "kitchen": "Kitchen",
       "customer": "Customer",
       "attendant": "Attendant",
-      "waiter": "Waiter"
+      "waiter": "Waiter",
+      "system_manager": "System Manager"
     }
   }
 }

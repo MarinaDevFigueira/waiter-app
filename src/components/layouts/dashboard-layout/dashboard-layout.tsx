@@ -10,7 +10,7 @@ import {
   CaretLeftIcon,
   CaretRightIcon,
   CookingPotIcon,
-  List,
+  ListIcon,
   FolderIcon,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
@@ -21,9 +21,11 @@ import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
 import { LanguageSelector } from "@/components/ui/language-selector/language-selector";
 import { authService } from "@/services/auth/auth.service";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { StorageKeys } from "@/shared/constants/storage-keys";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import { BusinessSelectorButton } from "@/components/ui/business-selector-button/business-selector-button";
+import { DeviceTypeEnum } from "@/components/ui/business-selector-button/business-selector-button.interface";
 
 interface MenuItem {
   icon: Icon;
@@ -66,10 +68,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const userProfile = auth?.profile;
-  const fullMenuProfiles = [UserProfileEnum.OWNER, UserProfileEnum.ADMIN];
+  const fullMenuProfiles = [UserRoleEnum.OWNER, UserRoleEnum.ADMIN];
   const hasFullMenuAccess = fullMenuProfiles.includes(
-    userProfile as UserProfileEnum,
+    userProfile as UserRoleEnum,
   );
+
+  const adminProfiles = [UserRoleEnum.ADMIN, UserRoleEnum.SYSTEM_MANAGER];
+  const shouldShowBusinessSelector = adminProfiles.includes(userProfile as UserRoleEnum);
 
   const menuItems = useMemo<MenuItem[]>(() => {
     const baseItems: MenuItem[] = [
@@ -141,10 +146,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         className="hidden md:flex flex-col bg-background border-r border-border data-[minimized=false]:w-64 data-[minimized=true]:w-16 transition-all duration-300 shadow-lg"
       >
         <div className="flex items-center justify-center h-14 sm:h-16 px-4 sm:px-6 md:px-8 border-b border-border relative">
-          <Logo
-            data-minimized={isMinimized}
-            className="text-lg data-[minimized=true]:hidden"
-          />
+          {shouldShowBusinessSelector ? (
+            <BusinessSelectorButton deviceType={DeviceTypeEnum.DESKTOP} />
+          ) : (
+            <Logo
+              data-minimized={isMinimized}
+              className="text-lg data-[minimized=true]:hidden"
+            />
+          )}
           <Button
             variant="ghost"
             size="icon-sm"
@@ -215,7 +224,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <Sheet.Content className="flex flex-col">
           <div className="flex items-center justify-center h-14 px-4 border-b border-border">
-            <Logo className="text-lg" />
+            {shouldShowBusinessSelector ? (
+              <BusinessSelectorButton deviceType={DeviceTypeEnum.MOBILE} />
+            ) : (
+              <Logo className="text-lg" />
+            )}
           </div>
 
           <nav className="flex-1 p-2">
@@ -273,7 +286,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 data-testid="mobile-menu-button"
                 className="md:hidden"
               >
-                <List size={20} />
+                <ListIcon size={20} />
               </Button>
               <Link
                 to="/dashboard"

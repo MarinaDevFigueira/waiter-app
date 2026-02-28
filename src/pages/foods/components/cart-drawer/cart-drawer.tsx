@@ -4,7 +4,7 @@ import { Drawer } from "@/components/ui/drawer/drawer";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useCart } from "@/shared/hooks/useCart";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { UserProfileEnum } from "@/shared/constants/user-profile";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { multiply } from "@/lib/math";
 import type { CartItem } from "@/shared/subjects/cart.subject";
 
@@ -97,12 +97,12 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
 
   const formattedTotal = useMemo(() => formatPrice(cart.total), [cart.total]);
 
-  const isMesaProfile = auth?.profile === UserProfileEnum.MESA;
+  const isTableProfile = auth?.profile === UserRoleEnum.TABLE;
 
   const confirmButtonLabel = useMemo(() => {
-    if (isMesaProfile) return t("cart.sendToKitchen");
+    if (isTableProfile) return t("cart.sendToKitchen");
     return t("cart.confirmOrder");
-  }, [isMesaProfile, t]);
+  }, [isTableProfile, t]);
 
   const itemCountLabel = useMemo(() => {
     const key = itemCount === 1 ? "cart.itemCount" : "cart.itemCountPlural";

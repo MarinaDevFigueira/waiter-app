@@ -7,6 +7,8 @@ export const StorageKeys = Object.freeze({
   LANGUAGE: "language",
   ORDERS_VIEW: "orders-view",
   CART: "cart",
+  BUSINESS_ID: "business_id",
+  BUSINESS_NAME: "business_name",
 });
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

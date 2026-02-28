@@ -11,7 +11,6 @@ import { Checkbox } from "@/components/ui/checkbox/checkbox";
 import { MultiSelect } from "@/components/ui/multi-select/multi-select";
 import { usersFiltersObservable } from "@/shared/subjects/users-filters.subject";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
-import { UserProfileEnum } from "@/shared/constants/user-profile";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useAuth } from "@/shared/hooks/useAuth";
 
@@ -29,7 +28,7 @@ export function UsersFilters() {
   const { auth } = useAuth();
 
   const userProfile = auth?.profile;
-  const isOwnerProfile = userProfile === UserProfileEnum.OWNER;
+  const isOwnerProfile = userProfile === UserRoleEnum.OWNER;
 
   const ROLE_OPTIONS: { value: UserRoleEnum; label: string }[] = useMemo(() => {
     const allOptions = [
@@ -39,6 +38,7 @@ export function UsersFilters() {
       { value: UserRoleEnum.CUSTOMER, label: t("users.roles.customer") },
       { value: UserRoleEnum.ATTENDANT, label: t("users.roles.attendant") },
       { value: UserRoleEnum.WAITER, label: t("users.roles.waiter") },
+      { value: UserRoleEnum.SYSTEM_MANAGER, label: t("users.roles.system_manager")}
     ];
 
     if (isOwnerProfile) {

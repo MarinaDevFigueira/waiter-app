@@ -298,6 +298,20 @@
     "title": "Página no encontrada",
     "description": "La página que estás buscando no existe o ha sido eliminada."
   },
+  "business": {
+    "selector": {
+      "select": "Seleccionar Empresa",
+      "selected": "Empresa seleccionada: {{name}}",
+      "search": "Buscar empresa...",
+      "searchLabel": "Buscar",
+      "noResults": "Ninguna empresa encontrada",
+      "title": "Seleccionar Empresa",
+      "description": "Elija la empresa para ver los datos",
+      "placeholder": "Seleccionar empresa",
+      "searchPlaceholder": "Buscar empresa...",
+      "emptyMessage": "Ninguna empresa encontrada"
+    }
+  },
   "users": {
     "pageTitle": "Usuarios",
     "pageSubtitle": "Gestiona los usuarios del sistema",
@@ -357,7 +371,8 @@
       "kitchen": "Cocina",
       "customer": "Cliente",
       "attendant": "Asistente",
-      "waiter": "Camarero"
+      "waiter": "Camarero",
+      "system_manager": "Administrador del sistema"
     }
   }
 }
