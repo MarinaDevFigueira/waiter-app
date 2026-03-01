@@ -36,4 +36,20 @@ export const cookies = {
     const secureAttr = isSecure ? ";Secure" : "";
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax${secureAttr}${domainAttr}`;
   },
+
+  safeClearAll: (): void => {
+    const cookiesArray = document.cookie.split(";");
+    const isSecure = window.location.protocol === "https:";
+    const secureAttr = isSecure ? ";Secure" : "";
+
+    for (let i = 0; i < cookiesArray.length; i++) {
+      const cookie = cookiesArray[i];
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+      const isLanguageCookie = name === "user_language";
+      if (!isLanguageCookie) {
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax${secureAttr}${domainAttr}`;
+      }
+    }
+  },
 };
