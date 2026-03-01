@@ -355,10 +355,10 @@
     },
     "limits": {
       "title": "Business Limits",
-      "maxTableUsers": "Table Users",
-      "maxWaiterUsers": "Waiters",
-      "maxKitchenUsers": "Kitchen Users",
-      "maxAttendantUsers": "Attendants",
+      "tableUsers": "Table Users",
+      "waiterUsers": "Waiters",
+      "kitchenUsers": "Kitchen Users",
+      "attendantUsers": "Attendants",
       "loadError": "Error loading business limits"
     }
   },

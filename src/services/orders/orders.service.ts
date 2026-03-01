@@ -1,30 +1,19 @@
 import { api } from "@/services/api";
-import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
-import { formatZodError } from "@/lib/zod-errors";
 import { logger } from "@/lib/logger";
-import {
-  apiOrderSchema,
-  apiOrderPaginatedListSchema,
-  createOrderRequestSchema,
-  updateOrderStatusSchema,
-} from "./orders.schema";
-import type { ApiOrder, CreateOrderRequest } from "./orders.schema";
+import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
+import type {
+  GetOrderResponse,
+  GetOrdersApiResponse,
+  CreateOrderRequestBody,
+  GetOrdersResponse,
+  GetOrdersRequestQuery,
+} from "./interfaces/orders.interface";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
-export interface PaginatedOrders {
-  items: Order[];
-  total: number;
-  page: number;
-  size: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
-function mapApiOrderToOrder(raw: ApiOrder): Order {
+function mapApiOrderToOrder(raw: GetOrderResponse): Order {
   return {
     id: raw.id,
     userName: raw.userName,
@@ -45,7 +34,7 @@ function mapApiOrderToOrder(raw: ApiOrder): Order {
 }
 
 export const ordersService = {
-  async getAll(filters: { status?: string; search?: string; orderBy?: string; direction?: string; page?: number; size?: number; orderSessionId?: string } = {}): Promise<ServiceResult<PaginatedOrders>> {
+  async getAll(filters: GetOrdersRequestQuery = {}): Promise<ServiceResult<GetOrdersResponse>> {
     try {
       const params = new URLSearchParams();
       if (filters.status) params.set("status", filters.status);
@@ -66,25 +55,20 @@ export const ordersService = {
         return { error: result.error };
       }
 
-      const parsed = apiOrderPaginatedListSchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error("[ordersService.getAll] Erro de validação", new Error(zodMessage));
-        return { error: "Resposta inválida do servidor" };
-      }
+      const apiData = result.data as GetOrdersApiResponse;
 
       return {
         data: {
-          items: parsed.data.items.map(mapApiOrderToOrder),
-          total: parsed.data.total,
-          page: parsed.data.page,
-          size: parsed.data.size,
-          totalPages: parsed.data.totalPages,
-          hasNextPage: parsed.data.hasNextPage,
-          hasPreviousPage: parsed.data.hasPreviousPage,
+          items: apiData.items.map(mapApiOrderToOrder),
+          total: apiData.total,
+          page: apiData.page,
+          size: apiData.size,
+          totalPages: apiData.totalPages,
+          hasNextPage: apiData.hasNextPage,
+          hasPreviousPage: apiData.hasPreviousPage,
         },
       };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar pedidos";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -101,15 +85,8 @@ export const ordersService = {
         return { error: result.error };
       }
 
-      const parsed = apiOrderSchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error("[ordersService.getById] Erro de validação", new Error(zodMessage));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiOrderToOrder(parsed.data) };
-    } catch (error) {
+      return { data: mapApiOrderToOrder(result.data as GetOrderResponse) };
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar pedido";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -117,17 +94,9 @@ export const ordersService = {
     }
   },
 
-  async create(data: CreateOrderRequest): Promise<ServiceResult<void>> {
+  async create(data: CreateOrderRequestBody): Promise<ServiceResult<void>> {
     try {
-      const validated = createOrderRequestSchema.safeParse(data);
-      const validationFailed = !validated.success;
-      if (validationFailed) {
-        const zodMessage = formatZodError(validated.error);
-        logger.error("[ordersService.create] Erro de validação", new Error(zodMessage));
-        return { error: "Dados do pedido inválidos" };
-      }
-
-      const result = await api.post<unknown>("/orders", validated.data);
+      const result = await api.post<unknown>("/orders", data);
 
       const hasError = "error" in result;
       if (hasError) {
@@ -135,7 +104,7 @@ export const ordersService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao criar pedido";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -148,16 +117,8 @@ export const ordersService = {
     status: OrderStatus
   ): Promise<ServiceResult<void>> {
     try {
-      const validated = updateOrderStatusSchema.safeParse({ status });
-      const validationFailed = !validated.success;
-      if (validationFailed) {
-        const zodMessage = formatZodError(validated.error);
-        logger.error("[ordersService.updateStatus] Erro de validação", new Error(zodMessage));
-        return { error: "Status inválido" };
-      }
-
       const result = await api.patch<unknown>(`/orders/${orderId}/status`, {
-        status: validated.data.status,
+        status,
       });
 
       const hasError = "error" in result;
@@ -166,7 +127,7 @@ export const ordersService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar status do pedido";
       logger.error(errorMessage, error instanceof Error ? error : null);

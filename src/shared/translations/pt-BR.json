@@ -355,10 +355,10 @@
     },
     "limits": {
       "title": "Limites da Empresa",
-      "maxTableUsers": "Usuários de Mesa",
-      "maxWaiterUsers": "Garçons",
-      "maxKitchenUsers": "Usuários da Cozinha",
-      "maxAttendantUsers": "Atendentes",
+      "tableUsers": "Usuários de Mesa",
+      "waiterUsers": "Garçons",
+      "kitchenUsers": "Usuários da Cozinha",
+      "attendantUsers": "Atendentes",
       "loadError": "Erro ao carregar limites da empresa"
     }
   },

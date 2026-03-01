@@ -3,10 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { businessLimitsService } from "@/services/business-limits/business-limits.service";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useBusiness } from "@/shared/hooks/useBusiness";
+import { useAuth } from "@/shared/hooks/useAuth";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { logger } from "@/lib/logger";
 
-function LimitField({ label, value }: { label: string; value: number }) {
-  const displayValue = String(value);
+interface UserLimit {
+  max: number;
+  used: number;
+}
+
+function LimitField({ label, limit }: { label: string; limit: UserLimit }) {
+  const displayValue = `${limit.used} / ${limit.max}`;
   return (
     <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
       <span className="text-sm font-medium">{label}</span>
@@ -18,8 +25,11 @@ function LimitField({ label, value }: { label: string; value: number }) {
 export function BusinessLimitsPage() {
   const { t } = useTranslation();
   const { selectedBusiness } = useBusiness();
+  const { profile } = useAuth();
 
-  const hasBusinessSelected = selectedBusiness !== null;
+  const rolesRequiringBusinessSelection = [UserRoleEnum.ADMIN, UserRoleEnum.SYSTEM_MANAGER];
+  const needsBusinessSelection = rolesRequiringBusinessSelection.includes(profile as UserRoleEnum);
+  const hasBusinessSelected = needsBusinessSelection ? selectedBusiness !== null : true;
   const businessId = selectedBusiness?.id;
 
   const queryKey = useMemo(() => ["business-limits", businessId], [businessId]);
@@ -75,15 +85,15 @@ export function BusinessLimitsPage() {
     if (!limits) return null;
     return (
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <LimitField label={t("business.limits.maxTableUsers")} value={limits.maxTableUsers} />
-        <LimitField label={t("business.limits.maxWaiterUsers")} value={limits.maxWaiterUsers} />
-        <LimitField label={t("business.limits.maxKitchenUsers")} value={limits.maxKitchenUsers} />
-        <LimitField label={t("business.limits.maxAttendantUsers")} value={limits.maxAttendantUsers} />
+        <LimitField label={t("business.limits.tableUsers")} limit={limits.tableUsers} />
+        <LimitField label={t("business.limits.waiterUsers")} limit={limits.waiterUsers} />
+        <LimitField label={t("business.limits.kitchenUsers")} limit={limits.kitchenUsers} />
+        <LimitField label={t("business.limits.attendantUsers")} limit={limits.attendantUsers} />
       </div>
     );
   }, [limits, t]);
 
-  const shouldShowNoBusinessContent = !hasBusinessSelected;
+  const shouldShowNoBusinessContent = needsBusinessSelection && !selectedBusiness;
   const shouldShowLoading = hasBusinessSelected && isLoading;
   const shouldShowError = hasBusinessSelected && isError;
   const shouldShowViewContent = hasBusinessSelected && !isLoading && !isError;

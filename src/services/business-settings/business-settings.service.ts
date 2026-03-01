@@ -1,18 +1,16 @@
 import { api } from "@/services/api";
-import { formatZodError } from "@/lib/zod-errors";
 import { logger } from "@/lib/logger";
-import {
-  apiBusinessSettingsSchema,
-  type ApiBusinessSettings,
-} from "./schemas/get.schema";
-import type { BusinessSettingsUpdateForm } from "./schemas/update.schema";
+import type {
+  GetBusinessSettingsResponse,
+  UpdateBusinessSettingsRequestBody,
+} from "./interfaces/business-settings.interface";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
 export const businessSettingsService = {
-  async get(): Promise<ServiceResult<ApiBusinessSettings>> {
+  async get(): Promise<ServiceResult<GetBusinessSettingsResponse>> {
     try {
       const result = await api.get<unknown>("/business-settings");
 
@@ -21,16 +19,34 @@ export const businessSettingsService = {
         return { error: result.error };
       }
 
-      const parsed = apiBusinessSettingsSchema.safeParse(result.data);
-      const validationFailed = !parsed.success;
-      if (validationFailed) {
-        const zodMessage = formatZodError(parsed.error);
-        const error = new Error(zodMessage);
-        logger.error("[businessSettingsService.get] Validation error", error);
-        return { error: "Resposta inválida do servidor" };
-      }
+      const rawData = result.data as {
+        id: string;
+        primaryColor: string;
+        secondaryColor: string;
+        enabledLanguages: string | string[];
+        businessId?: string | null;
+      };
 
-      return { data: parsed.data };
+      const enabledLanguages = typeof rawData.enabledLanguages === "string"
+        ? (() => {
+            try {
+              const parsed = JSON.parse(rawData.enabledLanguages);
+              return Array.isArray(parsed) ? parsed : [rawData.enabledLanguages];
+            } catch {
+              return [rawData.enabledLanguages];
+            }
+          })()
+        : rawData.enabledLanguages;
+
+      const settings: GetBusinessSettingsResponse = {
+        id: rawData.id,
+        primaryColor: rawData.primaryColor,
+        secondaryColor: rawData.secondaryColor,
+        enabledLanguages,
+        businessId: rawData.businessId,
+      };
+
+      return { data: settings };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar configurações";
@@ -39,7 +55,7 @@ export const businessSettingsService = {
     }
   },
 
-  async update(data: BusinessSettingsUpdateForm): Promise<ServiceResult<void>> {
+  async update(data: UpdateBusinessSettingsRequestBody): Promise<ServiceResult<void>> {
     try {
       const result = await api.patch<unknown>("/business-settings", data);
 

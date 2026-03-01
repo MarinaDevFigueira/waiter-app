@@ -1,19 +1,17 @@
 import { api } from "@/services/api";
 import { logger } from "@/lib/logger";
-import {
-  apiOrderSessionSchema,
-  apiOrderSessionSummarySchema,
-  type ApiOrderSession,
-  type ApiOrderSessionSummary,
-  type OrderSession,
-  type OrderSessionSummary,
-} from "./order-sessions.schema";
+import type {
+  GetOrderSessionResponse,
+  GetOrderSessionSummaryResponse,
+  OrderSession,
+  OrderSessionSummary,
+} from "./interfaces/order-sessions.interface";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
-function mapApiOrderSessionToOrderSession(raw: ApiOrderSession): OrderSession {
+function mapApiOrderSessionToOrderSession(raw: GetOrderSessionResponse): OrderSession {
   return {
     id: raw.id,
     tableUserId: raw.tableUserId,
@@ -27,7 +25,7 @@ function mapApiOrderSessionToOrderSession(raw: ApiOrderSession): OrderSession {
 }
 
 function mapApiOrderSessionSummaryToOrderSessionSummary(
-  raw: ApiOrderSessionSummary
+  raw: GetOrderSessionSummaryResponse
 ): OrderSessionSummary {
   return {
     orderSession: mapApiOrderSessionToOrderSession(raw.orderSession),
@@ -51,14 +49,8 @@ export const orderSessionsService = {
         return { error: result.error };
       }
 
-      const parsed = apiOrderSessionSchema.safeParse(result.data);
-      if (!parsed.success) {
-        logger.error("[orderSessionsService.open] Erro de validação", new Error(parsed.error.message));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiOrderSessionToOrderSession(parsed.data) };
-    } catch (error) {
+      return { data: mapApiOrderSessionToOrderSession(result.data as GetOrderSessionResponse) };
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao abrir sessão de pedidos";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -87,14 +79,8 @@ export const orderSessionsService = {
         return { data: null };
       }
 
-      const parsed = apiOrderSessionSchema.safeParse(result.data);
-      if (!parsed.success) {
-        logger.error("[orderSessionsService.getActive] Erro de validação", new Error(parsed.error.message));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiOrderSessionToOrderSession(parsed.data) };
-    } catch (error) {
+      return { data: mapApiOrderSessionToOrderSession(result.data as GetOrderSessionResponse) };
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar sessão ativa";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -111,14 +97,8 @@ export const orderSessionsService = {
         return { error: result.error };
       }
 
-      const parsed = apiOrderSessionSummarySchema.safeParse(result.data);
-      if (!parsed.success) {
-        logger.error("[orderSessionsService.close] Erro de validação", new Error(parsed.error.message));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiOrderSessionSummaryToOrderSessionSummary(parsed.data) };
-    } catch (error) {
+      return { data: mapApiOrderSessionSummaryToOrderSessionSummary(result.data as GetOrderSessionSummaryResponse) };
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao fechar sessão de pedidos";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -135,14 +115,8 @@ export const orderSessionsService = {
         return { error: result.error };
       }
 
-      const parsed = apiOrderSessionSummarySchema.safeParse(result.data);
-      if (!parsed.success) {
-        logger.error("[orderSessionsService.getSummary] Erro de validação", new Error(parsed.error.message));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiOrderSessionSummaryToOrderSessionSummary(parsed.data) };
-    } catch (error) {
+      return { data: mapApiOrderSessionSummaryToOrderSessionSummary(result.data as GetOrderSessionSummaryResponse) };
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
           ? error.message

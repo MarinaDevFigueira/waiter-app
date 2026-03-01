@@ -18,7 +18,7 @@ import { PermissionEnum } from "@/shared/enums/permission.enum";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { TranslationsEnum } from "@/shared/enums/translations.enum";
 import { logger } from "@/lib/logger";
-import type { ApiBusinessSettings } from "@/services/business-settings/schemas/get.schema";
+import type { GetBusinessSettingsResponse } from "@/services/business-settings/interfaces/business-settings.interface";
 
 const businessSettingsFormSchema = z.object({
   primaryColor: z.string().min(1, "Cor primária é obrigatória"),
@@ -34,7 +34,7 @@ const LANGUAGE_OPTIONS = [
   { value: TranslationsEnum.ES, label: "Español" },
 ];
 
-function buildDefaultValues(settings: ApiBusinessSettings): BusinessSettingsFormValues {
+function buildDefaultValues(settings: GetBusinessSettingsResponse): BusinessSettingsFormValues {
   const enabledLanguages = Array.isArray(settings.enabledLanguages)
     ? settings.enabledLanguages
     : [];
@@ -108,7 +108,9 @@ export function BusinessSettingsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const hasBusinessSelected = selectedBusiness !== null;
+  const rolesRequiringBusinessSelection = [UserRoleEnum.ADMIN, UserRoleEnum.SYSTEM_MANAGER];
+  const needsBusinessSelection = rolesRequiringBusinessSelection.includes(profile as UserRoleEnum);
+  const hasBusinessSelected = needsBusinessSelection ? selectedBusiness !== null : true;
 
   const isAdmin = profile === UserRoleEnum.ADMIN;
   const hasEditPermission = hasPermissionTo(PermissionEnum.EDIT_BUSINESS_SETTINGS);
@@ -329,7 +331,7 @@ export function BusinessSettingsPage() {
     saveButtonLabel,
   ]);
 
-  const shouldShowNoBusinessContent = !hasBusinessSelected;
+  const shouldShowNoBusinessContent = needsBusinessSelection && !selectedBusiness;
   const shouldShowLoading = hasBusinessSelected && isLoading;
   const shouldShowError = hasBusinessSelected && isError;
   const shouldShowEditContent = hasBusinessSelected && !isLoading && !isError && isEditing;

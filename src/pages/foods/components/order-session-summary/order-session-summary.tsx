@@ -6,6 +6,7 @@ import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useIsMobile } from "@/shared/hooks/useMediaQuery";
 import { useOrderSessionOrders } from "@/shared/hooks/useOrderSessionOrders";
 import { multiply, add } from "@/lib/math";
+import type { Order, OrderItem } from "@/shared/schemas/order.schema";
 
 interface OrderSessionSummaryModalProps {
   open: boolean;
@@ -49,8 +50,8 @@ export function OrderSessionSummaryModal({
 
   const orders = ordersData?.items ?? [];
 
-  const totalAmount = orders.reduce((sum, order) => {
-    const orderTotal = order.items.reduce((itemSum, item) => {
+  const totalAmount = orders.reduce((sum: number, order: Order) => {
+    const orderTotal = order.items.reduce((itemSum: number, item: OrderItem) => {
       const itemTotal = multiply(item.preco, item.quantity);
       return add(itemSum, itemTotal);
     }, 0);
@@ -75,7 +76,7 @@ export function OrderSessionSummaryModal({
 
   const ordersList = (
     <div className="space-y-4">
-      {orders.map((order) => {
+      {orders.map((order: Order) => {
         const shortId = order.id.slice(0, 8);
         return (
           <div key={order.id} className="border border-border rounded-lg p-4">
@@ -84,7 +85,7 @@ export function OrderSessionSummaryModal({
               <span className="text-xs text-muted-foreground select-none">{order.status}</span>
             </div>
             <ul className="space-y-2">
-              {order.items.map((item, index) => {
+              {order.items.map((item: OrderItem, index: number) => {
                 const itemTotalValue = multiply(item.preco, item.quantity);
                 const itemTotal = formatPrice(itemTotalValue);
                 return (

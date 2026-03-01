@@ -1,23 +1,22 @@
 import { api } from "@/services/api";
-import type { CategoryForm, Category } from "@/shared/schemas/category.schema";
-import { formatZodError } from "@/lib/zod-errors";
 import { logger } from "@/lib/logger";
-import {
-  apiCategoryListSchema,
-  apiCategorySchema,
-  apiCategoryTranslationsSchema,
-} from "./categories.schema";
-import type { PaginatedCategories, ApiCategory, CategoryQueryParams, ApiCategoryTranslations } from "./categories.schema";
+import type { CategoryForm, Category } from "@/shared/schemas/category.schema";
+import type {
+  GetCategoryResponse,
+  GetCategoryTranslationsResponse,
+  GetCategoriesRequestQuery,
+  GetCategoriesResponse,
+} from "./interfaces/categories.interface";
 
 type ServiceSuccess<T> = { data: T };
 type ServiceError = { error: string };
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
 
-function mapApiCategoryToCategory(raw: ApiCategory): Category {
+function mapApiCategoryToCategory(raw: GetCategoryResponse): Category {
   return {
     id: raw.id,
     name: raw.name,
-    description: raw.description ?? undefined,
+    description: raw.description ?? "",
     sortOrder: raw.sortOrder,
     active: raw.active,
     businessId: raw.businessId,
@@ -28,8 +27,8 @@ function mapApiCategoryToCategory(raw: ApiCategory): Category {
 
 export const categoriesService = {
   async getAll(
-    queryParams: CategoryQueryParams
-  ): Promise<ServiceResult<PaginatedCategories>> {
+    queryParams: GetCategoriesRequestQuery
+  ): Promise<ServiceResult<GetCategoriesResponse>> {
     try {
       const { page, size, orderBy, direction, search } = queryParams;
 
@@ -48,27 +47,30 @@ export const categoriesService = {
         return { error: result.error };
       }
 
-      const parsed = apiCategoryListSchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error("[categoriesService.getAll] Erro de validação", new Error(zodMessage));
-        return { error: "Resposta inválida do servidor" };
-      }
+      const apiData = result.data as {
+        items: GetCategoryResponse[];
+        total: number;
+        page: number;
+        size: number;
+        totalPages: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+      };
 
-      const items = parsed.data.items.map(mapApiCategoryToCategory);
+      const items = apiData.items.map(mapApiCategoryToCategory);
 
       return {
         data: {
           items,
-          total: parsed.data.total,
-          page: parsed.data.page,
-          size: parsed.data.size,
-          totalPages: parsed.data.totalPages,
-          hasNextPage: parsed.data.hasNextPage,
-          hasPreviousPage: parsed.data.hasPreviousPage,
+          total: apiData.total,
+          page: apiData.page,
+          size: apiData.size,
+          totalPages: apiData.totalPages,
+          hasNextPage: apiData.hasNextPage,
+          hasPreviousPage: apiData.hasPreviousPage,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar categorias";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -85,15 +87,8 @@ export const categoriesService = {
         return { error: result.error };
       }
 
-      const parsed = apiCategorySchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error("[categoriesService.getById] Erro de validação", new Error(zodMessage));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: mapApiCategoryToCategory(parsed.data) };
-    } catch (error: any) {
+      return { data: mapApiCategoryToCategory(result.data as GetCategoryResponse) };
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar categoria";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -111,7 +106,7 @@ export const categoriesService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao criar categoria";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -132,7 +127,7 @@ export const categoriesService = {
       }
 
       return { data: undefined };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar categoria";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -152,7 +147,7 @@ export const categoriesService = {
       }
 
       return { data: { success: true, id: categoryId } };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao deletar categoria";
       logger.error(errorMessage, error instanceof Error ? error : null);
@@ -162,7 +157,7 @@ export const categoriesService = {
 
   async getTranslations(
     categoryId: string
-  ): Promise<ServiceResult<ApiCategoryTranslations>> {
+  ): Promise<ServiceResult<GetCategoryTranslationsResponse>> {
     try {
       const result = await api.get<unknown>(`/categories/${categoryId}/translations`);
 
@@ -171,15 +166,8 @@ export const categoriesService = {
         return { error: result.error };
       }
 
-      const parsed = apiCategoryTranslationsSchema.safeParse(result.data);
-      if (!parsed.success) {
-        const zodMessage = formatZodError(parsed.error);
-        logger.error("[categoriesService.getTranslations] Erro de validação", new Error(zodMessage));
-        return { error: "Resposta inválida do servidor" };
-      }
-
-      return { data: parsed.data };
-    } catch (error) {
+      return { data: result.data as GetCategoryTranslationsResponse };
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar traduções";
       logger.error(errorMessage, error instanceof Error ? error : null);

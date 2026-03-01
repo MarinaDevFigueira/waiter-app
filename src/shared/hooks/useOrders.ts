@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { logger } from "@/lib/logger";
 import { kitchenOrdersObservable } from "@/shared/subjects/kitchen-orders.subject";
 import { ordersService } from "@/services/orders/orders.service";
-import type { PaginatedOrders } from "@/services/orders/orders.service";
+import type { GetOrdersResponse } from "@/services/orders/interfaces/orders.interface";
 import type { Order, OrderStatus } from "@/shared/schemas/order.schema";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
@@ -25,7 +25,7 @@ export function useOrders(): UseOrdersReturn {
   const [optimisticOrders, setOptimisticOrders] = useState<Order[]>(kitchenOrdersObservable.getValue());
   const [queryParams, setQueryParams] = useState<OrdersQueryParams>(DEFAULT_QUERY_PARAMS);
 
-  const { data, isLoading, error, isError } = useQuery<PaginatedOrders>({
+  const { data, isLoading, error, isError } = useQuery<GetOrdersResponse>({
     queryKey: addLanguagePrefix("orders", queryParams),
     queryFn: async () => {
       const result = await ordersService.getAll({

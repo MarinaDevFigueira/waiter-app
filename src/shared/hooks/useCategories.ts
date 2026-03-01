@@ -6,7 +6,7 @@ import { categoriesService } from "@/services/categories/categories.service";
 import { CategoriesOrderByEnum } from "@/shared/enums/categories-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type { Category } from "@/shared/schemas/category.schema";
-import type { PaginatedCategories, CategoryQueryParams } from "@/services/categories/categories.schema";
+import type { GetCategoriesResponse, GetCategoriesRequestQuery } from "@/services/categories/interfaces/categories.interface";
 import { useLanguage } from "@/shared/hooks/useLanguage";
 
 interface UseCategoriesReturn {
@@ -20,8 +20,8 @@ interface UseCategoriesReturn {
   isLoading: boolean;
   isError: boolean;
   error: Error | null;
-  queryParams: CategoryQueryParams;
-  setQueryParams: React.Dispatch<React.SetStateAction<CategoryQueryParams>>;
+  queryParams: GetCategoriesRequestQuery;
+  setQueryParams: React.Dispatch<React.SetStateAction<GetCategoriesRequestQuery>>;
   updateSearch: (search: string) => void;
   updateSorting: (orderBy: CategoriesOrderByEnum, direction: SortDirection) => void;
   updatePagination: (page: number, size: number) => void;
@@ -38,7 +38,7 @@ export function useCategories(options?: UseCategoriesOptions | string): UseCateg
   const resolvedErrorMessage = typeof options === "string" ? options : options?.errorMessage;
   const resolvedInitialSize = typeof options === "string" ? 10 : (options?.initialSize ?? 10);
 
-  const [queryParams, setQueryParams] = useState<CategoryQueryParams>({
+  const [queryParams, setQueryParams] = useState<GetCategoriesRequestQuery>({
     page: 1,
     size: resolvedInitialSize,
     orderBy: CategoriesOrderByEnum.NAME,
@@ -46,10 +46,10 @@ export function useCategories(options?: UseCategoriesOptions | string): UseCateg
     search: undefined,
   });
 
-  const { data, isLoading, error, isError } = useQuery<PaginatedCategories>({
+  const { data, isLoading, error, isError } = useQuery<GetCategoriesResponse>({
     queryKey: addLanguagePrefix("categories", queryParams),
     queryFn: async () => {
-      const result = await categoriesService.getAll(queryParams) as { data?: PaginatedCategories; error?: string };
+      const result = await categoriesService.getAll(queryParams) as { data?: GetCategoriesResponse; error?: string };
 
       if ("error" in result) {
         throw new Error(result.error);
