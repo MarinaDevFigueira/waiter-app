@@ -10,7 +10,7 @@ import { LogoutConfirmationModal } from "@/components/logout-confirmation-modal/
 import { authService } from "@/services/auth/auth.service";
 import { orderSessionsService } from "@/services/order-sessions/order-sessions.service";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { useRoles } from "@/shared/hooks/useRoles";
 import { cartObservable } from "@/shared/subjects/cart.subject";
 import { logger } from "@/lib/logger";
 import { useTranslation } from "@/shared/hooks/useTranslation";
@@ -22,16 +22,15 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
   const { auth } = useAuth();
+  const { isTable } = useRoles();
   const { t } = useTranslation();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const isTableProfile = auth?.profile === UserRoleEnum.TABLE;
-
   const handleLogoutClick = useCallback(() => {
     const currentCart = cartObservable.getValue();
     const hasActiveSession = Boolean(currentCart.orderSessionId);
-    const shouldConfirm = isTableProfile && hasActiveSession;
+    const shouldConfirm = isTable && hasActiveSession;
 
     if (shouldConfirm) {
       setIsLogoutModalOpen(true);
@@ -41,7 +40,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     authService.logout().then(() => {
       navigate({ to: "/" });
     });
-  }, [isTableProfile, navigate]);
+  }, [isTable, navigate]);
 
   const handleConfirmLogout = useCallback(async () => {
     setIsLoggingOut(true);

@@ -3,7 +3,7 @@ import { permissionsObservable } from "@/shared/subjects/permissions.subject";
 import { PermissionEnum } from "@/shared/enums/permission.enum";
 import type { Permission } from "@/shared/schemas/permission.schema";
 import { useAuth } from "./useAuth";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { useRoles } from "./useRoles";
 
 interface UsePermissionsReturn {
   permissions: Permission[];
@@ -17,18 +17,10 @@ export function usePermissions(): UsePermissionsReturn {
   const [isLoading, setIsLoading] = useState(true);
 
   const { profile, isAuthenticated } = useAuth();
-
-  if (!isAuthenticated) {
-    return {
-      permissions: [],
-      role: "",
-      isLoading: false,
-      hasPermissionTo: () => false,
-    };
-  }
+  const { hasAdminPrivileges } = useRoles();
 
   const role = useMemo(() => {
-    return profile!;
+    return profile ?? null;
   }, [profile]);
 
   useEffect(() => {
@@ -43,15 +35,22 @@ export function usePermissions(): UsePermissionsReturn {
 
   const hasPermissionTo = useCallback(
     (permission: PermissionEnum): boolean => {
-      const isAdmin = role === UserRoleEnum.ADMIN;
-
-      const hasToBypassPermission = isAdmin;
-
-      if (hasToBypassPermission) return true;
+      if (!isAuthenticated) return false;
+      if (hasAdminPrivileges) return true;
       return state.permissions.some((p) => p.name === permission);
     },
-    [permissionsStringified],
+    [permissionsStringified, hasAdminPrivileges, isAuthenticated],
   );
+
+  const notAuthenticated = !isAuthenticated;
+  if (notAuthenticated) {
+    return {
+      permissions: [],
+      role: "",
+      isLoading: false,
+      hasPermissionTo,
+    };
+  }
 
   return {
     permissions: state.permissions,

@@ -1,21 +1,14 @@
-import { useAuth } from "@/shared/hooks/useAuth";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { useRoles } from "@/shared/hooks/useRoles";
 
 export function AdminPage() {
-  const { auth } = useAuth();
-
-  const userProfile = auth?.profile;
-  const fullAdminProfiles = [UserRoleEnum.OWNER, UserRoleEnum.ADMIN];
-  const isFullAdmin = fullAdminProfiles.includes(
-    userProfile as UserRoleEnum,
-  );
+  const { hasFullMenuAccess } = useRoles();
 
   return (
     <div className="flex flex-col items-start justify-start gap-6 w-full">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">Painel Administrativo</h1>
         <p className="text-muted-foreground">
-          {isFullAdmin ? "Acesso completo ao sistema" : "Acesso limitado"}
+          {hasFullMenuAccess ? "Acesso completo ao sistema" : "Acesso limitado"}
         </p>
       </div>
 
@@ -41,7 +34,7 @@ export function AdminPage() {
           </p>
         </div>
 
-        {isFullAdmin && (
+        {hasFullMenuAccess && (
           <>
             <div className="p-6 border border-border rounded-lg">
               <h3 className="font-semibold mb-2">Configurações</h3>

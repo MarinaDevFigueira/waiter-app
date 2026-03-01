@@ -22,7 +22,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
 import { LanguageSelector } from "@/components/ui/language-selector/language-selector";
 import { authService } from "@/services/auth/auth.service";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { useRoles } from "@/shared/hooks/useRoles";
 import { StorageKeys } from "@/shared/constants/storage-keys";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { BusinessSelectorButton } from "@/components/ui/business-selector-button/business-selector-button";
@@ -59,6 +59,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
+  const { hasFullMenuAccess, shouldShowBusinessSelector } = useRoles();
   const { t } = useTranslation();
   const [isMinimized, setIsMinimized] = useState<boolean>(() => {
     const stored = localStorage.getItem(StorageKeys.SIDEBAR_MINIMIZED);
@@ -83,15 +84,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const toggleBusinessMenu = useCallback(() => {
     setIsBusinessExpanded((prev) => !prev);
   }, []);
-
-  const userProfile = auth?.profile;
-  const fullMenuProfiles = [UserRoleEnum.OWNER, UserRoleEnum.ADMIN];
-  const hasFullMenuAccess = fullMenuProfiles.includes(
-    userProfile as UserRoleEnum,
-  );
-
-  const adminProfiles = [UserRoleEnum.ADMIN, UserRoleEnum.SYSTEM_MANAGER];
-  const shouldShowBusinessSelector = adminProfiles.includes(userProfile as UserRoleEnum);
 
   const menuItems = useMemo<MenuItem[]>(() => {
     const baseItems: MenuItem[] = [
