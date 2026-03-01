@@ -1,8 +1,13 @@
+export interface UserLimit {
+  max: number;
+  used: number;
+}
+
 export interface GetBusinessLimitsResponse {
-  id: string | null;
-  maxTableUsers: number;
-  maxWaiterUsers: number;
-  maxKitchenUsers: number;
-  maxAttendantUsers: number;
-  businessId?: string | null;
+  id: string;
+  businessId: string;
+  tableUsers: UserLimit;
+  waiterUsers: UserLimit;
+  kitchenUsers: UserLimit;
+  attendantUsers: UserLimit;
 }
