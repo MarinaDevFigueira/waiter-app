@@ -2,6 +2,7 @@ import { api } from "@/services/api";
 import { logger } from "@/lib/logger";
 import type { User } from "@/shared/schemas/user.schema";
 import type {
+  CreateUserRequestBody,
   GetUserResponse,
   GetUsersApiResponse,
   GetUsersRequestQuery,
@@ -156,6 +157,24 @@ export const usersService = {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao atualizar usuário";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async create(data: CreateUserRequestBody): Promise<ServiceResult<void>> {
+    try {
+      const result = await api.post<unknown>("/users", data);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      return { data: undefined };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao criar usuário";
       logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }

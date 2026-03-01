@@ -388,10 +388,13 @@
     },
     "form": {
       "editTitle": "Edit User",
+      "createTitle": "New User",
       "fields": {
         "name": "Name",
         "username": "Username",
         "email": "Email",
+        "password": "Password",
+        "passwordOptional": "optional",
         "role": "Role"
       },
       "save": "Save",
@@ -409,7 +412,9 @@
     },
     "emptyState": "No users found",
     "success": {
-      "disable": "User disabled successfully"
+      "disable": "User disabled successfully",
+      "update": "User updated successfully",
+      "create": "User created successfully"
     },
     "errors": {
       "loadFailed": "Error loading users",

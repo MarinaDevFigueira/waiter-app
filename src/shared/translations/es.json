@@ -388,10 +388,13 @@
     },
     "form": {
       "editTitle": "Editar Usuario",
+      "createTitle": "Nuevo Usuario",
       "fields": {
         "name": "Nombre",
         "username": "Usuario",
         "email": "Correo electrónico",
+        "password": "Contraseña",
+        "passwordOptional": "opcional",
         "role": "Perfil"
       },
       "save": "Guardar",
@@ -409,7 +412,9 @@
     },
     "emptyState": "No se encontraron usuarios",
     "success": {
-      "disable": "Usuario deshabilitado con éxito"
+      "disable": "Usuario deshabilitado con éxito",
+      "update": "Usuario actualizado con éxito",
+      "create": "Usuario creado con éxito"
     },
     "errors": {
       "loadFailed": "Error al cargar usuarios",

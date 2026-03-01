@@ -30,6 +30,7 @@ export function UsersPage() {
     queryParams,
     updateSorting,
     updatePagination,
+    refetch,
   } = useUsers();
   const { t } = useTranslation();
   const { hasPermissionTo } = usePermissions();
@@ -148,6 +149,7 @@ export function UsersPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         user={selectedUser}
+        onSuccess={refetch}
       />
 
       <ConfirmationDialog.Root

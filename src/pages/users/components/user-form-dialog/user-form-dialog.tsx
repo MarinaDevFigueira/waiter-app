@@ -9,22 +9,34 @@ import { Input } from "@/components/ui/input/input";
 import { Label } from "@/components/ui/label/label";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { usersService } from "@/services/users/users.service";
+import { logger } from "@/lib/logger";
 import type { UserFormDialogProps, UserFormValues } from "./user-form-dialog.interface";
 
 const USER_ROLE_VALUES = Object.values(UserRoleEnum) as [UserRoleEnum, ...UserRoleEnum[]];
 
-const userFormSchema = z.object({
+const createUserFormSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   username: z.string().min(3, "Usuário deve ter no mínimo 3 caracteres"),
-  email: z.string().email("Email inválido"),
+  email: z.string().email("Email inválido").or(z.literal("")),
+  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
   role: z.enum(USER_ROLE_VALUES),
 });
 
-export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps) {
+const editUserFormSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+  username: z.string().min(3, "Usuário deve ter no mínimo 3 caracteres"),
+  email: z.string().email("Email inválido").or(z.literal("")),
+  password: z.string(),
+  role: z.enum(USER_ROLE_VALUES),
+});
+
+export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserFormDialogProps) {
   const { t } = useTranslation();
+  const isEditMode = user !== undefined;
+  const formSchema = isEditMode ? editUserFormSchema : createUserFormSchema;
 
   const roleOptions = [
-    { value: UserRoleEnum.ADMIN, label: t("users.roles.admin") },
     { value: UserRoleEnum.TABLE, label: t("users.roles.table") },
     { value: UserRoleEnum.KITCHEN, label: t("users.roles.kitchen") },
     { value: UserRoleEnum.CUSTOMER, label: t("users.roles.customer") },
@@ -33,11 +45,12 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
   ];
 
   const form = useForm<UserFormValues>({
-    resolver: zodResolver(userFormSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       username: "",
       email: "",
+      password: "",
       role: UserRoleEnum.CUSTOMER,
     },
   });
@@ -49,6 +62,7 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
         name: user.name,
         username: user.username,
         email: user.email || "",
+        password: "",
         role: userRole,
       });
     } else {
@@ -56,18 +70,56 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
         name: "",
         username: "",
         email: "",
+        password: "",
         role: UserRoleEnum.CUSTOMER,
       });
     }
   }, [user, form]);
 
   const onSubmit = async (data: UserFormValues) => {
-    toast.info("Funcionalidade de atualização de usuário ainda não implementada");
-    console.log("Form data:", data);
+    if (isEditMode) {
+      const result = await usersService.update(user.id, {
+        name: data.name,
+        username: data.username,
+        email: data.email || undefined,
+        role: data.role,
+      });
+
+      const hasError = "error" in result;
+      if (hasError) {
+        logger.error("[UserFormDialog] Erro ao atualizar usuário", new Error(result.error));
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success(t("users.success.update"));
+      onOpenChange(false);
+      onSuccess?.();
+      return;
+    }
+
+    const roleValue = data.role as "table" | "waiter" | "kitchen" | "attendant" | "customer";
+    const result = await usersService.create({
+      name: data.name,
+      username: data.username,
+      password: data.password,
+      email: data.email || undefined,
+      role: roleValue,
+    });
+
+    const hasError = "error" in result;
+    if (hasError) {
+      logger.error("[UserFormDialog] Erro ao criar usuário", new Error(result.error));
+      toast.error(result.error);
+      return;
+    }
+
+    toast.success(t("users.success.create"));
     onOpenChange(false);
+    onSuccess?.();
   };
 
-  const formTitle = user ? t("users.form.editTitle") : t("users.form.editTitle");
+  const formTitle = isEditMode ? t("users.form.editTitle") : t("users.form.createTitle");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -122,6 +174,24 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
             />
             {form.formState.errors.email && (
               <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-3">
+            <Label htmlFor="password" className="text-sm font-medium">
+              {t("users.form.fields.password")}
+              {isEditMode && (
+                <span className="text-muted-foreground font-normal"> ({t("users.form.fields.passwordOptional")})</span>
+              )}
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              {...form.register("password")}
+              placeholder="••••••••"
+            />
+            {form.formState.errors.password && (
+              <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
             )}
           </div>
 
