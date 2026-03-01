@@ -18,7 +18,7 @@ import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type { User } from "@/shared/schemas/user.schema";
 import type { UsersTableProps } from "../page.interface";
 
-export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable }: UsersTableProps) {
+export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable, canEdit, canDisable }: UsersTableProps) {
   const { t } = useTranslation();
   const hasSortingConfig = Boolean(sorting?.orderBy);
 
@@ -169,19 +169,27 @@ export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable 
         cell: (info) => {
           const user = info.row.original;
           const isDeleted = user.deletedAt !== null;
+          const shouldShowDisableButton = !isDeleted && canDisable;
+          const hasAnyAction = canEdit || shouldShowDisableButton;
+
+          if (!hasAnyAction) {
+            return null;
+          }
 
           return (
             <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => onEdit(user)}
-                data-testid={`edit-user-${user.id}`}
-                title={t("users.actions.edit")}
-              >
-                <PencilLineIcon size={16} />
-              </Button>
-              {!isDeleted && (
+              {canEdit && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => onEdit(user)}
+                  data-testid={`edit-user-${user.id}`}
+                  title={t("users.actions.edit")}
+                >
+                  <PencilLineIcon size={16} />
+                </Button>
+              )}
+              {shouldShowDisableButton && (
                 <Button
                   variant="ghost"
                   size="icon-sm"

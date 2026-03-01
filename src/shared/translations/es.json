@@ -398,6 +398,7 @@
       "cancel": "Cancelar"
     },
     "actions": {
+      "create": "Nuevo usuario",
       "edit": "Editar",
       "disable": "Deshabilitar"
     },
