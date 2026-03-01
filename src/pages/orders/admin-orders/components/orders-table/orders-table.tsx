@@ -9,6 +9,12 @@ import {
 } from "@tanstack/react-table";
 import { CaretDownIcon, ListBulletsIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu/dropdown-menu";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { multiply, add } from "@/lib/math";
 import type { Order, OrderItem, OrderStatus } from "@/shared/schemas/order.schema";
@@ -41,9 +47,15 @@ const DEFAULT_SORT_INDICATOR = "⬍";
 const STATUS_CLASSES: Record<OrderStatus, string> = {
   pending: "bg-yellow-500/10 text-yellow-600",
   preparing: "bg-blue-500/10 text-blue-600",
-  ready: "bg-green-500/10 text-green-600",
+  ready: "bg-purple-500/10 text-purple-600",
+  waiting_delivery_man: "bg-orange-500/10 text-orange-600",
+  in_delivery: "bg-cyan-500/10 text-cyan-600",
+  delivered: "bg-green-500/10 text-green-600",
+  finished: "bg-emerald-500/10 text-emerald-600",
   canceled: "bg-red-500/10 text-red-600",
 };
+
+const CHANGEABLE_STATUSES: OrderStatus[] = ["preparing", "ready", "waiting_delivery_man", "in_delivery", "delivered", "finished", "canceled"];
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat("pt-BR", {
@@ -190,7 +202,7 @@ function Body({ rows, expandedRowId, onRowToggle, totalLabel }: OrdersTableBodyP
   );
 }
 
-export function OrdersTable({ orders, sortState, onSortChange }: OrdersTableProps) {
+export function OrdersTable({ orders, sortState, onSortChange, onStatusChange }: OrdersTableProps) {
   const { t } = useTranslation();
   const [expandedRowId, setExpandedRowId] = useState<string | undefined>(undefined);
 
@@ -260,14 +272,39 @@ export function OrdersTable({ orders, sortState, onSortChange }: OrdersTableProp
         header: t("orders.admin.table.columns.status"),
         cell: (info) => {
           const status = info.getValue() as OrderStatus;
+          const orderId = info.row.original.id;
           const statusLabel = getStatusLabel(status);
           const statusClassName = STATUS_CLASSES[status];
+
           return (
-            <span
-              className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusClassName}`}
-            >
-              {statusLabel}
-            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium cursor-pointer border-0 outline-none focus:ring-1 focus:ring-ring ${statusClassName}`}
+                >
+                  {statusLabel}
+                  <CaretDownIcon size={12} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {CHANGEABLE_STATUSES.map((changeableStatus) => {
+                  const isCurrentStatus = changeableStatus === status;
+                  const itemClassName = STATUS_CLASSES[changeableStatus];
+                  return (
+                    <DropdownMenuItem
+                      key={changeableStatus}
+                      onClick={() => onStatusChange(orderId, changeableStatus)}
+                      disabled={isCurrentStatus}
+                      className={isCurrentStatus ? "opacity-50" : ""}
+                    >
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${itemClassName}`}>
+                        {getStatusLabel(changeableStatus)}
+                      </span>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           );
         },
       },
@@ -343,7 +380,7 @@ export function OrdersTable({ orders, sortState, onSortChange }: OrdersTableProp
         },
       },
     ],
-    [t, getStatusLabel, formatDate, expandedRowId, onRowToggle],
+    [t, getStatusLabel, formatDate, expandedRowId, onRowToggle, onStatusChange],
   );
 
   const table = useReactTable({

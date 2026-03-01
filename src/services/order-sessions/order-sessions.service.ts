@@ -3,6 +3,7 @@ import { logger } from "@/lib/logger";
 import type {
   GetOrderSessionResponse,
   GetOrderSessionSummaryResponse,
+  GetOrderSessionQrCodeResponse,
   OrderSession,
   OrderSessionSummary,
 } from "./interfaces/order-sessions.interface";
@@ -121,6 +122,26 @@ export const orderSessionsService = {
         error instanceof Error
           ? error.message
           : "Erro ao buscar resumo da sessão de pedidos";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async getQrCode(sessionId: string): Promise<ServiceResult<GetOrderSessionQrCodeResponse>> {
+    try {
+      const result = await api.get<unknown>(`/order-sessions/${sessionId}/qrcode`);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      return { data: result.data as GetOrderSessionQrCodeResponse };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Erro ao gerar QR code da sessão";
       logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }

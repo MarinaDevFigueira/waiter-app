@@ -47,6 +47,12 @@ export const BUSINESS_SELECTION_REQUIRED_PROFILES: readonly UserRoleEnum[] = [
   UserRoleEnum.SYSTEM_MANAGER,
 ] as const;
 
+export const CLOSE_ORDER_SESSION_PROFILES: readonly UserRoleEnum[] = [
+  UserRoleEnum.OWNER,
+  UserRoleEnum.ATTENDANT,
+  UserRoleEnum.WAITER,
+] as const;
+
 export function isBusinessRoleCheck(role: UserRoleEnum | undefined): role is BusinessRole {
   const hasRole = role !== undefined;
   const roleInBusinessRoles = (BUSINESS_ROLES as readonly UserRoleEnum[]).includes(role!);
@@ -82,6 +88,7 @@ export function useRoles(): UseRolesReturn {
     const canManageUsers = hasProfile && (USER_MANAGEMENT_PROFILES as readonly UserRoleEnum[]).includes(profile);
     const requiresBusinessSelection = hasProfile && (BUSINESS_SELECTION_REQUIRED_PROFILES as readonly UserRoleEnum[]).includes(profile);
     const hasAdminPrivileges = isAdmin || isSystemManager;
+    const canCloseOrderSessions = hasProfile && (CLOSE_ORDER_SESSION_PROFILES as readonly UserRoleEnum[]).includes(profile);
 
     return {
       isOwner,
@@ -100,6 +107,7 @@ export function useRoles(): UseRolesReturn {
       canManageUsers,
       requiresBusinessSelection,
       hasAdminPrivileges,
+      canCloseOrderSessions,
     };
   }, [profile]);
 

@@ -2,7 +2,7 @@ import type { Order } from "@/shared/schemas/order.schema";
 import type { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
 import type { SortDirection } from "@/shared/enums/sort-direction.enum";
 
-export type OrderStatus = "pending" | "preparing" | "ready" | "canceled";
+export type OrderStatus = "pending" | "preparing" | "ready" | "waiting_delivery_man" | "in_delivery" | "delivered" | "finished" | "canceled";
 
 export interface GetOrderItemResponse {
   id: string;

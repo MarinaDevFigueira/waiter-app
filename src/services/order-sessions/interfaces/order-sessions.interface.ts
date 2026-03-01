@@ -67,3 +67,8 @@ export interface OrderSessionSummary {
   orders: OrderSessionSummaryOrder[];
   totalAmount: number;
 }
+
+export interface GetOrderSessionQrCodeResponse {
+  qrCode: string;
+  sessionId: string;
+}

@@ -31,6 +31,7 @@ export interface UseRolesReturn {
   canManageUsers: boolean;
   requiresBusinessSelection: boolean;
   hasAdminPrivileges: boolean;
+  canCloseOrderSessions: boolean;
 
   hasRole: (role: UserRoleEnum) => boolean;
   hasAnyRole: (roles: UserRoleEnum[]) => boolean;

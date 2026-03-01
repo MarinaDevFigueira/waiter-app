@@ -20,6 +20,10 @@
       "pending": "Pending",
       "preparing": "Preparing",
       "ready": "Ready",
+      "waiting_delivery_man": "Waiting Delivery",
+      "in_delivery": "In Delivery",
+      "delivered": "Delivered",
+      "finished": "Finished",
       "canceled": "Canceled"
     },
     "sort": {
@@ -196,6 +200,9 @@
         },
         "itemsTotal": "items",
         "total": "Total"
+      },
+      "updateStatus": {
+        "success": "Order status updated successfully"
       }
     }
   },
@@ -289,7 +296,33 @@
     "closeSession": "Close Session",
     "sessionClosed": "Bill closed successfully",
     "sessionClosedAndLoggedOut": "Session closed. Goodbye!",
-    "noOrders": "No orders found for this session."
+    "noOrders": "No orders found for this session.",
+    "qrCode": {
+      "title": "Session QR Code",
+      "description": "Show this QR Code to the attendant to scan and close your session.",
+      "generating": "Generating QR Code...",
+      "error": "Error generating QR Code"
+    },
+    "scanner": {
+      "title": "Scan QR Code",
+      "description": "Point the camera at the customer's table QR Code.",
+      "button": "Scan Session",
+      "scanning": "Scanning...",
+      "error": "Error reading QR Code",
+      "permissionDenied": "Camera permission denied",
+      "notFound": "Session not found",
+      "success": "Session found!"
+    },
+    "staffSummary": {
+      "title": "Session Summary",
+      "table": "Table",
+      "orders": "Orders",
+      "closeAndConfirm": "Close Session",
+      "closing": "Closing...",
+      "closed": "Session closed successfully!",
+      "pendingOrders": "All orders must be delivered, finished, or canceled to close the session.",
+      "mustChangeStatus": "Change status to delivered, finished, or canceled."
+    }
   },
   "logout": {
     "confirmWithActiveSession": "Close active session?",

@@ -20,6 +20,10 @@
       "pending": "Pendente",
       "preparing": "Preparando",
       "ready": "Pronto",
+      "waiting_delivery_man": "Aguardando Entregador",
+      "in_delivery": "Em Entrega",
+      "delivered": "Entregue",
+      "finished": "Finalizado",
       "canceled": "Cancelado"
     },
     "sort": {
@@ -196,6 +200,9 @@
         },
         "itemsTotal": "itens",
         "total": "Total"
+      },
+      "updateStatus": {
+        "success": "Status do pedido atualizado com sucesso"
       }
     }
   },
@@ -289,7 +296,33 @@
     "closeSession": "Encerrar Sessão",
     "sessionClosed": "Conta encerrada com sucesso",
     "sessionClosedAndLoggedOut": "Sessão encerrada. Até logo!",
-    "noOrders": "Nenhum pedido encontrado para esta sessão."
+    "noOrders": "Nenhum pedido encontrado para esta sessão.",
+    "qrCode": {
+      "title": "QR Code da Sessão",
+      "description": "Mostre este QR Code para o atendente escanear e encerrar sua sessão.",
+      "generating": "Gerando QR Code...",
+      "error": "Erro ao gerar QR Code"
+    },
+    "scanner": {
+      "title": "Escanear QR Code",
+      "description": "Aponte a câmera para o QR Code da mesa do cliente.",
+      "button": "Escanear Sessão",
+      "scanning": "Escaneando...",
+      "error": "Erro ao ler QR Code",
+      "permissionDenied": "Permissão de câmera negada",
+      "notFound": "Sessão não encontrada",
+      "success": "Sessão encontrada!"
+    },
+    "staffSummary": {
+      "title": "Resumo da Sessão",
+      "table": "Mesa",
+      "orders": "Pedidos",
+      "closeAndConfirm": "Fechar Sessão",
+      "closing": "Fechando...",
+      "closed": "Sessão encerrada com sucesso!",
+      "pendingOrders": "Todos os pedidos devem estar entregues, finalizados ou cancelados para fechar a sessão.",
+      "mustChangeStatus": "Altere o status para entregue, finalizado ou cancelado."
+    }
   },
   "logout": {
     "confirmWithActiveSession": "Encerrar sessão ativa?",
