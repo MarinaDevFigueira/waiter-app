@@ -4,8 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cartObservable, type CartData, type CartItem } from "@/shared/subjects/cart.subject";
 import { orderSessionsService } from "@/services/order-sessions/order-sessions.service";
 import { ordersService } from "@/services/orders/orders.service";
-import { useAuth } from "@/shared/hooks/useAuth";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { useRoles } from "@/shared/hooks/useRoles";
 import { logger } from "@/lib/logger";
 import { useLanguage } from "@/shared/hooks/useLanguage";
 
@@ -23,7 +22,7 @@ interface UseCartReturn {
 export function useCart(): UseCartReturn {
   const [cart, setCart] = useState<CartData>(cartObservable.getValue());
   const [isLoading, setIsLoading] = useState(false);
-  const { auth } = useAuth();
+  const { isTable } = useRoles();
   const { addLanguagePrefix } = useLanguage();
   const queryClient = useQueryClient();
 
@@ -33,8 +32,7 @@ export function useCart(): UseCartReturn {
   }, []);
 
   useEffect(() => {
-    const isMesaProfile = auth?.profile === UserRoleEnum.TABLE;
-    if (!isMesaProfile) return;
+    if (!isTable) return;
 
     const initializeSession = async (): Promise<void> => {
       const currentCart = cartObservable.getValue();
@@ -69,11 +67,10 @@ export function useCart(): UseCartReturn {
     };
 
     initializeSession();
-  }, [auth]);
+  }, [isTable]);
 
   const ensureOrderSession = async (): Promise<boolean> => {
-    const isMesaProfile = auth?.profile === UserRoleEnum.TABLE;
-    if (!isMesaProfile) return true;
+    if (!isTable) return true;
 
     const currentCart = cartObservable.getValue();
     const hasSessionId = Boolean(currentCart.orderSessionId);
@@ -167,9 +164,8 @@ export function useCart(): UseCartReturn {
     try {
       const currentCart = cartObservable.getValue();
       const hasSessionId = Boolean(currentCart.orderSessionId);
-      const isMesaProfile = auth?.profile === UserRoleEnum.TABLE;
 
-      if (hasSessionId && isMesaProfile) {
+      if (hasSessionId && isTable) {
         const result = await orderSessionsService.close(currentCart.orderSessionId as string);
         const hasError = "error" in result;
         if (hasError) {
@@ -188,7 +184,6 @@ export function useCart(): UseCartReturn {
     setIsLoading(true);
     try {
       const currentCart = cartObservable.getValue();
-      const isMesaProfile = auth?.profile === UserRoleEnum.TABLE;
 
       const orderItems = currentCart.items.map((item) => ({
         name: item.productName,
@@ -197,7 +192,7 @@ export function useCart(): UseCartReturn {
       }));
 
       const hasSessionId = Boolean(currentCart.orderSessionId);
-      const orderSessionId = hasSessionId && isMesaProfile
+      const orderSessionId = hasSessionId && isTable
         ? (currentCart.orderSessionId as string)
         : undefined;
 
@@ -213,7 +208,7 @@ export function useCart(): UseCartReturn {
 
       cartObservable.clearCart();
 
-      const sessionStaysOpen = isMesaProfile && hasSessionId;
+      const sessionStaysOpen = isTable && hasSessionId;
       if (sessionStaysOpen) {
         cartObservable.setOrderSession(currentCart.orderSessionId);
       }

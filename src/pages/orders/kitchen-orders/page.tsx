@@ -18,7 +18,7 @@ function formatTime(timestamp: Date) {
   return format(new Date(timestamp), "HH:mm");
 }
 
-export function KitchenOrdersPage({ canSwitchOrdersView }: KitchenOrdersPageProps) {
+export function KitchenOrdersPage({ canSwitchOrdersView, extraActions }: KitchenOrdersPageProps) {
   const { orders, queryParams, total, page, size, totalPages, hasNextPage, hasPreviousPage, setQueryParams, updateOrderStatus } = useOrders();
   const { t } = useTranslation();
 
@@ -60,7 +60,10 @@ export function KitchenOrdersPage({ canSwitchOrdersView }: KitchenOrdersPageProp
           {t("orders.kitchen.pageSubtitle")}
         </p>
       </div>
-      <OrdersViewToggle disabled={!canSwitchOrdersView} />
+      <div className="flex items-center gap-2">
+        {extraActions}
+        <OrdersViewToggle disabled={!canSwitchOrdersView} />
+      </div>
     </div>
   );
 

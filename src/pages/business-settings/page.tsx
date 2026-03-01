@@ -13,9 +13,8 @@ import { businessSettingsService } from "@/services/business-settings/business-s
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useBusiness } from "@/shared/hooks/useBusiness";
 import { usePermissions } from "@/shared/hooks/usePermissions";
-import { useAuth } from "@/shared/hooks/useAuth";
+import { useRoles } from "@/shared/hooks/useRoles";
 import { PermissionEnum } from "@/shared/enums/permission.enum";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { TranslationsEnum } from "@/shared/enums/translations.enum";
 import { logger } from "@/lib/logger";
 import type { GetBusinessSettingsResponse } from "@/services/business-settings/interfaces/business-settings.interface";
@@ -102,17 +101,14 @@ function FormField({
 export function BusinessSettingsPage() {
   const { t } = useTranslation();
   const { selectedBusiness } = useBusiness();
-  const { profile } = useAuth();
+  const { requiresBusinessSelection, isAdmin } = useRoles();
   const { hasPermissionTo } = usePermissions();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const rolesRequiringBusinessSelection = [UserRoleEnum.ADMIN, UserRoleEnum.SYSTEM_MANAGER];
-  const needsBusinessSelection = rolesRequiringBusinessSelection.includes(profile as UserRoleEnum);
-  const hasBusinessSelected = needsBusinessSelection ? selectedBusiness !== null : true;
+  const hasBusinessSelected = requiresBusinessSelection ? selectedBusiness !== null : true;
 
-  const isAdmin = profile === UserRoleEnum.ADMIN;
   const hasEditPermission = hasPermissionTo(PermissionEnum.EDIT_BUSINESS_SETTINGS);
   const canEdit = isAdmin || hasEditPermission;
 
@@ -331,7 +327,7 @@ export function BusinessSettingsPage() {
     saveButtonLabel,
   ]);
 
-  const shouldShowNoBusinessContent = needsBusinessSelection && !selectedBusiness;
+  const shouldShowNoBusinessContent = requiresBusinessSelection && !selectedBusiness;
   const shouldShowLoading = hasBusinessSelected && isLoading;
   const shouldShowError = hasBusinessSelected && isError;
   const shouldShowEditContent = hasBusinessSelected && !isLoading && !isError && isEditing;

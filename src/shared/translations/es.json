@@ -20,7 +20,11 @@
       "pending": "Pendiente",
       "preparing": "Preparando",
       "ready": "Listo",
-      "canceled": "Canceled"
+      "waiting_delivery_man": "Esperando Repartidor",
+      "in_delivery": "En Entrega",
+      "delivered": "Entregado",
+      "finished": "Finalizado",
+      "canceled": "Cancelado"
     },
     "sort": {
       "ascending": "Ordenar ascendente",
@@ -196,6 +200,9 @@
         },
         "itemsTotal": "artículos",
         "total": "Total"
+      },
+      "updateStatus": {
+        "success": "Estado del pedido actualizado con éxito"
       }
     }
   },
@@ -289,7 +296,33 @@
     "closeSession": "Cerrar Sesión",
     "sessionClosed": "Cuenta cerrada con éxito",
     "sessionClosedAndLoggedOut": "Sesión cerrada. ¡Hasta luego!",
-    "noOrders": "No se encontraron pedidos para esta sesión."
+    "noOrders": "No se encontraron pedidos para esta sesión.",
+    "qrCode": {
+      "title": "Código QR de la Sesión",
+      "description": "Muestre este código QR al asistente para escanear y cerrar su sesión.",
+      "generating": "Generando código QR...",
+      "error": "Error al generar el código QR"
+    },
+    "scanner": {
+      "title": "Escanear Código QR",
+      "description": "Apunte la cámara al código QR de la mesa del cliente.",
+      "button": "Escanear Sesión",
+      "scanning": "Escaneando...",
+      "error": "Error al leer el código QR",
+      "permissionDenied": "Permiso de cámara denegado",
+      "notFound": "Sesión no encontrada",
+      "success": "¡Sesión encontrada!"
+    },
+    "staffSummary": {
+      "title": "Resumen de la Sesión",
+      "table": "Mesa",
+      "orders": "Pedidos",
+      "closeAndConfirm": "Cerrar Sesión",
+      "closing": "Cerrando...",
+      "closed": "¡Sesión cerrada con éxito!",
+      "pendingOrders": "Todos los pedidos deben estar entregados, finalizados o cancelados para cerrar la sesión.",
+      "mustChangeStatus": "Cambie el estado a entregado, finalizado o cancelado."
+    }
   },
   "logout": {
     "confirmWithActiveSession": "¿Cerrar sesión activa?",
@@ -388,16 +421,20 @@
     },
     "form": {
       "editTitle": "Editar Usuario",
+      "createTitle": "Nuevo Usuario",
       "fields": {
         "name": "Nombre",
         "username": "Usuario",
         "email": "Correo electrónico",
+        "password": "Contraseña",
+        "passwordOptional": "opcional",
         "role": "Perfil"
       },
       "save": "Guardar",
       "cancel": "Cancelar"
     },
     "actions": {
+      "create": "Nuevo usuario",
       "edit": "Editar",
       "disable": "Deshabilitar"
     },
@@ -408,7 +445,9 @@
     },
     "emptyState": "No se encontraron usuarios",
     "success": {
-      "disable": "Usuario deshabilitado con éxito"
+      "disable": "Usuario deshabilitado con éxito",
+      "update": "Usuario actualizado con éxito",
+      "create": "Usuario creado con éxito"
     },
     "errors": {
       "loadFailed": "Error al cargar usuarios",

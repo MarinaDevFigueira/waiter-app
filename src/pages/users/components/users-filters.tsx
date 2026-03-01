@@ -12,7 +12,7 @@ import { MultiSelect } from "@/components/ui/multi-select/multi-select";
 import { usersFiltersObservable } from "@/shared/subjects/users-filters.subject";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { useTranslation } from "@/shared/hooks/useTranslation";
-import { useAuth } from "@/shared/hooks/useAuth";
+import { useRoles } from "@/shared/hooks/useRoles";
 
 const USER_ROLE_VALUES = Object.values(UserRoleEnum) as [UserRoleEnum, ...UserRoleEnum[]];
 
@@ -25,10 +25,7 @@ type FilterFormValues = z.infer<typeof filterFormSchema>;
 
 export function UsersFilters() {
   const { t } = useTranslation();
-  const { auth } = useAuth();
-
-  const userProfile = auth?.profile;
-  const isOwnerProfile = userProfile === UserRoleEnum.OWNER;
+  const { isOwner } = useRoles();
 
   const ROLE_OPTIONS: { value: UserRoleEnum; label: string }[] = useMemo(() => {
     const allOptions = [
@@ -41,12 +38,12 @@ export function UsersFilters() {
       { value: UserRoleEnum.SYSTEM_MANAGER, label: t("users.roles.system_manager")}
     ];
 
-    if (isOwnerProfile) {
+    if (isOwner) {
       return allOptions.filter((option) => option.value !== UserRoleEnum.ADMIN);
     }
 
     return allOptions;
-  }, [t, isOwnerProfile]);
+  }, [t, isOwner]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");

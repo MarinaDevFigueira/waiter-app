@@ -45,6 +45,7 @@ interface UseUsersReturn {
   resetFilters: () => void;
   updateSorting: (orderBy: UsersOrderByEnum, direction: SortDirection) => void;
   updatePagination: (page: number, size: number) => void;
+  refetch: () => void;
 }
 
 export function useUsers(): UseUsersReturn {
@@ -70,7 +71,7 @@ export function useUsers(): UseUsersReturn {
     return () => subscription.unsubscribe();
   }, []);
 
-  const { data, isLoading, isFetching, error, isError } = useQuery<PaginatedUsers>({
+  const { data, isLoading, isFetching, error, isError, refetch } = useQuery<PaginatedUsers>({
     queryKey: addLanguagePrefix("users", queryParams),
     queryFn: async () => {
       const result = await usersService.getAll({
@@ -150,5 +151,6 @@ export function useUsers(): UseUsersReturn {
     resetFilters,
     updateSorting,
     updatePagination,
+    refetch,
   };
 }

@@ -22,7 +22,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
 import { LanguageSelector } from "@/components/ui/language-selector/language-selector";
 import { authService } from "@/services/auth/auth.service";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { useRoles } from "@/shared/hooks/useRoles";
 import { StorageKeys } from "@/shared/constants/storage-keys";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { BusinessSelectorButton } from "@/components/ui/business-selector-button/business-selector-button";
@@ -59,6 +59,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
+  const { hasFullMenuAccess, shouldShowBusinessSelector } = useRoles();
   const { t } = useTranslation();
   const [isMinimized, setIsMinimized] = useState<boolean>(() => {
     const stored = localStorage.getItem(StorageKeys.SIDEBAR_MINIMIZED);
@@ -83,15 +84,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const toggleBusinessMenu = useCallback(() => {
     setIsBusinessExpanded((prev) => !prev);
   }, []);
-
-  const userProfile = auth?.profile;
-  const fullMenuProfiles = [UserRoleEnum.OWNER, UserRoleEnum.ADMIN];
-  const hasFullMenuAccess = fullMenuProfiles.includes(
-    userProfile as UserRoleEnum,
-  );
-
-  const adminProfiles = [UserRoleEnum.ADMIN, UserRoleEnum.SYSTEM_MANAGER];
-  const shouldShowBusinessSelector = adminProfiles.includes(userProfile as UserRoleEnum);
 
   const menuItems = useMemo<MenuItem[]>(() => {
     const baseItems: MenuItem[] = [
@@ -256,7 +248,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <div
                 data-expanded={isBusinessExpanded}
                 data-minimized={isMinimized}
-                className="overflow-hidden data-[expanded=false]:hidden data-[minimized=true]:hidden"
+                className="overflow-hidden data-[expanded=false]:hidden data-[minimized=true]:hidden ml-3 mt-1 mb-1 pl-3 border-l border-border bg-secondary/50 dark:bg-black/20 rounded-r-md"
               >
                 {businessSubItems.map((subItem) => {
                   const isSubActive = normalizedPathname === subItem.path;
@@ -265,9 +257,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       key={subItem.path}
                       to={subItem.path}
                       data-active={isSubActive}
-                      className="group flex items-center gap-3 pl-9 pr-3 py-2 rounded-md mb-1 transition-colors data-[active=false]:text-foreground data-[active=false]:hover:bg-secondary data-[active=true]:bg-sidebar-primary"
+                      className="group flex items-center gap-3 pl-3 pr-3 py-2 rounded-md my-1 transition-colors data-[active=false]:text-muted-foreground data-[active=false]:hover:text-foreground data-[active=false]:hover:bg-secondary data-[active=true]:bg-sidebar-accent"
                     >
-                      <span className="text-sm group-data-[active=true]:text-white">
+                      <span className="text-sm group-data-[active=true]:text-sidebar-accent-foreground">
                         {subItem.label}
                       </span>
                     </Link>
@@ -364,7 +356,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
                 <div
                   data-expanded={isBusinessExpanded}
-                  className="overflow-hidden data-[expanded=false]:hidden"
+                  className="overflow-hidden data-[expanded=false]:hidden ml-3 mt-1 mb-1 pl-3 border-l border-border bg-secondary/50 dark:bg-black/20 rounded-r-md"
                 >
                   {businessSubItems.map((subItem) => {
                     const isSubActive = normalizedPathname === subItem.path;
@@ -374,9 +366,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                         to={subItem.path}
                         data-active={isSubActive}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="group flex items-center gap-3 pl-9 pr-3 py-2 rounded-md mb-1 transition-colors data-[active=false]:text-foreground data-[active=false]:hover:bg-secondary data-[active=true]:bg-sidebar-primary"
+                        className="group flex items-center gap-3 pl-3 pr-3 py-2 rounded-md my-1 transition-colors data-[active=false]:text-muted-foreground data-[active=false]:hover:text-foreground data-[active=false]:hover:bg-secondary data-[active=true]:bg-sidebar-accent"
                       >
-                        <span className="text-sm group-data-[active=true]:text-white">
+                        <span className="text-sm group-data-[active=true]:text-sidebar-accent-foreground">
                           {subItem.label}
                         </span>
                       </Link>

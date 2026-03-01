@@ -1,17 +1,22 @@
 import { useState, useMemo, useCallback } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { useOrders } from "@/shared/hooks/useOrders";
 import { usePagination } from "@/shared/hooks/usePagination";
+import { ordersService } from "@/services/orders/orders.service";
 import { OrdersTable } from "@/pages/orders/admin-orders/components/orders-table/orders-table";
 import { OrdersTableSkeleton } from "@/pages/orders/admin-orders/components/orders-table/orders-table-skeleton";
 import { OrdersViewToggle } from "@/pages/orders/kitchen-orders/components/orders-view-toggle/orders-view-toggle";
 import { Pagination } from "@/components/ui/pagination/pagination";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import { useLanguage } from "@/shared/hooks/useLanguage";
 import { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
+import type { OrderStatus } from "@/shared/schemas/order.schema";
 import type { AdminOrdersPageProps } from "@/pages/orders/admin-orders/page.interface";
 import type { OrdersTableSortState } from "@/pages/orders/admin-orders/components/orders-table/orders-table.interface";
 
-export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
+export function AdminOrdersPage({ canSwitchOrdersView, extraActions }: AdminOrdersPageProps) {
   const { orders, isLoading, total, page, size, totalPages, hasNextPage, hasPreviousPage, setQueryParams } = useOrders();
   const [sortState, setSortState] = useState<OrdersTableSortState>({
     orderBy: OrdersOrderByEnum.CREATED_AT,
@@ -23,6 +28,29 @@ export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
     setQueryParams((prev) => ({ ...prev, orderBy: sort.orderBy, direction: sort.direction, page: 1 }));
   }, [setQueryParams]);
   const { t } = useTranslation();
+  const { addLanguagePrefix } = useLanguage();
+  const queryClient = useQueryClient();
+
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ orderId, status }: { orderId: string; status: OrderStatus }) => {
+      const result = await ordersService.updateStatus(orderId, status);
+      const hasError = "error" in result;
+      if (hasError) {
+        throw new Error(result.error);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("orders") });
+      toast.success(t("orders.admin.updateStatus.success"));
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleStatusChange = useCallback((orderId: string, status: OrderStatus) => {
+    updateStatusMutation.mutate({ orderId, status });
+  }, [updateStatusMutation]);
 
   const pagination = usePagination({
     page,
@@ -52,7 +80,10 @@ export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
           {t("orders.admin.pageSubtitle")}
         </p>
       </div>
-      <OrdersViewToggle disabled={!canSwitchOrdersView} />
+      <div className="flex items-center gap-2">
+        {extraActions}
+        <OrdersViewToggle disabled={!canSwitchOrdersView} />
+      </div>
     </div>
   );
 
@@ -102,7 +133,7 @@ export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
       return (
         <div className="flex-1 min-h-0 flex flex-col gap-3">
           <div className="flex-1 min-h-0">
-            <OrdersTable orders={orders} sortState={sortState} onSortChange={handleSortChange} />
+            <OrdersTable orders={orders} sortState={sortState} onSortChange={handleSortChange} onStatusChange={handleStatusChange} />
           </div>
           {paginationBar}
         </div>
@@ -110,7 +141,7 @@ export function AdminOrdersPage({ canSwitchOrdersView }: AdminOrdersPageProps) {
     }
 
     return null;
-  }, [showSkeleton, showEmpty, showTable, t, orders, paginationBar]);
+  }, [showSkeleton, showEmpty, showTable, t, orders, sortState, handleSortChange, handleStatusChange, paginationBar]);
 
   return (
     <div className="flex flex-col h-full gap-6">

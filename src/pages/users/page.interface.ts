@@ -10,6 +10,8 @@ export interface UsersTableProps {
   onSortingChange: (orderBy: UsersOrderByEnum, direction: SortDirection) => void;
   onEdit: (user: User) => void;
   onDisable: (user: User) => void;
+  canEdit: boolean;
+  canDisable: boolean;
 }
 
 export interface SortingConfig {

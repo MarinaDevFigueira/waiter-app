@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { X } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog/dialog";
 import { Drawer } from "@/components/ui/drawer/drawer";
@@ -6,6 +6,7 @@ import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useIsMobile } from "@/shared/hooks/useMediaQuery";
 import { useOrderSessionOrders } from "@/shared/hooks/useOrderSessionOrders";
 import { multiply, add } from "@/lib/math";
+import { QrCodeModal } from "@/pages/foods/components/qr-code-modal/qr-code-modal";
 import type { Order, OrderItem } from "@/shared/schemas/order.schema";
 
 interface OrderSessionSummaryModalProps {
@@ -32,9 +33,18 @@ export function OrderSessionSummaryModal({
 }: OrderSessionSummaryModalProps) {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const [showQrCode, setShowQrCode] = useState(false);
   const { data: ordersData, isLoading } = useOrderSessionOrders(
     open ? orderSessionId : null
   );
+
+  const handleCloseSession = useCallback(() => {
+    setShowQrCode(true);
+  }, []);
+
+  const handleQrCodeClose = useCallback(() => {
+    setShowQrCode(false);
+  }, []);
 
   const handleOpenChange = useCallback(
     (isOpen: boolean) => {
@@ -109,7 +119,7 @@ export function OrderSessionSummaryModal({
         <span className="text-primary">{formattedTotal}</span>
       </div>
       <button
-        onClick={onCloseSession}
+        onClick={handleCloseSession}
         disabled={isClosing}
         data-disabled={isClosing}
         data-testid="close-session-button"
@@ -118,6 +128,14 @@ export function OrderSessionSummaryModal({
         {t("orderSession.closeSession")}
       </button>
     </div>
+  );
+
+  const qrCodeModal = (
+    <QrCodeModal
+      open={showQrCode}
+      onClose={handleQrCodeClose}
+      sessionId={orderSessionId}
+    />
   );
 
   const bodyContent = (
@@ -130,40 +148,46 @@ export function OrderSessionSummaryModal({
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={handleOpenChange}>
-        <Drawer.Content
-          className="max-h-[85vh] flex flex-col"
-          data-testid="order-session-summary-modal"
-        >
-          <Drawer.Header className="flex-row items-center justify-between">
-            <Drawer.Title>{t("orderSession.summary")}</Drawer.Title>
-          </Drawer.Header>
-          {bodyContent}
-          {footer}
-        </Drawer.Content>
-      </Drawer>
+      <>
+        <Drawer open={open} onOpenChange={handleOpenChange}>
+          <Drawer.Content
+            className="max-h-[85vh] flex flex-col"
+            data-testid="order-session-summary-modal"
+          >
+            <Drawer.Header className="flex-row items-center justify-between">
+              <Drawer.Title>{t("orderSession.summary")}</Drawer.Title>
+            </Drawer.Header>
+            {bodyContent}
+            {footer}
+          </Drawer.Content>
+        </Drawer>
+        {qrCodeModal}
+      </>
     );
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <Dialog.Content
-        className="max-w-2xl p-0 max-h-[80vh] flex flex-col"
-        data-testid="order-session-summary-modal"
-      >
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-lg font-semibold">{t("orderSession.summary")}</h2>
-          <button
-            onClick={onClose}
-            aria-label={t("common.buttons.cancel")}
-            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted hover:cursor-pointer transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        {bodyContent}
-        {footer}
-      </Dialog.Content>
-    </Dialog>
+    <>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <Dialog.Content
+          className="max-w-2xl p-0 max-h-[80vh] flex flex-col"
+          data-testid="order-session-summary-modal"
+        >
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <Dialog.Title className="text-lg font-semibold">{t("orderSession.summary")}</Dialog.Title>
+            <button
+              onClick={onClose}
+              aria-label={t("common.buttons.cancel")}
+              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted hover:cursor-pointer transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          {bodyContent}
+          {footer}
+        </Dialog.Content>
+      </Dialog>
+      {qrCodeModal}
+    </>
   );
 }

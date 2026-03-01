@@ -4,39 +4,27 @@ import { KitchenPage } from "@/pages/kitchen/page";
 import { LoginPage } from "@/pages/login/page";
 import { AppLayout } from "@/components/layouts/app-layout/app-layout";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { useRoles } from "@/shared/hooks/useRoles";
 
 const HomePage = () => {
-  const { auth, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { canAccessDashboard, isTable, isCustomer, isKitchen } = useRoles();
 
   const userIsNotAuthenticated = !isAuthenticated;
   if (userIsNotAuthenticated) {
     return <LoginPage />;
   }
 
-  const profile = auth?.profile;
-
-  const dashboardProfiles = [
-    UserRoleEnum.OWNER,
-    UserRoleEnum.ADMIN,
-    UserRoleEnum.ATTENDANT,
-    UserRoleEnum.KITCHEN,
-  ];
-  const hasDashboardAccess = dashboardProfiles.includes(
-    profile as UserRoleEnum,
-  );
-  if (hasDashboardAccess) {
+  if (canAccessDashboard) {
     return <Navigate to="/dashboard" />;
   }
 
   const renderHome = () => {
-    const isTableOrCustomer =
-      profile === UserRoleEnum.TABLE || profile === UserRoleEnum.CUSTOMER;
+    const isTableOrCustomer = isTable || isCustomer;
     if (isTableOrCustomer) {
       return <FoodsPage />;
     }
 
-    const isKitchen = profile === UserRoleEnum.KITCHEN;
     if (isKitchen) {
       return <KitchenPage />;
     }

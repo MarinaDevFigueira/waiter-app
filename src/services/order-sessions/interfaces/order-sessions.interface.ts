@@ -29,6 +29,14 @@ export interface GetOrderSessionSummaryResponse {
   totalAmount: number;
 }
 
+export interface OpenOrderSessionRequestBody {
+  tableUserId?: string;
+}
+
+export interface GetActiveOrderSessionRequestQuery {
+  tableUserId: string;
+}
+
 export interface OrderSession {
   id: string;
   tableUserId: string;
@@ -58,4 +66,9 @@ export interface OrderSessionSummary {
   orderSession: OrderSession;
   orders: OrderSessionSummaryOrder[];
   totalAmount: number;
+}
+
+export interface GetOrderSessionQrCodeResponse {
+  qrCode: string;
+  sessionId: string;
 }

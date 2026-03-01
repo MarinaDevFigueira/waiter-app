@@ -9,6 +9,7 @@ import type {
   GetProductsRequestQuery,
   GetProductsResponse,
   GetProductsApiResponse,
+  GetProductsRequestFilters,
 } from "./interfaces/products.interface";
 
 type ServiceSuccess<T> = { data: T };
@@ -71,12 +72,43 @@ function buildProductFormData(data: ProductForm, files: File[], options?: { excl
   return formData;
 }
 
+function buildProductsApiFilters(rawFilters: Record<string, unknown>): GetProductsRequestFilters {
+  const filters = rawFilters as {
+    search?: string;
+    categoria?: string[];
+    precoMin?: number;
+    precoMax?: number;
+    somenteEmEstoque?: boolean;
+    estoqueMin?: number;
+    status?: ProductStatusEnum[];
+    categoryId?: string;
+    priceMin?: number;
+    priceMax?: number;
+    inStock?: boolean;
+    stockMin?: number;
+    active?: string;
+  };
+
+  const activeValues = filters.status?.map((s) => (s === ProductStatusEnum.ACTIVE ? "true" : "false"));
+
+  return {
+    search: filters.search,
+    categoryId: filters.categoryId ?? (filters.categoria?.length ? filters.categoria.join(",") : undefined),
+    priceMin: filters.priceMin ?? filters.precoMin,
+    priceMax: filters.priceMax ?? filters.precoMax,
+    inStock: filters.inStock ?? filters.somenteEmEstoque,
+    stockMin: filters.stockMin ?? filters.estoqueMin,
+    active: filters.active ?? (activeValues?.length ? activeValues.join(",") : undefined),
+  };
+}
+
 export const productsService = {
   async getAll(
     queryParams: GetProductsRequestQuery
   ): Promise<ServiceResult<GetProductsResponse>> {
     try {
-      const { page, size, orderBy, direction, filters = {} } = queryParams;
+      const { page, size, orderBy, direction, filters: rawFilters = {} } = queryParams;
+      const filters = buildProductsApiFilters(rawFilters as Record<string, unknown>);
 
       const params = new URLSearchParams();
       params.set("page", String(page));
@@ -85,17 +117,12 @@ export const productsService = {
       params.set("direction", direction);
 
       if (filters.search) params.set("search", filters.search);
-      if (filters.categoria?.length) {
-        params.set("categoryId", filters.categoria.join(","));
-      }
-      if (filters.precoMin !== undefined) params.set("priceMin", String(filters.precoMin));
-      if (filters.precoMax !== undefined) params.set("priceMax", String(filters.precoMax));
-      if (filters.somenteEmEstoque) params.set("inStock", "true");
-      if (filters.estoqueMin !== undefined) params.set("stockMin", String(filters.estoqueMin));
-      if (filters.status?.length) {
-        const activeValues = filters.status.map((s) => (s === ProductStatusEnum.ACTIVE ? "true" : "false"));
-        params.set("active", activeValues.join(","));
-      }
+      if (filters.categoryId) params.set("categoryId", filters.categoryId);
+      if (filters.priceMin !== undefined) params.set("priceMin", String(filters.priceMin));
+      if (filters.priceMax !== undefined) params.set("priceMax", String(filters.priceMax));
+      if (filters.inStock) params.set("inStock", "true");
+      if (filters.stockMin !== undefined) params.set("stockMin", String(filters.stockMin));
+      if (filters.active) params.set("active", filters.active);
 
       const result = await api.get<unknown>(`/products?${params.toString()}`);
 

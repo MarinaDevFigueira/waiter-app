@@ -1,7 +1,3 @@
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { USER_MANAGEMENT_PROFILES } from "@/shared/hooks/useRoles";
 
-export const USERS_PAGE_ALLOWED_PROFILES = [
-  UserRoleEnum.OWNER,
-  UserRoleEnum.ADMIN,
-  UserRoleEnum.SYSTEM_MANAGER
-] as const;
+export const USERS_PAGE_ALLOWED_PROFILES = USER_MANAGEMENT_PROFILES;

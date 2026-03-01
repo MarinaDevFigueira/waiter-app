@@ -3,8 +3,7 @@ import { ShoppingBag, Trash2, Plus, Minus } from "lucide-react";
 import { Drawer } from "@/components/ui/drawer/drawer";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useCart } from "@/shared/hooks/useCart";
-import { useAuth } from "@/shared/hooks/useAuth";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { useRoles } from "@/shared/hooks/useRoles";
 import { multiply } from "@/lib/math";
 import type { CartItem } from "@/shared/subjects/cart.subject";
 
@@ -91,18 +90,16 @@ interface CartDrawerProps {
 
 export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps) {
   const { t } = useTranslation();
-  const { auth } = useAuth();
+  const { isTable } = useRoles();
   const { cart, itemCount, removeItem, updateQuantity, clearCart, confirmOrder, isLoading } = useCart();
   const [isConfirming, setIsConfirming] = useState(false);
 
   const formattedTotal = useMemo(() => formatPrice(cart.total), [cart.total]);
 
-  const isTableProfile = auth?.profile === UserRoleEnum.TABLE;
-
   const confirmButtonLabel = useMemo(() => {
-    if (isTableProfile) return t("cart.sendToKitchen");
+    if (isTable) return t("cart.sendToKitchen");
     return t("cart.confirmOrder");
-  }, [isTableProfile, t]);
+  }, [isTable, t]);
 
   const itemCountLabel = useMemo(() => {
     const key = itemCount === 1 ? "cart.itemCount" : "cart.itemCountPlural";

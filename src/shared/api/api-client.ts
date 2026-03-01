@@ -141,7 +141,8 @@ async function request<T>(
     });
 
     const isUnauthorized = response.status === 401;
-    if (isUnauthorized) {
+    const isAuthEndpoint = path.startsWith("/auth/");
+    if (isUnauthorized && !isAuthEndpoint) {
       const refreshed = await refreshTokens();
       const refreshFailed = !refreshed;
       if (refreshFailed) {

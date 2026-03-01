@@ -5,6 +5,8 @@ import { StorageKeys } from "@/shared/constants/storage-keys";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { permissionsService } from "@/services/permissions/permissions.service";
 import { logger } from "@/lib/logger";
+import { queryClient } from "@/lib/query-client";
+import { PERMISSIONS_QUERY_KEY } from "@/shared/hooks/useUserPermissions";
 import type { AuthData } from "@/shared/subjects/auth";
 
 type LoginSuccess = { data: AuthData };
@@ -91,10 +93,17 @@ class AuthService {
     try {
       authObservable.clearAuth();
       permissionsObservable.clear();
+      queryClient.removeQueries({ queryKey: PERMISSIONS_QUERY_KEY });
+      queryClient.clear();
+      sessionStorage.removeItem(StorageKeys.ACCESS_TOKEN);
+      sessionStorage.removeItem(StorageKeys.REFRESH_TOKEN);
       return { data: { success: true } };
     } catch (error) {
       authObservable.clearAuth();
       permissionsObservable.clear();
+      queryClient.clear();
+      sessionStorage.removeItem(StorageKeys.ACCESS_TOKEN);
+      sessionStorage.removeItem(StorageKeys.REFRESH_TOKEN);
       return { data: { success: true } };
     }
   }

@@ -1,14 +1,18 @@
 import { useState, useCallback } from "react";
 import { toast } from "react-toastify";
+import { PlusIcon } from "@phosphor-icons/react";
 import { UsersTable } from "@/pages/users/components/users-table";
 import { UsersTableSkeleton } from "@/pages/users/components/users-table-skeleton";
 import { UsersFilters } from "@/pages/users/components/users-filters";
 import { UserFormDialog } from "@/pages/users/components/user-form-dialog/user-form-dialog";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog/confirmation-dialog";
 import { Pagination } from "@/components/ui/pagination/pagination";
+import { Button } from "@/components/ui/button/button";
 import { useUsers } from "@/shared/hooks/useUsers";
 import { usePagination } from "@/shared/hooks/usePagination";
 import { useTranslation } from "@/shared/hooks/useTranslation";
+import { usePermissions } from "@/shared/hooks/usePermissions";
+import { PermissionEnum } from "@/shared/enums/permission.enum";
 import type { User } from "@/shared/schemas/user.schema";
 
 export function UsersPage() {
@@ -26,12 +30,23 @@ export function UsersPage() {
     queryParams,
     updateSorting,
     updatePagination,
+    refetch,
   } = useUsers();
   const { t } = useTranslation();
+  const { hasPermissionTo } = usePermissions();
   const [formOpen, setFormOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
+
+  const canCreateUser = hasPermissionTo(PermissionEnum.CREATE_USERS);
+  const canEditUser = hasPermissionTo(PermissionEnum.EDIT_USERS);
+  const canDeleteUser = hasPermissionTo(PermissionEnum.DELETE_USERS);
   const [confirmDisableOpen, setConfirmDisableOpen] = useState(false);
   const [userToDisable, setUserToDisable] = useState<User | undefined>(undefined);
+
+  const handleCreateUser = useCallback(() => {
+    setSelectedUser(undefined);
+    setFormOpen(true);
+  }, []);
 
   const handleEditUser = useCallback((user: User) => {
     setSelectedUser(user);
@@ -62,6 +77,13 @@ export function UsersPage() {
     onPageChange: updatePagination,
   });
 
+  const createButton = canCreateUser ? (
+    <Button onClick={handleCreateUser} data-testid="create-user-button">
+      <PlusIcon size={16} />
+      {t("users.actions.create")}
+    </Button>
+  ) : null;
+
   const pageHeader = (
     <div className="flex items-start justify-between">
       <div>
@@ -72,6 +94,7 @@ export function UsersPage() {
           {t("users.pageSubtitle")}
         </p>
       </div>
+      {createButton}
     </div>
   );
 
@@ -126,6 +149,7 @@ export function UsersPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         user={selectedUser}
+        onSuccess={refetch}
       />
 
       <ConfirmationDialog.Root
@@ -148,6 +172,8 @@ export function UsersPage() {
               onSortingChange={updateSorting}
               onEdit={handleEditUser}
               onDisable={handleDisableUser}
+              canEdit={canEditUser}
+              canDisable={canDeleteUser}
             />
           </div>
 
