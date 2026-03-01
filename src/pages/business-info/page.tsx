@@ -81,7 +81,7 @@ function FormField({
 export function BusinessInfoPage() {
   const { t } = useTranslation();
   const { selectedBusiness } = useBusiness();
-  const { requiresBusinessSelection, isAdmin } = useRoles();
+  const { requiresBusinessSelection, isAdmin, isSystemRole } = useRoles();
   const { hasPermissionTo } = usePermissions();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
@@ -93,12 +93,28 @@ export function BusinessInfoPage() {
   const hasEditPermission = hasPermissionTo(PermissionEnum.EDIT_BUSINESS);
   const canEdit = isAdmin || hasEditPermission;
 
-  const queryKey = useMemo(() => ["business-detail", businessId], [businessId]);
+  const queryKey = useMemo(() => {
+    if (isSystemRole) {
+      return ["business-detail", businessId];
+    }
+    return ["business-detail", "me"];
+  }, [isSystemRole, businessId]);
 
   const { data: business, isLoading, isError } = useQuery({
     queryKey,
     queryFn: async () => {
-      const result = await businessService.getById(businessId ?? "");
+      if (isSystemRole) {
+        const result = await businessService.getById(businessId ?? "");
+        const hasError = "error" in result;
+        if (hasError) {
+          const error = new Error(result.error);
+          logger.error("[BusinessInfoPage] Failed to load business", error);
+          throw error;
+        }
+        return result.data;
+      }
+
+      const result = await businessService.getMe();
       const hasError = "error" in result;
       if (hasError) {
         const error = new Error(result.error);
@@ -107,7 +123,7 @@ export function BusinessInfoPage() {
       }
       return result.data;
     },
-    enabled: hasBusinessSelected,
+    enabled: isSystemRole ? hasBusinessSelected : true,
   });
 
   const form = useForm<BusinessInfoFormValues>({
@@ -294,11 +310,12 @@ export function BusinessInfoPage() {
     );
   }, [isEditing, form, handleSubmit, handleCancel, isSaving, t, nameError, saveButtonLabel]);
 
-  const shouldShowNoBusinessContent = requiresBusinessSelection && !selectedBusiness;
-  const shouldShowLoading = hasBusinessSelected && isLoading;
-  const shouldShowError = hasBusinessSelected && isError;
-  const shouldShowEditContent = hasBusinessSelected && !isLoading && !isError && isEditing;
-  const shouldShowViewContent = hasBusinessSelected && !isLoading && !isError && !isEditing;
+  const shouldShowNoBusinessContent = isSystemRole && requiresBusinessSelection && !selectedBusiness;
+  const canLoadData = isSystemRole ? hasBusinessSelected : true;
+  const shouldShowLoading = canLoadData && isLoading;
+  const shouldShowError = canLoadData && isError;
+  const shouldShowEditContent = canLoadData && !isLoading && !isError && isEditing;
+  const shouldShowViewContent = canLoadData && !isLoading && !isError && !isEditing;
 
   const bodyContent = useMemo(() => {
     if (shouldShowNoBusinessContent) return noBusinessContent;

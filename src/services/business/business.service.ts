@@ -98,6 +98,24 @@ export const businessService = {
     }
   },
 
+  async getMe(): Promise<ServiceResult<GetBusinessDetailResponse>> {
+    try {
+      const result = await api.get<unknown>("/business/me");
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      return { data: result.data as GetBusinessDetailResponse };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao buscar empresa do usuário";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
   async update(id: string, data: UpdateBusinessRequestBody): Promise<ServiceResult<void>> {
     try {
       const result = await api.put<unknown>(`/business/${id}`, data);
