@@ -5,7 +5,7 @@ import { StorageKeys } from "@/shared/constants/storage-keys";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { permissionsService } from "@/services/permissions/permissions.service";
 import { logger } from "@/lib/logger";
-import { queryClient } from "@/main";
+import { queryClient } from "@/lib/query-client";
 import { PERMISSIONS_QUERY_KEY } from "@/shared/hooks/useUserPermissions";
 import type { AuthData } from "@/shared/subjects/auth";
 
