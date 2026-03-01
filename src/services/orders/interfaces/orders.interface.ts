@@ -1,4 +1,6 @@
 import type { Order } from "@/shared/schemas/order.schema";
+import type { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
+import type { SortDirection } from "@/shared/enums/sort-direction.enum";
 
 export type OrderStatus = "pending" | "preparing" | "ready" | "canceled";
 
@@ -57,9 +59,10 @@ export interface GetOrdersResponse {
 export interface GetOrdersRequestQuery {
   status?: string;
   search?: string;
-  orderBy?: string;
-  direction?: string;
+  userId?: string;
+  orderSessionId?: string;
+  orderBy?: OrdersOrderByEnum;
+  direction?: SortDirection;
   page?: number;
   size?: number;
-  orderSessionId?: string;
 }

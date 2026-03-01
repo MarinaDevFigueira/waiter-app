@@ -36,8 +36,8 @@ export interface GetUsersRequestFilters {
 export interface GetUsersRequestQuery {
   page: number;
   size: number;
-  orderBy: UsersOrderByEnum;
-  direction: SortDirection;
+  orderBy?: UsersOrderByEnum;
+  direction?: SortDirection;
   filters?: GetUsersRequestFilters;
 }
 
@@ -51,6 +51,17 @@ export interface GetUsersResponse {
   hasPreviousPage: boolean;
 }
 
+export interface CreateUserRequestBody {
+  name: string;
+  username: string;
+  password: string;
+  role: "table" | "waiter" | "kitchen" | "attendant" | "customer";
+  email?: string;
+  document?: string;
+  documentType?: "cpf" | "rg";
+  birthDate?: string;
+}
+
 export interface UpdateMeRequestBody {
   name?: string;
   email?: string;
@@ -59,9 +70,11 @@ export interface UpdateMeRequestBody {
 
 export interface UpdateUserRequestBody {
   name?: string;
+  username?: string;
   email?: string;
-  role?: string;
+  role?: UserRoleEnum;
   document?: string;
   documentType?: "cpf" | "rg";
   birthDate?: string;
+  active?: boolean;
 }

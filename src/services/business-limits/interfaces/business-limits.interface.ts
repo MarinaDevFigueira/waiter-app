@@ -11,3 +11,10 @@ export interface GetBusinessLimitsResponse {
   kitchenUsers: UserLimit;
   attendantUsers: UserLimit;
 }
+
+export interface UpdateBusinessLimitsRequestBody {
+  maxTableUsers?: number;
+  maxWaiterUsers?: number;
+  maxKitchenUsers?: number;
+  maxAttendantUsers?: number;
+}

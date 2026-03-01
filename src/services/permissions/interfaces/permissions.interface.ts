@@ -19,3 +19,11 @@ export interface GetPermissionCatalogItemResponse {
 export interface GetPermissionsCatalogResponse {
   permissions: GetPermissionCatalogItemResponse[];
 }
+
+export interface AddUserPermissionsRequestBody {
+  permissions: string[];
+}
+
+export interface RemoveUserPermissionsRequestBody {
+  permissions: string[];
+}

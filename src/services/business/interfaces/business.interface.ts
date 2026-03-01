@@ -63,9 +63,22 @@ export interface GetBusinessesRequestQuery {
   };
 }
 
+export interface CreateBusinessRequestBody {
+  name: string;
+  ownerId: string;
+  street?: string;
+  number?: string;
+  complement?: string;
+  neighborhood?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  zipCode?: string;
+}
+
 export interface UpdateBusinessRequestBody {
   name?: string;
-  logoUrl?: string | null;
+  ownerId?: string;
   street?: string | null;
   number?: string | null;
   complement?: string | null;

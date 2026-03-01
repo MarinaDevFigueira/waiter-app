@@ -7,9 +7,9 @@ import { DefaultNotFound } from "./components/default-not-found/default-not-foun
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
-const FIVE_SECONDS = 1000 * 5
+const FIVE_SECONDS = 1000 * 5;
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
