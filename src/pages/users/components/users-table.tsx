@@ -151,6 +151,7 @@ export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable,
       {
         accessorKey: "deletedAt",
         header: t("users.table.columns.disabledAt"),
+        enableSorting: false,
         cell: (info) => {
           const user = info.row.original;
           const hasDeletedAt = user.deletedAt !== null && user.deletedAt !== undefined;

@@ -361,6 +361,7 @@ export function OrdersTable({
       {
         id: "total",
         header: t("orders.admin.table.columns.total"),
+        enableSorting: false,
         accessorFn: (row) => {
           return row.items.reduce((acc, item) => {
             const itemTotal = multiply(item.quantity, item.preco);

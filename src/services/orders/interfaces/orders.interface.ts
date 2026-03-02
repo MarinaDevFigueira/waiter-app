@@ -69,6 +69,7 @@ export interface GetOrdersRequestQuery {
   search?: string;
   userId?: string;
   orderSessionId?: string;
+  closedBy?: string;
   orderBy?: OrdersOrderByEnum;
   direction?: SortDirection;
   page?: number;
