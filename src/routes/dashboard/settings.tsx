@@ -1,12 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SettingsPage } from "@/pages/settings/page";
 
 export const Route = createFileRoute("/dashboard/settings")({
-  component: () => (
-    <div className="flex items-center justify-center h-full">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Configurações</h1>
-        <p className="text-muted-foreground">Página em desenvolvimento</p>
-      </div>
-    </div>
-  ),
+  component: SettingsPage,
 });
