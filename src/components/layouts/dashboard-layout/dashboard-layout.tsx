@@ -13,6 +13,7 @@ import {
   ListIcon,
   FolderIcon,
   BuildingsIcon,
+  GearIcon,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
@@ -23,6 +24,8 @@ import { LanguageSelector } from "@/components/ui/language-selector/language-sel
 import { authService } from "@/services/auth/auth.service";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useRoles } from "@/shared/hooks/useRoles";
+import { usePermissions } from "@/shared/hooks/usePermissions";
+import { PermissionEnum } from "@/shared/enums/permission.enum";
 import { StorageKeys } from "@/shared/constants/storage-keys";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { BusinessSelectorButton } from "@/components/ui/business-selector-button/business-selector-button";
@@ -60,7 +63,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
   const { auth } = useAuth();
   const { hasFullMenuAccess, shouldShowBusinessSelector } = useRoles();
+  const { hasPermissionTo } = usePermissions();
   const { t } = useTranslation();
+  const hasClearCachePermission = hasPermissionTo(PermissionEnum.CLEAR_CACHE);
   const [isMinimized, setIsMinimized] = useState<boolean>(() => {
     const stored = localStorage.getItem(StorageKeys.SIDEBAR_MINIMIZED);
     return stored === "true";
@@ -268,6 +273,26 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
             </div>
           )}
+
+          {hasClearCachePermission && (
+            <Link
+              to="/dashboard/settings"
+              data-active={normalizedPathname === "/dashboard/settings"}
+              data-minimized={isMinimized}
+              className="group flex items-center gap-3 px-3 py-2 rounded-md mb-1 transition-colors data-[active=false]:text-foreground data-[active=false]:hover:bg-secondary data-[active=true]:bg-sidebar-primary"
+            >
+              <GearIcon
+                size={20}
+                className="shrink-0 group-data-[active=true]:text-white"
+              />
+              <span
+                data-minimized={isMinimized}
+                className="text-sm data-[minimized=true]:hidden group-data-[active=true]:text-white"
+              >
+                {t("dashboard.navigation.settings")}
+              </span>
+            </Link>
+          )}
         </nav>
 
         <div className="p-4 border-t border-border">
@@ -376,6 +401,23 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   })}
                 </div>
               </div>
+            )}
+
+            {hasClearCachePermission && (
+              <Link
+                to="/dashboard/settings"
+                data-active={normalizedPathname === "/dashboard/settings"}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="group flex items-center gap-3 px-3 py-2 rounded-md mb-1 transition-colors data-[active=false]:text-foreground data-[active=false]:hover:bg-secondary data-[active=true]:bg-sidebar-primary"
+              >
+                <GearIcon
+                  size={20}
+                  className="shrink-0 group-data-[active=true]:text-white"
+                />
+                <span className="text-sm group-data-[active=true]:text-white">
+                  {t("dashboard.navigation.settings")}
+                </span>
+              </Link>
             )}
           </nav>
 

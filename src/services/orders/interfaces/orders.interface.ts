@@ -11,12 +11,20 @@ export interface GetOrderItemResponse {
   price: number;
 }
 
+export interface GetOrderClosedByResponse {
+  id: string;
+  name: string;
+  email?: string;
+}
+
 export interface GetOrderResponse {
   id: string;
   userName: string;
   status: OrderStatus;
   timestamp: string;
   items: GetOrderItemResponse[];
+  orderSessionId: string | null;
+  closedBy: GetOrderClosedByResponse | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -61,6 +69,7 @@ export interface GetOrdersRequestQuery {
   search?: string;
   userId?: string;
   orderSessionId?: string;
+  closedBy?: string;
   orderBy?: OrdersOrderByEnum;
   direction?: SortDirection;
   page?: number;

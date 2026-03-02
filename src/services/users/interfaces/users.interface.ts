@@ -24,7 +24,10 @@ export interface GetUsersApiResponse {
   items: GetUserResponse[];
   total: number;
   page: number;
-  limit: number;
+  size: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 export interface GetUsersRequestFilters {

@@ -38,14 +38,26 @@ export const usersService = {
     queryParams: GetUsersRequestQuery
   ): Promise<ServiceResult<GetUsersResponse>> {
     try {
-      const { page, size, filters = {} } = queryParams;
+      const { page, size, orderBy, direction, filters = {} } = queryParams;
 
       const params = new URLSearchParams();
       params.set("page", String(page));
-      params.set("limit", String(size));
+      params.set("size", String(size));
 
-      if (filters.role?.length) {
-        params.set("role", filters.role.join(","));
+      const hasOrderBy = orderBy !== undefined;
+      if (hasOrderBy) {
+        params.set("orderBy", orderBy);
+      }
+
+      const hasDirection = direction !== undefined;
+      if (hasDirection) {
+        params.set("direction", direction);
+      }
+
+      const roleFilter = filters.role;
+      const hasRoleFilter = roleFilter !== undefined && roleFilter.length > 0;
+      if (hasRoleFilter) {
+        params.set("roles", roleFilter.join(","));
       }
       if (filters.search) {
         params.set("search", filters.search);
@@ -62,10 +74,6 @@ export const usersService = {
       }
 
       const apiData = result.data as GetUsersApiResponse;
-      const totalPages = Math.ceil(apiData.total / apiData.limit);
-      const hasNextPage = apiData.page < totalPages;
-      const hasPreviousPage = apiData.page > 1;
-
       const mappedItems = apiData.items.map(mapApiUserToUser);
 
       return {
@@ -73,10 +81,10 @@ export const usersService = {
           items: mappedItems,
           total: apiData.total,
           page: apiData.page,
-          size: apiData.limit,
-          totalPages,
-          hasNextPage,
-          hasPreviousPage,
+          size: apiData.size,
+          totalPages: apiData.totalPages,
+          hasNextPage: apiData.hasNextPage,
+          hasPreviousPage: apiData.hasPreviousPage,
         },
       };
     } catch (error: unknown) {

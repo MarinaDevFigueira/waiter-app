@@ -10,6 +10,12 @@ export const orderItemSchema = z.object({
   preco: z.number().positive({ message: "Preço deve ser positivo" }),
 });
 
+export const orderClosedBySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().optional(),
+});
+
 export const orderSchema = baseEntitySchema.extend({
   id: z.string(),
   userName: z.string(),
@@ -18,6 +24,8 @@ export const orderSchema = baseEntitySchema.extend({
     .min(1, { message: "Pedido deve ter pelo menos um item" }),
   status: z.enum(["pending", "preparing", "ready", "waiting_delivery_man", "in_delivery", "delivered", "finished", "canceled"]),
   timestamp: z.date(),
+  orderSessionId: z.string().nullable(),
+  closedBy: orderClosedBySchema.nullable(),
 });
 
 export const orderFormSchema = orderSchema.omit({
@@ -31,6 +39,7 @@ export const orderFormSchema = orderSchema.omit({
 });
 
 export type OrderItem = z.infer<typeof orderItemSchema>;
+export type OrderClosedBy = z.infer<typeof orderClosedBySchema>;
 export type Order = z.infer<typeof orderSchema>;
 export type OrderForm = z.infer<typeof orderFormSchema>;
 export type OrderStatus = "pending" | "preparing" | "ready" | "waiting_delivery_man" | "in_delivery" | "delivered" | "finished" | "canceled";

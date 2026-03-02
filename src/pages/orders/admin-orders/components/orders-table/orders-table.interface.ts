@@ -18,6 +18,8 @@ export interface OrdersTableProps {
   sortState: OrdersTableSortState;
   onSortChange: (sort: OrdersTableSortState) => void;
   onStatusChange: (orderId: string, status: OrderStatus) => void;
+  onEditClosedBy?: (orderSessionId: string) => void;
+  showActionsColumn?: boolean;
 }
 
 export interface OrdersTableHeaderProps {

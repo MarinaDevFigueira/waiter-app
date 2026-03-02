@@ -24,6 +24,8 @@ function mapApiOrderToOrder(raw: GetOrderResponse): Order {
       quantity: item.quantity,
       preco: item.price,
     })),
+    orderSessionId: raw.orderSessionId,
+    closedBy: raw.closedBy,
     createdAt: new Date(raw.createdAt),
     createdBy: "api",
     updatedAt: new Date(raw.updatedAt),
@@ -43,7 +45,9 @@ export const ordersService = {
       if (filters.direction) params.set("direction", filters.direction);
       if (filters.page != null) params.set("page", String(filters.page));
       if (filters.size != null) params.set("size", String(filters.size));
+      if (filters.userId) params.set("userId", filters.userId);
       if (filters.orderSessionId) params.set("orderSessionId", filters.orderSessionId);
+      if (filters.closedBy) params.set("closedBy", filters.closedBy);
 
       const query = params.toString();
       const path = query ? `/orders?${query}` : "/orders";

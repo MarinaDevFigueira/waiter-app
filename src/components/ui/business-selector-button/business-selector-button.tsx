@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { BuildingsIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button/button";
@@ -7,7 +8,7 @@ import { Drawer } from "@/components/ui/drawer/drawer";
 import { BusinessCombobox } from "@/components/ui/business-combobox/business-combobox";
 import { useBusiness } from "@/shared/hooks/useBusiness";
 import { useTranslation } from "@/shared/hooks/useTranslation";
-import { useCallback } from "react";
+import { useLanguage } from "@/shared/hooks/useLanguage";
 import type { BusinessSelectorButtonProps } from "./business-selector-button.interface";
 import type { BusinessSelection } from "@/components/ui/business-combobox/business-combobox.interface";
 import { DeviceTypeEnum } from "./business-selector-button.interface";
@@ -18,13 +19,21 @@ export function BusinessSelectorButton({
   const [open, setOpen] = useState(false);
   const { selectedBusiness, setBusiness } = useBusiness();
   const { t } = useTranslation();
+  const { addLanguagePrefix } = useLanguage();
+  const queryClient = useQueryClient();
 
   const handleBusinessChange = useCallback(
     (business: BusinessSelection) => {
       setBusiness(business);
       setOpen(false);
+
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("orders") });
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("products") });
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("categories") });
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("users") });
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("order-sessions") });
     },
-    [setBusiness]
+    [setBusiness, queryClient, addLanguagePrefix]
   );
 
   const hasSelectedBusiness = selectedBusiness !== null;

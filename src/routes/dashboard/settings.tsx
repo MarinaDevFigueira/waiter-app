@@ -1,12 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { authObservable } from "@/shared/subjects/auth";
+import { USERS_PAGE_ALLOWED_PROFILES } from "@/shared/constants/users-page-access";
+import { SettingsPage } from "@/pages/settings/page";
 
 export const Route = createFileRoute("/dashboard/settings")({
-  component: () => (
-    <div className="flex items-center justify-center h-full">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Configurações</h1>
-        <p className="text-muted-foreground">Página em desenvolvimento</p>
-      </div>
-    </div>
-  ),
+  beforeLoad: () => {
+    const auth = authObservable.getValue();
+    const userProfile = auth?.profile;
+    const allowedProfiles = USERS_PAGE_ALLOWED_PROFILES as readonly string[];
+    const isAllowed = userProfile && allowedProfiles.includes(userProfile);
+    const notAllowed = !isAllowed;
+
+    if (notAllowed) {
+      throw redirect({ to: "/" });
+    }
+  },
+  component: SettingsPage,
 });

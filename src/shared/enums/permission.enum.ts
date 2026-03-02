@@ -1,4 +1,6 @@
 export enum PermissionEnum {
+  CLEAR_CACHE = "clear.cache",
+
   CREATE_BUSINESS = "create.business",
   DELETE_BUSINESS = "delete.business",
   EDIT_BUSINESS = "edit.business",
@@ -24,6 +26,7 @@ export enum PermissionEnum {
 
   CREATE_ORDER_SESSIONS = "create.order-sessions",
   EDIT_ORDER_SESSIONS_CLOSE = "edit.order-sessions.close",
+  EDIT_ORDER_SESSIONS_CLOSED_BY = "edit.order-sessions.closed-by",
   GET_ORDER_SESSIONS_ACTIVE = "get.order-sessions.active",
   GET_ORDER_SESSIONS_SUMMARY = "get.order-sessions.summary",
 

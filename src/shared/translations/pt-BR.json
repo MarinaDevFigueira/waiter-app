@@ -195,14 +195,31 @@
           "status": "Status",
           "items": "Itens",
           "total": "Total",
-          "timestamp": "Horário",
-          "createdAt": "Criado em"
+          "createdAt": "Criado em",
+          "updatedAt": "Atualizado em",
+          "closedBy": "Fechado por",
+          "actions": "Ações"
+        },
+        "actions": {
+          "editClosedBy": "Editar fechado por"
         },
         "itemsTotal": "itens",
-        "total": "Total"
+        "total": "Total",
+        "closedBySystem": "Sistema"
       },
       "updateStatus": {
         "success": "Status do pedido atualizado com sucesso"
+      },
+      "editClosedBy": {
+        "title": "Editar Responsável pelo Fechamento",
+        "descriptionSingle": "Selecione o usuário que fechou esta sessão.",
+        "userLabel": "Responsável",
+        "userPlaceholder": "Selecione um usuário...",
+        "userSearchPlaceholder": "Buscar usuário...",
+        "userEmptyMessage": "Nenhum usuário encontrado",
+        "confirmButton": "Salvar",
+        "updateSuccess": "Responsável atualizado com sucesso",
+        "updateError": "Erro ao atualizar responsável"
       }
     }
   },
@@ -393,6 +410,27 @@
       "kitchenUsers": "Usuários da Cozinha",
       "attendantUsers": "Atendentes",
       "loadError": "Erro ao carregar limites da empresa"
+    }
+  },
+  "settings": {
+    "pageTitle": "Configurações",
+    "pageSubtitle": "Gerencie as configurações do sistema",
+    "system": {
+      "title": "Sistema",
+      "description": "Configurações avançadas do sistema"
+    },
+    "cache": {
+      "title": "Cache do Sistema",
+      "description": "Limpar o cache em memória do servidor. Útil após operações em massa.",
+      "clearButton": "Limpar Cache",
+      "clearSuccess": "Cache limpo com sucesso!",
+      "confirmTitle": "Limpar Cache do Sistema?",
+      "confirmDescription": "Esta ação irá remover todas as entradas do cache em memória do servidor. Os dados serão recarregados do banco de dados nas próximas requisições.",
+      "confirmButton": "Limpar Cache"
+    },
+    "noAccess": {
+      "title": "Acesso Restrito",
+      "description": "Você não tem permissão para acessar estas configurações."
     }
   },
   "users": {

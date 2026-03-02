@@ -7,7 +7,7 @@ import {
   flexRender,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { CaretDownIcon, ListBulletsIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, ListBulletsIcon, GearIcon, PencilSimpleIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import {
   DropdownMenu,
@@ -32,7 +32,6 @@ import type {
 const COLUMN_TO_ORDER_BY: Partial<Record<string, OrdersOrderByEnum>> = {
   userName: OrdersOrderByEnum.USER_ID,
   status: OrdersOrderByEnum.STATUS,
-  timestamp: OrdersOrderByEnum.TIMESTAMP,
   createdAt: OrdersOrderByEnum.CREATED_AT,
   updatedAt: OrdersOrderByEnum.UPDATED_AT,
 };
@@ -76,7 +75,7 @@ function Root({ children }: OrdersTableRootProps) {
 
 function Header({ headerGroups, sortState, getSortTitle, onColumnSort }: OrdersTableHeaderProps) {
   return (
-    <thead className="bg-muted/50 border-b border-border">
+    <thead className="bg-muted border-b border-border sticky top-0 z-10">
       {headerGroups.map((headerGroup) => (
         <tr key={headerGroup.id}>
           {headerGroup.headers.map((header) => {
@@ -202,7 +201,14 @@ function Body({ rows, expandedRowId, onRowToggle, totalLabel }: OrdersTableBodyP
   );
 }
 
-export function OrdersTable({ orders, sortState, onSortChange, onStatusChange }: OrdersTableProps) {
+export function OrdersTable({
+  orders,
+  sortState,
+  onSortChange,
+  onStatusChange,
+  onEditClosedBy,
+  showActionsColumn = false,
+}: OrdersTableProps) {
   const { t } = useTranslation();
   const [expandedRowId, setExpandedRowId] = useState<string | undefined>(undefined);
 
@@ -257,7 +263,17 @@ export function OrdersTable({ orders, sortState, onSortChange, onStatusChange }:
     });
   }, []);
 
-  const columns = useMemo<ColumnDef<Order>[]>(
+  const handleEditClosedBy = useCallback(
+    (orderSessionId: string | null) => {
+      const hasOrderSessionId = orderSessionId !== null;
+      if (hasOrderSessionId && onEditClosedBy) {
+        onEditClosedBy(orderSessionId);
+      }
+    },
+    [onEditClosedBy]
+  );
+
+  const dataColumns = useMemo<ColumnDef<Order>[]>(
     () => [
       {
         accessorKey: "userName",
@@ -277,15 +293,16 @@ export function OrdersTable({ orders, sortState, onSortChange, onStatusChange }:
           const statusClassName = STATUS_CLASSES[status];
 
           return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium cursor-pointer border-0 outline-none focus:ring-1 focus:ring-ring ${statusClassName}`}
-                >
-                  {statusLabel}
-                  <CaretDownIcon size={12} />
-                </button>
-              </DropdownMenuTrigger>
+            <div className="min-w-[144px]">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={`w-full inline-flex items-center justify-center gap-1 px-2 py-1 rounded-md text-xs font-medium cursor-pointer border-0 outline-none focus:ring-1 focus:ring-ring ${statusClassName}`}
+                  >
+                    {statusLabel}
+                    <CaretDownIcon size={12} />
+                  </button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 {CHANGEABLE_STATUSES.map((changeableStatus) => {
                   const isCurrentStatus = changeableStatus === status;
@@ -304,7 +321,8 @@ export function OrdersTable({ orders, sortState, onSortChange, onStatusChange }:
                   );
                 })}
               </DropdownMenuContent>
-            </DropdownMenu>
+              </DropdownMenu>
+            </div>
           );
         },
       },
@@ -343,6 +361,7 @@ export function OrdersTable({ orders, sortState, onSortChange, onStatusChange }:
       {
         id: "total",
         header: t("orders.admin.table.columns.total"),
+        enableSorting: false,
         accessorFn: (row) => {
           return row.items.reduce((acc, item) => {
             const itemTotal = multiply(item.quantity, item.preco);
@@ -356,15 +375,6 @@ export function OrdersTable({ orders, sortState, onSortChange, onStatusChange }:
         },
       },
       {
-        accessorKey: "timestamp",
-        header: t("orders.admin.table.columns.timestamp"),
-        cell: (info) => {
-          const date = info.getValue() as Date;
-          const formattedDate = formatDate(date);
-          return <span>{formattedDate}</span>;
-        },
-      },
-      {
         accessorKey: "createdAt",
         header: t("orders.admin.table.columns.createdAt"),
         cell: (info) => {
@@ -372,22 +382,111 @@ export function OrdersTable({ orders, sortState, onSortChange, onStatusChange }:
           const formattedDate = formatDate(date);
           const createdBy = info.row.original.createdBy;
           return (
-            <div>
+            <div className="min-w-[156px]">
               <div>{formattedDate}</div>
               <div className="text-xs text-muted-foreground">por {createdBy}</div>
             </div>
           );
         },
       },
+      {
+        accessorKey: "updatedAt",
+        header: t("orders.admin.table.columns.updatedAt"),
+        cell: (info) => {
+          const date = info.getValue() as Date | undefined;
+          const hasDate = date !== undefined && date !== null;
+          if (!hasDate) {
+            return <span className="text-muted-foreground">-</span>;
+          }
+          const formattedDate = formatDate(date);
+          const updatedBy = info.row.original.updatedBy;
+          return (
+            <div className="min-w-[156px]">
+              <div>{formattedDate}</div>
+              <div className="text-xs text-muted-foreground">por {updatedBy}</div>
+            </div>
+          );
+        },
+      },
+      {
+        id: "closedBy",
+        header: t("orders.admin.table.columns.closedBy"),
+        accessorFn: (row) => row.closedBy,
+        cell: (info) => {
+          const order = info.row.original;
+          const closedBy = order.closedBy;
+          const orderSessionId = order.orderSessionId;
+          const hasClosedBy = closedBy !== null && closedBy !== undefined;
+          const hasNoOrderSession = orderSessionId === null || orderSessionId === undefined;
+
+          if (hasNoOrderSession) {
+            return <span className="text-muted-foreground min-w-[130px]">{t("orders.admin.table.closedBySystem")}</span>;
+          }
+
+          if (!hasClosedBy) {
+            return <span className="text-muted-foreground min-w-[130px]">-</span>;
+          }
+
+          return <span className="text-foreground min-w-[130px]">{closedBy.name}</span>;
+        },
+        enableSorting: false,
+      },
     ],
     [t, getStatusLabel, formatDate, expandedRowId, onRowToggle, onStatusChange],
   );
+
+  const actionsColumn: ColumnDef<Order> = useMemo(
+    () => ({
+      id: "actions",
+      header: t("orders.admin.table.columns.actions"),
+      cell: (info) => {
+        const order = info.row.original;
+        const orderSessionId = order.orderSessionId;
+        const hasOrderSessionId = orderSessionId !== null;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="size-8 p-0"
+                data-testid="order-actions-trigger"
+              >
+                <GearIcon size={20} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => handleEditClosedBy(orderSessionId)}
+                disabled={!hasOrderSessionId}
+                className="gap-2"
+              >
+                <PencilSimpleIcon size={16} />
+                {t("orders.admin.table.actions.editClosedBy")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+      enableSorting: false,
+    }),
+    [t, handleEditClosedBy]
+  );
+
+  const columns = useMemo<ColumnDef<Order>[]>(() => {
+    if (showActionsColumn) {
+      return [...dataColumns, actionsColumn];
+    }
+    return dataColumns;
+  }, [showActionsColumn, dataColumns, actionsColumn]);
 
   const table = useReactTable({
     data: orders,
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
+    getRowId: (row) => row.id,
   });
 
   const headerGroups = table.getHeaderGroups();

@@ -6,6 +6,8 @@ import type {
   GetOrderSessionQrCodeResponse,
   OrderSession,
   OrderSessionSummary,
+  UpdateOrderSessionClosedByRequestBody,
+  UpdateOrderSessionClosedByResponse,
 } from "./interfaces/order-sessions.interface";
 
 type ServiceSuccess<T> = { data: T };
@@ -142,6 +144,29 @@ export const orderSessionsService = {
         error instanceof Error
           ? error.message
           : "Erro ao gerar QR code da sessão";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async updateClosedBy(
+    sessionId: string,
+    data: UpdateOrderSessionClosedByRequestBody
+  ): Promise<ServiceResult<UpdateOrderSessionClosedByResponse>> {
+    try {
+      const result = await api.patch<unknown>(`/order-sessions/${sessionId}/closed-by`, data);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      return { data: result.data as UpdateOrderSessionClosedByResponse };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Erro ao atualizar responsável pelo fechamento";
       logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }
