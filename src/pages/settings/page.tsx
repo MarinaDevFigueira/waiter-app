@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card/card";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog/confirmation-dialog";
 import { cacheService } from "@/services/cache/cache.service";
-import { useRoles } from "@/shared/hooks/useRoles";
+import { usePermissions } from "@/shared/hooks/usePermissions";
+import { PermissionEnum } from "@/shared/enums/permission.enum";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function SettingsPage() {
   const { t } = useTranslation();
-  const { hasAdminPrivileges } = useRoles();
+  const { hasPermissionTo } = usePermissions();
+  const hasClearCachePermission = hasPermissionTo(PermissionEnum.CLEAR_CACHE);
   const queryClient = useQueryClient();
   const [clearCacheDialogOpen, setClearCacheDialogOpen] = useState(false);
 
@@ -48,7 +50,7 @@ export function SettingsPage() {
   const isLoading = clearCacheMutation.isPending;
 
   const systemSection = useMemo(() => {
-    if (!hasAdminPrivileges) {
+    if (!hasClearCachePermission) {
       return null;
     }
 
@@ -78,10 +80,10 @@ export function SettingsPage() {
         </CardContent>
       </Card>
     );
-  }, [hasAdminPrivileges, t, handleOpenClearCacheDialog, isLoading]);
+  }, [hasClearCachePermission, t, handleOpenClearCacheDialog, isLoading]);
 
   const pageContent = useMemo(() => {
-    if (!hasAdminPrivileges) {
+    if (!hasClearCachePermission) {
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
@@ -101,7 +103,7 @@ export function SettingsPage() {
         {systemSection}
       </div>
     );
-  }, [hasAdminPrivileges, t, systemSection]);
+  }, [hasClearCachePermission, t, systemSection]);
 
   return (
     <div className="flex flex-col h-full gap-6">

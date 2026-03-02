@@ -1,4 +1,6 @@
 export enum PermissionEnum {
+  CLEAR_CACHE = "clear.cache",
+
   CREATE_BUSINESS = "create.business",
   DELETE_BUSINESS = "delete.business",
   EDIT_BUSINESS = "edit.business",
