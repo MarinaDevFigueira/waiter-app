@@ -195,14 +195,31 @@
           "status": "Status",
           "items": "Items",
           "total": "Total",
-          "timestamp": "Time",
-          "createdAt": "Created at"
+          "createdAt": "Created at",
+          "updatedAt": "Updated at",
+          "closedBy": "Closed by",
+          "actions": "Actions"
+        },
+        "actions": {
+          "editClosedBy": "Edit closed by"
         },
         "itemsTotal": "items",
-        "total": "Total"
+        "total": "Total",
+        "closedBySystem": "System"
       },
       "updateStatus": {
         "success": "Order status updated successfully"
+      },
+      "editClosedBy": {
+        "title": "Edit Closed By",
+        "descriptionSingle": "Select the user who closed this session.",
+        "userLabel": "Responsible",
+        "userPlaceholder": "Select a user...",
+        "userSearchPlaceholder": "Search user...",
+        "userEmptyMessage": "No users found",
+        "confirmButton": "Save",
+        "updateSuccess": "Responsible updated successfully",
+        "updateError": "Error updating responsible"
       }
     }
   },
@@ -393,6 +410,27 @@
       "kitchenUsers": "Kitchen Users",
       "attendantUsers": "Attendants",
       "loadError": "Error loading business limits"
+    }
+  },
+  "settings": {
+    "pageTitle": "Settings",
+    "pageSubtitle": "Manage system settings",
+    "system": {
+      "title": "System",
+      "description": "Advanced system settings"
+    },
+    "cache": {
+      "title": "System Cache",
+      "description": "Clear the server's in-memory cache. Useful after bulk operations.",
+      "clearButton": "Clear Cache",
+      "clearSuccess": "Cache cleared successfully!",
+      "confirmTitle": "Clear System Cache?",
+      "confirmDescription": "This action will remove all entries from the server's in-memory cache. Data will be reloaded from the database on the next requests.",
+      "confirmButton": "Clear Cache"
+    },
+    "noAccess": {
+      "title": "Restricted Access",
+      "description": "You do not have permission to access these settings."
     }
   },
   "users": {

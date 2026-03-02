@@ -19,6 +19,8 @@ export const kitchenOrdersMock: Order[] = [
     updatedBy: "garcom-1",
     deletedAt: null,
     deletedBy: null,
+    orderSessionId: "session-1",
+    closedBy: null,
   },
   {
     id: "order-2",
@@ -36,6 +38,8 @@ export const kitchenOrdersMock: Order[] = [
     updatedBy: "garcom-2",
     deletedAt: null,
     deletedBy: null,
+    orderSessionId: "session-2",
+    closedBy: null,
   },
   {
     id: "order-3",
@@ -53,6 +57,8 @@ export const kitchenOrdersMock: Order[] = [
     updatedBy: "cozinha",
     deletedAt: null,
     deletedBy: null,
+    orderSessionId: "session-1",
+    closedBy: null,
   },
   {
     id: "order-4",
@@ -69,6 +75,8 @@ export const kitchenOrdersMock: Order[] = [
     updatedBy: "garcom-3",
     deletedAt: null,
     deletedBy: null,
+    orderSessionId: "session-3",
+    closedBy: null,
   },
   {
     id: "order-5",
@@ -85,6 +93,8 @@ export const kitchenOrdersMock: Order[] = [
     updatedBy: "cozinha",
     deletedAt: null,
     deletedBy: null,
+    orderSessionId: "session-2",
+    closedBy: null,
   },
   {
     id: "order-6",
@@ -101,5 +111,7 @@ export const kitchenOrdersMock: Order[] = [
     updatedBy: "garcom-1",
     deletedAt: null,
     deletedBy: null,
+    orderSessionId: null,
+    closedBy: null,
   },
 ];

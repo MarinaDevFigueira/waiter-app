@@ -3,15 +3,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useOrders } from "@/shared/hooks/useOrders";
 import { usePagination } from "@/shared/hooks/usePagination";
+import { usePermissions } from "@/shared/hooks/usePermissions";
 import { ordersService } from "@/services/orders/orders.service";
 import { OrdersTable } from "@/pages/orders/admin-orders/components/orders-table/orders-table";
 import { OrdersTableSkeleton } from "@/pages/orders/admin-orders/components/orders-table/orders-table-skeleton";
+import { EditClosedByModal } from "@/pages/orders/admin-orders/components/edit-closed-by-modal/edit-closed-by-modal";
 import { OrdersViewToggle } from "@/pages/orders/kitchen-orders/components/orders-view-toggle/orders-view-toggle";
 import { Pagination } from "@/components/ui/pagination/pagination";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useLanguage } from "@/shared/hooks/useLanguage";
 import { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
+import { PermissionEnum } from "@/shared/enums/permission.enum";
+import { editClosedByObservable } from "@/pages/orders/admin-orders/observables/edit-closed-by.observable";
 import type { OrderStatus } from "@/shared/schemas/order.schema";
 import type { AdminOrdersPageProps } from "@/pages/orders/admin-orders/page.interface";
 import type { OrdersTableSortState } from "@/pages/orders/admin-orders/components/orders-table/orders-table.interface";
@@ -27,9 +31,13 @@ export function AdminOrdersPage({ canSwitchOrdersView, extraActions }: AdminOrde
     setSortState(sort);
     setQueryParams((prev) => ({ ...prev, orderBy: sort.orderBy, direction: sort.direction, page: 1 }));
   }, [setQueryParams]);
+
   const { t } = useTranslation();
   const { addLanguagePrefix } = useLanguage();
   const queryClient = useQueryClient();
+  const { hasPermissionTo } = usePermissions();
+
+  const canEditClosedBy = hasPermissionTo(PermissionEnum.EDIT_ORDER_SESSIONS_CLOSED_BY);
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ orderId, status }: { orderId: string; status: OrderStatus }) => {
@@ -51,6 +59,10 @@ export function AdminOrdersPage({ canSwitchOrdersView, extraActions }: AdminOrde
   const handleStatusChange = useCallback((orderId: string, status: OrderStatus) => {
     updateStatusMutation.mutate({ orderId, status });
   }, [updateStatusMutation]);
+
+  const handleEditClosedBy = useCallback((orderSessionId: string) => {
+    editClosedByObservable.open(orderSessionId);
+  }, []);
 
   const pagination = usePagination({
     page,
@@ -133,7 +145,14 @@ export function AdminOrdersPage({ canSwitchOrdersView, extraActions }: AdminOrde
       return (
         <div className="flex-1 min-h-0 flex flex-col gap-3">
           <div className="flex-1 min-h-0">
-            <OrdersTable orders={orders} sortState={sortState} onSortChange={handleSortChange} onStatusChange={handleStatusChange} />
+            <OrdersTable
+              orders={orders}
+              sortState={sortState}
+              onSortChange={handleSortChange}
+              onStatusChange={handleStatusChange}
+              onEditClosedBy={handleEditClosedBy}
+              showActionsColumn={canEditClosedBy}
+            />
           </div>
           {paginationBar}
         </div>
@@ -141,12 +160,13 @@ export function AdminOrdersPage({ canSwitchOrdersView, extraActions }: AdminOrde
     }
 
     return null;
-  }, [showSkeleton, showEmpty, showTable, t, orders, sortState, handleSortChange, handleStatusChange, paginationBar]);
+  }, [showSkeleton, showEmpty, showTable, t, orders, sortState, handleSortChange, handleStatusChange, handleEditClosedBy, paginationBar, canEditClosedBy]);
 
   return (
     <div className="flex flex-col h-full gap-6">
       {pageHeader}
       {bodyContent}
+      <EditClosedByModal />
     </div>
   );
 }

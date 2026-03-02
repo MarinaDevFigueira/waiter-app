@@ -44,8 +44,10 @@ export const usersService = {
       params.set("page", String(page));
       params.set("limit", String(size));
 
-      if (filters.role?.length) {
-        params.set("role", filters.role.join(","));
+      const roleFilter = filters.role;
+      const hasRoleFilter = roleFilter !== undefined && roleFilter.length > 0;
+      if (hasRoleFilter) {
+        params.set("roles", roleFilter.join(","));
       }
       if (filters.search) {
         params.set("search", filters.search);

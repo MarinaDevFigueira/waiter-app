@@ -228,7 +228,7 @@ export function ProductsTable({ products, categories, sorting, onSortingChange, 
     <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden h-full flex flex-col">
       <div className="overflow-auto flex-1">
         <table className="w-full">
-          <thead className="bg-muted/50 border-b border-border">
+          <thead className="bg-muted/50 border-b border-border sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {

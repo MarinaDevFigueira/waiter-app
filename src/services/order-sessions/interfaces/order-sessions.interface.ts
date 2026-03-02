@@ -72,3 +72,12 @@ export interface GetOrderSessionQrCodeResponse {
   qrCode: string;
   sessionId: string;
 }
+
+export interface UpdateOrderSessionClosedByRequestBody {
+  closedBy: string;
+}
+
+export interface UpdateOrderSessionClosedByResponse {
+  id: string;
+  closedBy: string;
+}

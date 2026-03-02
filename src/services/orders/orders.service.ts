@@ -24,6 +24,8 @@ function mapApiOrderToOrder(raw: GetOrderResponse): Order {
       quantity: item.quantity,
       preco: item.price,
     })),
+    orderSessionId: raw.orderSessionId,
+    closedBy: raw.closedBy,
     createdAt: new Date(raw.createdAt),
     createdBy: "api",
     updatedAt: new Date(raw.updatedAt),
