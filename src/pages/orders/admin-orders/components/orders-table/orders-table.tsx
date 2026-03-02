@@ -75,7 +75,7 @@ function Root({ children }: OrdersTableRootProps) {
 
 function Header({ headerGroups, sortState, getSortTitle, onColumnSort }: OrdersTableHeaderProps) {
   return (
-    <thead className="bg-muted/50 border-b border-border sticky top-0 z-10">
+    <thead className="bg-muted border-b border-border sticky top-0 z-10">
       {headerGroups.map((headerGroup) => (
         <tr key={headerGroup.id}>
           {headerGroup.headers.map((header) => {
