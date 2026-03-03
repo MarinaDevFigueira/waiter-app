@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "@tanstack/react-router";
 import { Title } from "./components/title";
@@ -18,6 +18,7 @@ import { logger } from "@/lib/logger";
 import { cartObservable } from "@/shared/subjects/cart.subject";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
+import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
 import type { Product } from "@/shared/schemas/product.schema";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 
@@ -39,6 +40,16 @@ export const FoodsPage = () => {
   });
 
   const { products, isLoading: isProductsLoading, isFetching: isProductsFetching, setQueryParams } = useProducts();
+
+  useEffect(() => {
+    setQueryParams((prev) => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        status: [ProductStatusEnum.ACTIVE],
+      },
+    }));
+  }, [setQueryParams]);
 
   const { addItem, itemCount, cart } = useCart();
 
@@ -182,14 +193,6 @@ export const FoodsPage = () => {
     }
   }, [t, navigate]);
 
-  const filteredProducts = useMemo(() => {
-    const activeProducts = products.filter((p) => {
-      const isActive = p.active;
-      return isActive;
-    });
-    return activeProducts;
-  }, [products]);
-
   const sortedByCategory = useMemo(() => {
     const categoryPairs = activeCategories.map((c) => {
       const categoryId = c.id;
@@ -198,7 +201,7 @@ export const FoodsPage = () => {
       return pair;
     });
     const categoryOrderMap = new Map(categoryPairs);
-    const productsCopy = [...filteredProducts];
+    const productsCopy = [...products];
     const sorted = productsCopy.sort((a, b) => {
       const categoryIdA = a.categoryId;
       const categoryIdB = b.categoryId;
@@ -209,12 +212,12 @@ export const FoodsPage = () => {
       return comparison;
     });
     return sorted;
-  }, [filteredProducts, activeCategories]);
+  }, [products, activeCategories]);
 
   const categoryIdExists = selectedCategoryId !== null;
   const hasSelectedCategory = categoryIdExists;
   const displayProducts = hasSelectedCategory
-    ? filteredProducts
+    ? products
     : sortedByCategory;
   const sessionIdExists = !!cart.orderSessionId;
   const hasActiveSession = sessionIdExists;

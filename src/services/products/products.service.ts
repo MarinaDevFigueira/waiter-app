@@ -2,14 +2,12 @@ import { api } from "@/services/api";
 import { logger } from "@/lib/logger";
 import { type Product, type ProductForm } from "@/shared/schemas/product.schema";
 import { baseEntityDefaults } from "@/shared/schemas/base-entity.schema";
-import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
 import type {
   GetProductResponse,
   GetProductTranslationsResponse,
   GetProductsRequestQuery,
   GetProductsResponse,
   GetProductsApiResponse,
-  GetProductsRequestFilters,
 } from "./interfaces/products.interface";
 
 type ServiceSuccess<T> = { data: T };
@@ -72,43 +70,12 @@ function buildProductFormData(data: ProductForm, files: File[], options?: { excl
   return formData;
 }
 
-function buildProductsApiFilters(rawFilters: Record<string, unknown>): GetProductsRequestFilters {
-  const filters = rawFilters as {
-    search?: string;
-    categoria?: string[];
-    precoMin?: number;
-    precoMax?: number;
-    somenteEmEstoque?: boolean;
-    estoqueMin?: number;
-    status?: ProductStatusEnum[];
-    categoryId?: string;
-    priceMin?: number;
-    priceMax?: number;
-    inStock?: boolean;
-    stockMin?: number;
-    active?: string;
-  };
-
-  const activeValues = filters.status?.map((s) => (s === ProductStatusEnum.ACTIVE ? "true" : "false"));
-
-  return {
-    search: filters.search,
-    categoryId: filters.categoryId ?? (filters.categoria?.length ? filters.categoria.join(",") : undefined),
-    priceMin: filters.priceMin ?? filters.precoMin,
-    priceMax: filters.priceMax ?? filters.precoMax,
-    inStock: filters.inStock ?? filters.somenteEmEstoque,
-    stockMin: filters.stockMin ?? filters.estoqueMin,
-    active: filters.active ?? (activeValues?.length ? activeValues.join(",") : undefined),
-  };
-}
-
 export const productsService = {
   async getAll(
     queryParams: GetProductsRequestQuery
   ): Promise<ServiceResult<GetProductsResponse>> {
     try {
-      const { page, size, orderBy, direction, filters: rawFilters = {} } = queryParams;
-      const filters = buildProductsApiFilters(rawFilters as Record<string, unknown>);
+      const { page, size, orderBy, direction, search, categoryId, priceMin, priceMax, inStock, stockMin, active } = queryParams;
 
       const params = new URLSearchParams();
       params.set("page", String(page));
@@ -116,13 +83,26 @@ export const productsService = {
       params.set("orderBy", orderBy);
       params.set("direction", direction);
 
-      if (filters.search) params.set("search", filters.search);
-      if (filters.categoryId) params.set("categoryId", filters.categoryId);
-      if (filters.priceMin !== undefined) params.set("priceMin", String(filters.priceMin));
-      if (filters.priceMax !== undefined) params.set("priceMax", String(filters.priceMax));
-      if (filters.inStock) params.set("inStock", "true");
-      if (filters.stockMin !== undefined) params.set("stockMin", String(filters.stockMin));
-      if (filters.active) params.set("active", filters.active);
+      const hasSearch = search !== undefined && search !== "";
+      if (hasSearch) params.set("search", search);
+
+      const hasCategoryId = categoryId !== undefined && categoryId !== "";
+      if (hasCategoryId) params.set("categoryId", categoryId);
+
+      const hasPriceMin = priceMin !== undefined;
+      if (hasPriceMin) params.set("priceMin", String(priceMin));
+
+      const hasPriceMax = priceMax !== undefined;
+      if (hasPriceMax) params.set("priceMax", String(priceMax));
+
+      const hasInStock = inStock === true;
+      if (hasInStock) params.set("inStock", "true");
+
+      const hasStockMin = stockMin !== undefined;
+      if (hasStockMin) params.set("stockMin", String(stockMin));
+
+      const hasActive = active !== undefined && active !== "";
+      if (hasActive) params.set("active", active);
 
       const result = await api.get<unknown>(`/products?${params.toString()}`);
 

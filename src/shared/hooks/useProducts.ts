@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { logger } from "@/lib/logger";
@@ -6,7 +6,9 @@ import { productsService } from "@/services/products/products.service";
 import { productsFiltersObservable, type ProductFilters } from "@/shared/subjects/products-filters.subject";
 import { ProductsOrderByEnum } from "@/shared/enums/products-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
+import { ProductStatusEnum } from "@/shared/enums/product-status.enum";
 import type { Product } from "@/shared/schemas/product.schema";
+import type { GetProductsRequestQuery } from "@/services/products/interfaces/products.interface";
 import { useLanguage } from "@/shared/hooks/useLanguage";
 
 interface QueryParams {
@@ -47,6 +49,31 @@ interface UseProductsReturn {
   updatePagination: (page: number, size: number) => void;
 }
 
+function mapFiltersToApiQuery(queryParams: QueryParams): GetProductsRequestQuery {
+  const { page, size, orderBy, direction, filters } = queryParams;
+
+  const categoryId = filters.categoria?.length ? filters.categoria.join(",") : undefined;
+  const hasStatusFilter = filters.status && filters.status.length > 0;
+  const activeValues = hasStatusFilter
+    ? filters.status!.map((s) => (s === ProductStatusEnum.ACTIVE ? "true" : "false"))
+    : undefined;
+  const active = activeValues?.length ? activeValues.join(",") : undefined;
+
+  return {
+    page,
+    size,
+    orderBy,
+    direction,
+    search: filters.search,
+    categoryId,
+    priceMin: filters.precoMin,
+    priceMax: filters.precoMax,
+    inStock: filters.somenteEmEstoque,
+    stockMin: filters.estoqueMin,
+    active,
+  };
+}
+
 export function useProducts(): UseProductsReturn {
   const { addLanguagePrefix } = useLanguage();
 
@@ -70,10 +97,12 @@ export function useProducts(): UseProductsReturn {
     return () => subscription.unsubscribe();
   }, []);
 
+  const apiQueryParams = useMemo(() => mapFiltersToApiQuery(queryParams), [queryParams]);
+
   const { data, isLoading, isFetching, error, isError } = useQuery<PaginatedProducts>({
-    queryKey: addLanguagePrefix("products", queryParams),
+    queryKey: addLanguagePrefix("products", apiQueryParams),
     queryFn: async () => {
-      const result = await productsService.getAll(queryParams) as { data?: PaginatedProducts; error?: string };
+      const result = await productsService.getAll(apiQueryParams) as { data?: PaginatedProducts; error?: string };
 
       if ("error" in result) {
         throw new Error(result.error);
