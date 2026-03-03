@@ -27,7 +27,11 @@ export interface GetProductTranslationsResponse {
   translations: ProductTranslation[];
 }
 
-export interface GetProductsRequestFilters {
+export interface GetProductsRequestQuery {
+  page: number;
+  size: number;
+  orderBy: ProductsOrderByEnum;
+  direction: SortDirection;
   search?: string;
   categoryId?: string;
   priceMin?: number;
@@ -35,14 +39,6 @@ export interface GetProductsRequestFilters {
   inStock?: boolean;
   stockMin?: number;
   active?: string;
-}
-
-export interface GetProductsRequestQuery {
-  page: number;
-  size: number;
-  orderBy: ProductsOrderByEnum;
-  direction: SortDirection;
-  filters?: GetProductsRequestFilters;
 }
 
 export interface GetProductsResponse {
