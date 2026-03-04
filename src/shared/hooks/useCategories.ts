@@ -67,7 +67,6 @@ export function useCategories(options?: UseCategoriesOptions | string): UseCateg
 
   useEffect(() => {
     if (isError && error) {
-      console.error("[useCategories] Erro ao buscar categorias:", error);
       const message = resolvedErrorMessage ?? error.message ?? "Erro ao buscar categorias";
       toast.error(message);
       logger.error("Erro ao buscar categorias", error);

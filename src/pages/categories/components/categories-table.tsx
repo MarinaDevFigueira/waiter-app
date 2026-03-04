@@ -76,7 +76,7 @@ export function CategoriesTable({ categories, sorting, onSortingChange, onEdit }
     return [{ id: sorting.orderBy, desc: sortDescending }];
   }, [hasSortingConfig, sorting]);
 
-  const handleSortingChange = (updater: Updater<SortingState>) => {
+  const handleSortingChange = useCallback((updater: Updater<SortingState>) => {
     const isUpdaterFunction = typeof updater === "function";
     const newSorting = isUpdaterFunction ? updater(tableSorting) : updater;
 
@@ -92,7 +92,7 @@ export function CategoriesTable({ categories, sorting, onSortingChange, onEdit }
     const sortDirection = sortConfig.desc ? SortDirection.DESC : SortDirection.ASC;
 
     onSortingChange(sortField, sortDirection);
-  };
+  }, [tableSorting, onSortingChange]);
 
   const activeLabel = t("common.status.active");
   const inactiveLabel = t("common.status.inactive");

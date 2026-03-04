@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, forwardRef, useMemo } from "react";
+import { useState, useRef, useEffect, forwardRef, useMemo, useCallback } from "react";
 import { CaretUpDownIcon, CheckIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
@@ -41,7 +41,10 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const selectedOption = options.find((option) => option.value === value);
+    const selectedOption = useMemo(
+      () => options.find((option) => option.value === value),
+      [options, value]
+    );
 
     const filteredOptions = useMemo(
       () => options.filter((option) => option.label.toLowerCase().includes(search.toLowerCase())),
@@ -69,17 +72,17 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
       }
     }, [open]);
 
-    const handleSelect = (optionValue: string) => {
+    const handleSelect = useCallback((optionValue: string) => {
       onChange?.(optionValue);
       setOpen(false);
       setSearch("");
-    };
+    }, [onChange]);
 
-    const handleToggle = () => {
+    const handleToggle = useCallback(() => {
       if (!disabled) {
         setOpen(!open);
       }
-    };
+    }, [disabled, open]);
 
     const optionsList = useMemo(() => {
       return filteredOptions.map((option) => {
@@ -89,16 +92,18 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
             key={option.value}
             type="button"
             onClick={() => handleSelect(option.value)}
+            data-selected={isSelected}
             className={cn(
               "flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm transition-colors",
               "hover:bg-muted/50",
-              isSelected && "bg-muted"
+              "data-[selected=true]:bg-muted"
             )}
           >
             <CheckIcon
+              data-selected={isSelected}
               className={cn(
                 "size-4",
-                isSelected ? "text-primary" : "text-transparent"
+                "data-[selected=true]:text-primary data-[selected=false]:text-transparent"
               )}
             />
             <span>{option.label}</span>

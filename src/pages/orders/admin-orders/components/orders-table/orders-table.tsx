@@ -120,13 +120,13 @@ function OrderItemsDetails({ items, columnsCount, totalLabel, isExpanded }: Orde
   }, 0);
   const formattedTotal = formatCurrency(total);
   const expandedColSpan = columnsCount;
-  const gridRowsClassName = isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]";
-  const gridClassName = `grid transition-[grid-template-rows] duration-300 ease-in-out ${gridRowsClassName}`;
-
   return (
     <tr data-testid="order-items-details">
       <td colSpan={expandedColSpan} className="p-0 overflow-hidden">
-        <div className={gridClassName}>
+        <div
+          data-expanded={isExpanded}
+          className="grid transition-[grid-template-rows] duration-300 ease-in-out data-[expanded=true]:grid-rows-[1fr] data-[expanded=false]:grid-rows-[0fr]"
+        >
         <div className="overflow-hidden min-h-0">
         <div className="bg-muted/40 border-t border-border px-6 py-4">
           <table className="w-full text-sm">
@@ -312,7 +312,8 @@ export function OrdersTable({
                       key={changeableStatus}
                       onClick={() => onStatusChange(orderId, changeableStatus)}
                       disabled={isCurrentStatus}
-                      className={isCurrentStatus ? "opacity-50" : ""}
+                      data-current={isCurrentStatus}
+                      className="data-[current=true]:opacity-50"
                     >
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${itemClassName}`}>
                         {getStatusLabel(changeableStatus)}

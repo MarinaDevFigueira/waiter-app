@@ -120,7 +120,6 @@ export function useProducts(): UseProductsReturn {
 
   useEffect(() => {
     if (isError && error) {
-      console.error("[useProducts] Erro ao buscar produtos:", error);
       toast.error(error.message ?? "Erro ao buscar produtos");
       logger.error("Erro ao buscar produtos", error);
     }

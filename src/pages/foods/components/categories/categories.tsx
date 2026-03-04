@@ -158,4 +158,4 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
   );
 };
 
-export default Categories;
+export { Categories };

@@ -21,7 +21,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
-  const { auth } = useAuth();
+  const { auth, isAuthenticated } = useAuth();
   const { isTable } = useRoles();
   const { t } = useTranslation();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -77,7 +77,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 py-3 sm:py-4">
           <Logo className="text-lg sm:text-xl" />
           <div className="flex items-center gap-4">
-            {auth && (
+            {isAuthenticated && auth && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground hidden sm:inline">
                   {auth.name}

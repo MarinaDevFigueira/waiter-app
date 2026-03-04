@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import { ArrowLeftIcon, HouseIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
@@ -22,13 +22,13 @@ export function DashboardNotFoundPage() {
     return `/${segments.join("/")}`;
   }, [pathname]);
 
-  const handleGoBack = () => {
+  const handleGoBack = useCallback(() => {
     navigate({ to: parentPath });
-  };
+  }, [navigate, parentPath]);
 
-  const handleGoHome = () => {
+  const handleGoHome = useCallback(() => {
     navigate({ to: "/dashboard" });
-  };
+  }, [navigate]);
 
   return (
     <div className="flex flex-col items-center justify-center h-full gap-6">

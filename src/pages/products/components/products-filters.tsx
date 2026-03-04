@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,14 +34,13 @@ export function ProductsFilters() {
     [categories]
   );
 
-  const STATUS_OPTIONS: { value: ProductStatusEnum; label: string }[] = [
+  const STATUS_OPTIONS = useMemo<{ value: ProductStatusEnum; label: string }[]>(() => [
     { value: ProductStatusEnum.ACTIVE, label: t("common.status.active") },
     { value: ProductStatusEnum.INACTIVE, label: t("common.status.inactive") },
-  ];
+  ], [t]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const [activeFilterCount, setActiveFilterCount] = useState(0);
+  const [searchValue, setSearchValue] = useState(() => productsFiltersObservable.getValue().search || "");
 
   const currentFilters = productsFiltersObservable.getValue();
 
@@ -57,20 +56,18 @@ export function ProductsFilters() {
 
   const categoriaValue = watch("categoria");
   const statusValue = watch("status");
+  const precoMinValue = watch("precoMin");
+  const precoMaxValue = watch("precoMax");
 
-  useEffect(() => {
-    const currentFilters = productsFiltersObservable.getValue();
-    setSearchValue(currentFilters.search || "");
-
-    const hasCategories = currentFilters.categoria && currentFilters.categoria.length > 0;
-    const hasMinPrice = currentFilters.precoMin !== undefined;
-    const hasMaxPrice = currentFilters.precoMax !== undefined;
-    const hasCustomStatus = currentFilters.status && currentFilters.status.length !== 2;
+  const activeFilterCount = useMemo(() => {
+    const hasCategories = categoriaValue && categoriaValue.length > 0;
+    const hasMinPrice = precoMinValue !== undefined;
+    const hasMaxPrice = precoMaxValue !== undefined;
+    const hasCustomStatus = statusValue && statusValue.length !== 2;
 
     const filtersArray = [hasCategories, hasMinPrice, hasMaxPrice, hasCustomStatus];
-    const count = filtersArray.filter(Boolean).length;
-    setActiveFilterCount(count);
-  }, []);
+    return filtersArray.filter(Boolean).length;
+  }, [categoriaValue, precoMinValue, precoMaxValue, statusValue]);
 
   const handleSearch = useCallback(() => {
     productsFiltersObservable.updateFilter("search", searchValue);
@@ -105,7 +102,6 @@ export function ProductsFilters() {
     setValue("precoMin", undefined);
     setValue("precoMax", undefined);
     setSearchValue("");
-    setActiveFilterCount(0);
     productsFiltersObservable.resetFilters();
     setIsModalOpen(false);
   }, [setValue]);
@@ -154,7 +150,7 @@ export function ProductsFilters() {
             <SlidersHorizontalIcon className="size-4" />
             {t("products.filters.title")}
             {hasActiveFilters && (
-              <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+              <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
                 {activeFilterCount}
               </span>
             )}

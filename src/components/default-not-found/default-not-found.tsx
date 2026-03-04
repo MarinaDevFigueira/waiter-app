@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { HouseIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
@@ -8,9 +9,9 @@ export function DefaultNotFound() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const handleGoHome = () => {
+  const handleGoHome = useCallback(() => {
     navigate({ to: "/" });
-  };
+  }, [navigate]);
 
   return (
     <div className="flex items-center justify-center min-h-screen w-screen bg-background p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">

@@ -48,7 +48,7 @@ export function ProductsTable({ products, categories, sorting, onSortingChange, 
     return [{ id: sorting.orderBy, desc: sortDescending }];
   }, [hasSortingConfig, sorting]);
 
-  const handleSortingChange = (updater: Updater<SortingState>) => {
+  const handleSortingChange = useCallback((updater: Updater<SortingState>) => {
     const isUpdaterFunction = typeof updater === "function";
     const newSorting = isUpdaterFunction ? updater(tableSorting) : updater;
 
@@ -64,7 +64,7 @@ export function ProductsTable({ products, categories, sorting, onSortingChange, 
     const sortDirection = sortConfig.desc ? SortDirection.DESC : SortDirection.ASC;
 
     onSortingChange(sortField, sortDirection);
-  };
+  }, [tableSorting, onSortingChange]);
 
   const formatCurrency = useCallback((value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -243,9 +243,8 @@ export function ProductsTable({ products, categories, sorting, onSortingChange, 
                     <th
                       key={header.id}
                       style={columnStyle}
-                      className={`px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider ${
-                        canSort ? "cursor-pointer select-none" : ""
-                      }`}
+                      data-sortable={canSort}
+                      className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider data-[sortable=true]:cursor-pointer data-[sortable=true]:select-none"
                       onClick={header.column.getToggleSortingHandler()}
                       title={
                         canSort

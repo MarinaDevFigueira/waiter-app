@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -76,7 +76,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
     }
   }, [user, form]);
 
-  const onSubmit = async (data: UserFormValues) => {
+  const onSubmit = useCallback(async (data: UserFormValues) => {
     if (isEditMode) {
       const result = await usersService.update(user.id, {
         name: data.name,
@@ -117,9 +117,14 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
     toast.success(t("users.success.create"));
     onOpenChange(false);
     onSuccess?.();
-  };
+  }, [isEditMode, user, t, onOpenChange, onSuccess]);
 
   const formTitle = isEditMode ? t("users.form.editTitle") : t("users.form.createTitle");
+  const hasNameError = Boolean(form.formState.errors.name);
+  const hasUsernameError = Boolean(form.formState.errors.username);
+  const hasEmailError = Boolean(form.formState.errors.email);
+  const hasPasswordError = Boolean(form.formState.errors.password);
+  const hasRoleError = Boolean(form.formState.errors.role);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -142,8 +147,8 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               {...form.register("name")}
               placeholder="Ex: João Silva"
             />
-            {form.formState.errors.name && (
-              <p className="text-xs text-destructive">{form.formState.errors.name.message}</p>
+            {hasNameError && (
+              <p className="text-xs text-destructive">{form.formState.errors.name?.message}</p>
             )}
           </div>
 
@@ -157,8 +162,8 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               {...form.register("username")}
               placeholder="Ex: joaosilva"
             />
-            {form.formState.errors.username && (
-              <p className="text-xs text-destructive">{form.formState.errors.username.message}</p>
+            {hasUsernameError && (
+              <p className="text-xs text-destructive">{form.formState.errors.username?.message}</p>
             )}
           </div>
 
@@ -172,8 +177,8 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               {...form.register("email")}
               placeholder="Ex: joao@example.com"
             />
-            {form.formState.errors.email && (
-              <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
+            {hasEmailError && (
+              <p className="text-xs text-destructive">{form.formState.errors.email?.message}</p>
             )}
           </div>
 
@@ -190,8 +195,8 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               {...form.register("password")}
               placeholder="••••••••"
             />
-            {form.formState.errors.password && (
-              <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
+            {hasPasswordError && (
+              <p className="text-xs text-destructive">{form.formState.errors.password?.message}</p>
             )}
           </div>
 
@@ -210,8 +215,8 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
                 </option>
               ))}
             </select>
-            {form.formState.errors.role && (
-              <p className="text-xs text-destructive">{form.formState.errors.role.message}</p>
+            {hasRoleError && (
+              <p className="text-xs text-destructive">{form.formState.errors.role?.message}</p>
             )}
           </div>
         </form>

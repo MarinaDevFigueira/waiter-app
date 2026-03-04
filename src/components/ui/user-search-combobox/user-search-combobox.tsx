@@ -104,16 +104,18 @@ export const UserSearchCombobox = forwardRef<HTMLButtonElement, UserSearchCombob
             key={user.id}
             type="button"
             onClick={() => handleSelect({ id: user.id, name: user.name })}
+            data-selected={isSelected}
             className={cn(
               "flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm transition-colors",
               "hover:bg-muted/50",
-              isSelected && "bg-muted"
+              "data-[selected=true]:bg-muted"
             )}
           >
             <CheckIcon
+              data-selected={isSelected}
               className={cn(
                 "size-4",
-                isSelected ? "text-primary" : "text-transparent"
+                "data-[selected=true]:text-primary data-[selected=false]:text-transparent"
               )}
             />
             <div className="flex flex-col items-start">

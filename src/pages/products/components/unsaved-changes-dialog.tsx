@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button/button";
@@ -12,14 +13,14 @@ interface UnsavedChangesDialogProps {
 function UnsavedChangesDialogRoot({ open, onOpenChange, onConfirm }: UnsavedChangesDialogProps) {
   const { t } = useTranslation();
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     onOpenChange(false);
-  };
+  }, [onOpenChange]);
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     onConfirm();
     onOpenChange(false);
-  };
+  }, [onConfirm, onOpenChange]);
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
