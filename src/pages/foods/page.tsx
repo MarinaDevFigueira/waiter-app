@@ -8,7 +8,7 @@ import { CartButton } from "./components/cart-button/cart-button";
 import { OrderSessionButton } from "./components/order-session-button/order-session-button";
 import { OrderSessionSummaryModal } from "./components/order-session-summary/order-session-summary";
 import { ProductDetailModal } from "./components/product-detail-modal/product-detail-modal";
-import Categories from "./components/categories/categories";
+import { Categories } from "./components/categories/categories";
 import { useCategories } from "@/shared/hooks/useCategories";
 import { useProducts } from "@/shared/hooks/useProducts";
 import { useCart } from "@/shared/hooks/useCart";
@@ -221,6 +221,7 @@ export const FoodsPage = () => {
     : sortedByCategory;
   const sessionIdExists = !!cart.orderSessionId;
   const hasActiveSession = sessionIdExists;
+  const hasSelectedProduct = selectedProduct !== null;
 
   const contentToRender = useMemo(() => {
     const isLoadingProducts = isProductsLoading || isProductsFetching;
@@ -268,7 +269,7 @@ export const FoodsPage = () => {
         onCloseSession={handleCloseSession}
         isClosing={isClosingSession}
       />
-      {selectedProduct && (
+      {hasSelectedProduct && (
         <ProductDetailModal
           product={selectedProduct}
           open={isProductDetailOpen}

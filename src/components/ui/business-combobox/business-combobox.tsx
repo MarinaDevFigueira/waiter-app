@@ -118,16 +118,18 @@ export const BusinessCombobox = forwardRef<
             key={business.id}
             type="button"
             onClick={() => handleSelect(business.id)}
+            data-selected={isSelected}
             className={cn(
               "flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm transition-colors",
               "hover:bg-muted/50",
-              isSelected && "bg-muted"
+              "data-[selected=true]:bg-muted"
             )}
           >
             <CheckIcon
+              data-selected={isSelected}
               className={cn(
                 "size-4",
-                isSelected ? "text-primary" : "text-transparent"
+                "data-[selected=true]:text-primary data-[selected=false]:text-transparent"
               )}
             />
             <span>{business.name}</span>
@@ -176,13 +178,13 @@ export const BusinessCombobox = forwardRef<
     const dropdown = useMemo(() => {
       if (!open) return null;
 
-      const positionClasses = isTopPosition ? "bottom-full mb-1" : "top-full mt-1";
-
       return (
         <div
+          data-position={isTopPosition ? "top" : "bottom"}
           className={cn(
             "absolute z-50 w-full rounded-md border border-border bg-card shadow-lg",
-            positionClasses
+            "data-[position=top]:bottom-full data-[position=top]:mb-1",
+            "data-[position=bottom]:top-full data-[position=bottom]:mt-1"
           )}
         >
           <div className="flex items-center border-b border-border px-3 py-2">

@@ -2,6 +2,7 @@ import { TranslationsEnum, type TranslationLanguage } from "@/shared/enums/trans
 import ptBR from "@/shared/translations/pt-BR.json";
 import enUS from "@/shared/translations/en-US.json";
 import es from "@/shared/translations/es.json";
+import { logger } from "@/lib/logger";
 
 type TranslationRecord = Record<string, unknown>;
 
@@ -16,7 +17,7 @@ let currentLanguage: TranslationLanguage = TranslationsEnum.PT_BR;
 export function setLanguage(language: TranslationLanguage): void {
   const isValidLanguage = (Object.values(TranslationsEnum) as string[]).includes(language);
   if (!isValidLanguage) {
-    console.warn(`Invalid language: ${language}. Using default: ${TranslationsEnum.PT_BR}`);
+    logger.warn(`Invalid language: ${language}. Using default: ${TranslationsEnum.PT_BR}`);
     return;
   }
   currentLanguage = language;
@@ -33,7 +34,7 @@ export function t(key: string, variables: Record<string, string | number> = {}):
   for (const k of keys) {
     const hasKey = value !== null && typeof value === "object" && k in (value as Record<string, unknown>);
     if (!hasKey) {
-      console.warn(`Translation key not found: ${key}`);
+      logger.warn(`Translation key not found: ${key}`);
       return key;
     }
     value = (value as Record<string, unknown>)[k];
@@ -41,7 +42,7 @@ export function t(key: string, variables: Record<string, string | number> = {}):
 
   const isString = typeof value === "string";
   if (!isString) {
-    console.warn(`Translation value is not a string: ${key}`);
+    logger.warn(`Translation value is not a string: ${key}`);
     return key;
   }
 

@@ -73,18 +73,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBusinessExpanded, setIsBusinessExpanded] = useState(false);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await authService.logout();
     navigate({ to: "/login" });
-  };
+  }, [navigate]);
 
-  const toggleSidebar = () => {
+  const toggleSidebar = useCallback(() => {
     setIsMinimized((prev) => {
       const newValue = !prev;
       localStorage.setItem(StorageKeys.SIDEBAR_MINIMIZED, String(newValue));
       return newValue;
     });
-  };
+  }, []);
 
   const toggleBusinessMenu = useCallback(() => {
     setIsBusinessExpanded((prev) => !prev);

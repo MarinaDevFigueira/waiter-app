@@ -27,6 +27,5 @@ function Button({
   );
 }
 
-export default Button;
 export { Button };
 export type { ButtonProps };

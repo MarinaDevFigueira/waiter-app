@@ -29,7 +29,7 @@ export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable,
     return [{ id: sorting.orderBy, desc: sortDescending }];
   }, [hasSortingConfig, sorting]);
 
-  const handleSortingChange = (updater: Updater<SortingState>) => {
+  const handleSortingChange = useCallback((updater: Updater<SortingState>) => {
     const isUpdaterFunction = typeof updater === "function";
     const newSorting = isUpdaterFunction ? updater(tableSorting) : updater;
 
@@ -45,7 +45,7 @@ export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable,
     const sortDirection = sortConfig.desc ? SortDirection.DESC : SortDirection.ASC;
 
     onSortingChange(sortField, sortDirection);
-  };
+  }, [tableSorting, onSortingChange]);
 
   const formatDate = useCallback((date: Date) => {
     return format(new Date(date), "dd/MM/yyyy HH:mm", { locale: ptBR });
@@ -240,9 +240,8 @@ export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable,
                     <th
                       key={header.id}
                       style={columnStyle}
-                      className={`px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider ${
-                        canSort ? "cursor-pointer select-none" : ""
-                      }`}
+                      data-sortable={canSort}
+                      className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider data-[sortable=true]:cursor-pointer data-[sortable=true]:select-none"
                       onClick={header.column.getToggleSortingHandler()}
                       title={
                         canSort

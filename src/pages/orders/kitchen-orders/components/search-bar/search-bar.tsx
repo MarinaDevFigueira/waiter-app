@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,9 +26,9 @@ export function SearchBar({ onSearch }: SearchBarProps) {
     defaultValues: { query: "" },
   });
 
-  const onSubmit = (validData: SearchFormValues) => {
+  const onSubmit = useCallback((validData: SearchFormValues) => {
     onSearch(validData.query);
-  };
+  }, [onSearch]);
 
   const hasQueryError = Boolean(errors.query);
   const queryErrorElement = hasQueryError ? (

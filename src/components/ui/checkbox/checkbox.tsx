@@ -36,4 +36,3 @@ function Checkbox({ className, indeterminate, checked, ...props }: CheckboxProps
 }
 
 export { Checkbox };
-export default Checkbox;

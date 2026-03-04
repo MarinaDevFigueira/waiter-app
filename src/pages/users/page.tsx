@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { toast } from "react-toastify";
+import { logger } from "@/lib/logger";
 import { PlusIcon } from "@phosphor-icons/react";
 import { UsersTable } from "@/pages/users/components/users-table";
 import { UsersTableSkeleton } from "@/pages/users/components/users-table-skeleton";
@@ -62,7 +63,7 @@ export function UsersPage() {
     if (!userToDisable) return;
 
     toast.info("Funcionalidade de desabilitar usuário ainda não implementada");
-    console.log("Disable user:", userToDisable.id);
+    logger.info(`Disable user: ${userToDisable.id}`);
     setConfirmDisableOpen(false);
     setUserToDisable(undefined);
   }, [userToDisable]);

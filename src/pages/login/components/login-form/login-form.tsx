@@ -1,8 +1,9 @@
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { UserCircleIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
@@ -20,6 +21,7 @@ import { useTranslation } from "@/shared/hooks/useTranslation";
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const router = useRouter();
   const { t } = useTranslation();
 
   const loginSchema = z.object({
@@ -43,7 +45,10 @@ export function LoginForm() {
 
   const loginMutation = useMutation({
     mutationFn: async (formData: LoginFormValues) => {
-      const result = await authService.login(formData.username, formData.password);
+      const result = await authService.login(
+        formData.username,
+        formData.password,
+      );
 
       const hasError = "error" in result;
       if (hasError) {
@@ -55,13 +60,17 @@ export function LoginForm() {
       return result;
     },
     onSuccess: () => {
+      router.invalidate({ sync: true });
       navigate({ to: "/" });
     },
   });
 
-  const onSubmit = (validData: LoginFormValues) => {
-    loginMutation.mutate(validData);
-  };
+  const onSubmit = useCallback(
+    (validData: LoginFormValues) => {
+      loginMutation.mutate(validData);
+    },
+    [loginMutation],
+  );
 
   const hasUsernameError = Boolean(errors.username);
   const usernameErrorElement = hasUsernameError ? (
@@ -76,10 +85,7 @@ export function LoginForm() {
   const hasMutationError = loginMutation.isError;
   const mutationErrorElement = hasMutationError ? (
     <div className="space-y-2" data-testid="login-error-container">
-      <p
-        className="text-sm text-destructive"
-        data-testid="login-error-message"
-      >
+      <p className="text-sm text-destructive" data-testid="login-error-message">
         {loginMutation.error.message}
       </p>
     </div>

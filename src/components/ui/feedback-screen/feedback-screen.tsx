@@ -32,6 +32,11 @@ const FeedbackScreen = React.forwardRef<HTMLDivElement, FeedbackScreenProps>(
   ) => {
     const isSuccess = variant === "success";
     const buttonVariant = isSuccess ? "outline" : "default";
+    const hasIllustration = Boolean(illustration);
+    const hasTitle = Boolean(title);
+    const hasDescription = Boolean(description);
+    const hasAction = Boolean(action);
+    const isIllustrationString = typeof illustration === "string";
 
     return (
       <div
@@ -40,12 +45,12 @@ const FeedbackScreen = React.forwardRef<HTMLDivElement, FeedbackScreenProps>(
         className={cn(feedbackScreenVariants({ variant, size, className }))}
         {...props}
       >
-        {illustration && (
+        {hasIllustration && (
           <div
             data-testid="feedback-illustration"
             className="flex items-center justify-center"
           >
-            {typeof illustration === "string" ? (
+            {isIllustrationString ? (
               <img
                 src={illustration}
                 alt=""
@@ -57,7 +62,7 @@ const FeedbackScreen = React.forwardRef<HTMLDivElement, FeedbackScreenProps>(
           </div>
         )}
 
-        {title && (
+        {hasTitle && (
           <h1
             data-testid="feedback-title"
             data-issuccess={isSuccess}
@@ -67,7 +72,7 @@ const FeedbackScreen = React.forwardRef<HTMLDivElement, FeedbackScreenProps>(
           </h1>
         )}
 
-        {description && (
+        {hasDescription && (
           <p
             data-testid="feedback-description"
             data-issuccess={isSuccess}
@@ -79,7 +84,7 @@ const FeedbackScreen = React.forwardRef<HTMLDivElement, FeedbackScreenProps>(
 
         {children}
 
-        {action && (
+        {hasAction && (
           <Button
             data-testid="feedback-action"
             onClick={onAction}
@@ -96,5 +101,4 @@ const FeedbackScreen = React.forwardRef<HTMLDivElement, FeedbackScreenProps>(
 
 FeedbackScreen.displayName = "FeedbackScreen";
 
-export default FeedbackScreen;
 export { FeedbackScreen };

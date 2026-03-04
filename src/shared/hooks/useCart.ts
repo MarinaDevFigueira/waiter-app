@@ -46,7 +46,6 @@ export function useCart(): UseCartReturn {
           const hasError = "error" in result;
           if (hasError) {
             const sessionError = new Error(result.error);
-            console.error("[useCart] Erro ao buscar sessão ativa:", sessionError);
             logger.error("Erro ao buscar sessão ativa", sessionError);
             return;
           }
@@ -58,7 +57,6 @@ export function useCart(): UseCartReturn {
           }
         } catch (error) {
           const sessionError = error instanceof Error ? error : new Error(String(error));
-          console.error("[useCart] Erro ao inicializar sessão:", sessionError);
           logger.error("Erro ao inicializar sessão", sessionError);
         } finally {
           setIsLoading(false);
@@ -98,7 +96,6 @@ export function useCart(): UseCartReturn {
       const openHasError = "error" in openResult;
       if (openHasError) {
         const openError = new Error(openResult.error);
-        console.error("[useCart] Erro ao abrir sessão:", openError);
         toast.error(openResult.error ?? "Erro ao abrir sessão");
         logger.error("Erro ao abrir sessão", openError);
         return false;
@@ -108,7 +105,6 @@ export function useCart(): UseCartReturn {
       return true;
     } catch (error) {
       const sessionError = error instanceof Error ? error : new Error(String(error));
-      console.error("[useCart] Erro ao criar sessão:", sessionError);
       logger.error("Erro ao criar sessão", sessionError);
       return false;
     }
@@ -200,7 +196,6 @@ export function useCart(): UseCartReturn {
       const hasError = "error" in result;
       if (hasError) {
         const orderError = new Error(result.error);
-        console.error("[useCart] Erro ao criar pedido:", orderError);
         toast.error(result.error ?? "Erro ao criar pedido");
         logger.error("Erro ao criar pedido", orderError);
         return false;

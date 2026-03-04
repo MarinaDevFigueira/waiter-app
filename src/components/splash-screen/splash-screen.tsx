@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SPLASH_STORAGE_KEY } from "@/shared/constants/splash";
-import FeedbackScreen from "@/components/ui/feedback-screen/feedback-screen";
+import { FeedbackScreen } from "@/components/ui/feedback-screen/feedback-screen";
 
 const SPLASH_DURATION_MS = 1500;
 
@@ -16,11 +16,11 @@ interface SplashScreenProps {
 export function SplashScreen({ onDismiss }: SplashScreenProps){
   const [isVisible, setIsVisible] = useState<boolean>(getInitialVisibility);
 
-  const handleDismiss = () => {
+  const handleDismiss = useCallback(() => {
     sessionStorage.setItem(SPLASH_STORAGE_KEY, "false");
     setIsVisible(false);
     onDismiss?.();
-  };
+  }, [onDismiss]);
 
   useEffect(() => {
     const shouldAutoDismiss = isVisible;

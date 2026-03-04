@@ -77,11 +77,12 @@ export function MultiSelect({
                 <div
                   key={option.value}
                   onClick={() => handleToggle(option.value)}
+                  data-selected={isSelected}
                   className={cn(
                     "relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none",
                     "hover:bg-accent hover:text-accent-foreground",
                     "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-                    isSelected && "bg-accent"
+                    "data-[selected=true]:bg-accent"
                   )}
                 >
                   <Checkbox
@@ -103,4 +104,3 @@ export function MultiSelect({
   );
 }
 
-export default MultiSelect;

@@ -53,7 +53,6 @@ export function useOrders(): UseOrdersReturn {
 
   useEffect(() => {
     if (isError && error) {
-      console.error("[useOrders] Erro ao buscar pedidos:", error);
       toast.error(error.message ?? "Erro ao buscar pedidos");
       logger.error("Erro ao buscar pedidos", error);
     }

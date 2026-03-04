@@ -149,4 +149,3 @@ Drawer.Footer = DrawerFooter;
 Drawer.Close = DrawerClose;
 
 export { Drawer };
-export default Drawer;

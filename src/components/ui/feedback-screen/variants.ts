@@ -23,5 +23,4 @@ const feedbackScreenVariants = cva(
   },
 );
 
-export default feedbackScreenVariants;
 export { feedbackScreenVariants };

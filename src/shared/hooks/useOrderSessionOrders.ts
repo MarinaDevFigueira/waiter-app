@@ -33,7 +33,6 @@ export function useOrderSessionOrders(orderSessionId: string | null) {
 
   useEffect(() => {
     if (query.isError && query.error) {
-      console.error("[useOrderSessionOrders] Erro ao buscar pedidos da sessão:", query.error);
       toast.error(query.error.message ?? "Erro ao buscar pedidos da sessão");
       logger.error("Erro ao buscar pedidos da sessão", query.error);
     }

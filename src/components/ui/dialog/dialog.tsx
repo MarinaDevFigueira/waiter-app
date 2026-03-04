@@ -116,4 +116,3 @@ Dialog.Footer = DialogFooter;
 Dialog.Close = DialogClose;
 
 export { Dialog };
-export default Dialog;

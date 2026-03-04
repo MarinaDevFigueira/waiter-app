@@ -103,7 +103,6 @@ export function useUsers(): UseUsersReturn {
 
   useEffect(() => {
     if (isError && error) {
-      console.error("[useUsers] Erro ao buscar usuários:", error);
       toast.error(error.message ?? "Erro ao buscar usuários");
       logger.error("Erro ao buscar usuários", error);
     }

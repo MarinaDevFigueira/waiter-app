@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -46,8 +46,7 @@ export function UsersFilters() {
   }, [t, isOwner]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const [activeFilterCount, setActiveFilterCount] = useState(0);
+  const [searchValue, setSearchValue] = useState(() => usersFiltersObservable.getValue().search || "");
 
   const currentFilters = usersFiltersObservable.getValue();
 
@@ -62,17 +61,13 @@ export function UsersFilters() {
   const roleValue = watch("role");
   const includeDeletedValue = watch("includeDeleted");
 
-  useEffect(() => {
-    const currentFilters = usersFiltersObservable.getValue();
-    setSearchValue(currentFilters.search || "");
-
-    const hasRole = currentFilters.role && currentFilters.role.length > 0;
-    const hasIncludeDeleted = currentFilters.includeDeleted === true;
+  const activeFilterCount = useMemo(() => {
+    const hasRole = roleValue && roleValue.length > 0;
+    const hasIncludeDeleted = includeDeletedValue === true;
 
     const filtersArray = [hasRole, hasIncludeDeleted];
-    const count = filtersArray.filter(Boolean).length;
-    setActiveFilterCount(count);
-  }, []);
+    return filtersArray.filter(Boolean).length;
+  }, [roleValue, includeDeletedValue]);
 
   const handleSearch = useCallback(() => {
     usersFiltersObservable.updateFilter("search", searchValue);
@@ -103,7 +98,6 @@ export function UsersFilters() {
     setValue("role", []);
     setValue("includeDeleted", false);
     setSearchValue("");
-    setActiveFilterCount(0);
     usersFiltersObservable.resetFilters();
     setIsModalOpen(false);
   }, [setValue]);
@@ -141,7 +135,7 @@ export function UsersFilters() {
             <SlidersHorizontalIcon className="size-4" />
             {t("users.filters.title")}
             {hasActiveFilters && (
-              <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+              <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
                 {activeFilterCount}
               </span>
             )}

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { BuildingsIcon } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button/button";
 import { Dialog } from "@/components/ui/dialog/dialog";
 import { Drawer } from "@/components/ui/drawer/drawer";
@@ -44,9 +44,6 @@ export function BusinessSelectorButton({
   const isMobile = deviceType === DeviceTypeEnum.MOBILE;
   const isDesktop = deviceType === DeviceTypeEnum.DESKTOP;
 
-  const mobileClasses = isMobile ? "block md:hidden" : "";
-  const desktopClasses = isDesktop ? "hidden md:block" : "";
-
   const titleText = t("business.selector.title");
   const placeholderText = t("business.selector.placeholder");
   const searchPlaceholderText = t("business.selector.searchPlaceholder");
@@ -76,7 +73,7 @@ export function BusinessSelectorButton({
 
   if (isMobile) {
     return (
-      <div className={cn(mobileClasses)}>
+      <div data-device="mobile" className="data-[device=mobile]:block data-[device=mobile]:md:hidden">
         {triggerButton}
 
         <Drawer open={open} onOpenChange={setOpen}>
@@ -94,7 +91,7 @@ export function BusinessSelectorButton({
   }
 
   return (
-    <div className={cn(desktopClasses)}>
+    <div data-device="desktop" className="data-[device=desktop]:hidden data-[device=desktop]:md:block">
       {triggerButton}
 
       <Dialog open={open} onOpenChange={setOpen}>

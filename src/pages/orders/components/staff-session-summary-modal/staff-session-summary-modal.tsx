@@ -225,7 +225,8 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
                     key={changeableStatus}
                     onClick={() => handleStatusChange(order.id, changeableStatus)}
                     disabled={isCurrentStatus}
-                    className={isCurrentStatus ? "opacity-50" : ""}
+                    data-current={isCurrentStatus}
+                    className="data-[current=true]:opacity-50"
                   >
                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${itemClassName}`}>
                       {getStatusLabel(changeableStatus)}
