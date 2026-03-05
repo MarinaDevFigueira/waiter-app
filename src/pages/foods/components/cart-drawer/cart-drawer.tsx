@@ -1,10 +1,11 @@
 import { useState, useCallback, useMemo } from "react";
-import { ShoppingBag, Trash2, Plus, Minus } from "lucide-react";
+import { ShoppingBag, Trash2, Plus, Minus, X } from "lucide-react";
+import { Dialog } from "@/components/ui/dialog/dialog";
 import { Drawer } from "@/components/ui/drawer/drawer";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useCart } from "@/shared/hooks/useCart";
 import { useRoles } from "@/shared/hooks/useRoles";
-import { multiply } from "@/lib/math";
+import { useIsMobile } from "@/shared/hooks/useMediaQuery";
 import type { CartItem } from "@/shared/subjects/cart.subject";
 
 interface CartItemRowProps {
@@ -35,10 +36,9 @@ function CartItemRow({ item, onRemove, onUpdateQuantity }: CartItemRowProps) {
     onUpdateQuantity(item.productId, item.quantity - 1);
   }, [item.productId, item.quantity, onUpdateQuantity]);
 
-  const itemTotalValue = multiply(item.productPrice, item.quantity);
-  const itemTotal = formatPrice(itemTotalValue);
   const hasImage = Boolean(item.productImageUrl);
   const imageSrc = hasImage ? item.productImageUrl : "/placeholder-food.png";
+  const unitPrice = formatPrice(item.productPrice);
 
   return (
     <li className="flex items-center gap-3 py-3 border-b border-border last:border-0">
@@ -49,8 +49,8 @@ function CartItemRow({ item, onRemove, onUpdateQuantity }: CartItemRowProps) {
       />
       <div className="flex-1 flex flex-col gap-1 min-w-0">
         <span className="text-sm font-semibold truncate">{item.productName}</span>
-        <span className="text-xs text-muted-foreground">{formatPrice(item.productPrice)} cada</span>
-        <div className="flex items-center justify-between mt-1">
+        <span className="text-xs text-muted-foreground">{unitPrice}</span>
+        <div className="flex items-center mt-1">
           <div className="flex items-center gap-2">
             <button
               onClick={handleDecrease}
@@ -68,7 +68,6 @@ function CartItemRow({ item, onRemove, onUpdateQuantity }: CartItemRowProps) {
               <Plus className="w-3 h-3" />
             </button>
           </div>
-          <span className="text-sm font-bold text-primary">{itemTotal}</span>
         </div>
       </div>
       <button
@@ -91,6 +90,7 @@ interface CartDrawerProps {
 export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps) {
   const { t } = useTranslation();
   const { isTable } = useRoles();
+  const isMobile = useIsMobile();
   const { cart, itemCount, removeItem, updateQuantity, clearCart, confirmOrder, isLoading } = useCart();
   const [isConfirming, setIsConfirming] = useState(false);
 
@@ -137,71 +137,117 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
   const hasItems = cart.items.length > 0;
   const isDisabled = isLoading || isConfirming;
 
+  const headerTitle = (
+    <div className="flex items-center gap-2">
+      <ShoppingBag className="w-5 h-5 text-primary" />
+      <span className="text-lg font-semibold leading-none tracking-tight">{t("cart.title")}</span>
+      {hasItems && (
+        <span className="text-sm text-muted-foreground">({itemCountLabel})</span>
+      )}
+    </div>
+  );
+
+  const itemsContent = useMemo(() => {
+    if (hasItems) {
+      return (
+        <ul className="py-2">
+          {cart.items.map((item) => (
+            <CartItemRow
+              key={item.productId}
+              item={item}
+              onRemove={removeItem}
+              onUpdateQuantity={updateQuantity}
+            />
+          ))}
+        </ul>
+      );
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
+        <ShoppingBag className="w-12 h-12 text-muted-foreground/30" />
+        <span className="text-base font-semibold text-muted-foreground">{t("cart.empty")}</span>
+        <span className="text-sm text-muted-foreground">{t("cart.emptyDescription")}</span>
+      </div>
+    );
+  }, [hasItems, cart.items, removeItem, updateQuantity, t]);
+
+  const bodyContent = (
+    <div className="flex-1 overflow-y-auto px-4 min-h-0">
+      {itemsContent}
+    </div>
+  );
+
+  const footerContent = useMemo(() => {
+    if (!hasItems) return null;
+
+    return (
+      <div className="border-t border-border p-4 flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <span className="text-base font-semibold">{t("cart.total")}</span>
+          <span className="text-xl font-bold text-primary">{formattedTotal}</span>
+        </div>
+        <button
+          onClick={handleConfirmOrder}
+          disabled={isDisabled}
+          data-disabled={isDisabled}
+          className="w-full bg-primary text-primary-foreground font-semibold py-3 px-4 rounded-lg hover:opacity-90 active:opacity-75 hover:cursor-pointer transition-opacity data-[disabled=true]:opacity-50 data-[disabled=true]:pointer-events-none"
+          data-testid="confirm-order-button"
+        >
+          {confirmButtonLabel}
+        </button>
+        <button
+          onClick={handleCancelOrder}
+          disabled={isDisabled}
+          data-disabled={isDisabled}
+          className="w-full border border-border text-muted-foreground font-semibold py-2 px-4 rounded-lg hover:bg-muted hover:text-foreground hover:cursor-pointer transition-colors data-[disabled=true]:opacity-50 data-[disabled=true]:pointer-events-none"
+          data-testid="cancel-order-button"
+        >
+          {t("cart.cancelOrder")}
+        </button>
+      </div>
+    );
+  }, [hasItems, t, formattedTotal, handleConfirmOrder, handleCancelOrder, isDisabled, confirmButtonLabel]);
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={handleOpenChange}>
+        <Drawer.Content
+          className="max-h-[85vh] flex flex-col"
+          data-testid="cart-drawer"
+        >
+          <Drawer.Header className="border-b border-border">
+            {headerTitle}
+            <Drawer.Close />
+          </Drawer.Header>
+          {bodyContent}
+          {footerContent}
+        </Drawer.Content>
+      </Drawer>
+    );
+  }
+
   return (
-    <Drawer open={open} onOpenChange={handleOpenChange}>
-      <Drawer.Content
-        className="max-h-[85vh] flex flex-col"
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <Dialog.Content
+        className="max-w-lg p-0 max-h-[80vh] flex flex-col"
         data-testid="cart-drawer"
       >
-        <Drawer.Header className="border-b border-border">
-          <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-primary" />
-            <Drawer.Title>{t("cart.title")}</Drawer.Title>
-            {hasItems && (
-              <span className="text-sm text-muted-foreground">({itemCountLabel})</span>
-            )}
-          </div>
-          <Drawer.Close />
-        </Drawer.Header>
-
-        <div className="flex-1 overflow-y-auto px-4 min-h-0">
-          {hasItems ? (
-            <ul className="py-2">
-              {cart.items.map((item) => (
-                <CartItemRow
-                  key={item.productId}
-                  item={item}
-                  onRemove={removeItem}
-                  onUpdateQuantity={updateQuantity}
-                />
-              ))}
-            </ul>
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-              <ShoppingBag className="w-12 h-12 text-muted-foreground/30" />
-              <span className="text-base font-semibold text-muted-foreground">{t("cart.empty")}</span>
-              <span className="text-sm text-muted-foreground">{t("cart.emptyDescription")}</span>
-            </div>
-          )}
-        </div>
-
-        {hasItems && (
-          <Drawer.Footer className="border-t border-border gap-3">
-            <div className="flex items-center justify-between">
-              <span className="text-base font-semibold">{t("cart.total")}</span>
-              <span className="text-xl font-bold text-primary">{formattedTotal}</span>
-            </div>
-            <button
-              onClick={handleConfirmOrder}
-              disabled={isDisabled}
-              data-disabled={isDisabled}
-              className="w-full bg-primary text-primary-foreground font-semibold py-3 px-4 rounded-lg hover:opacity-90 active:opacity-75 hover:cursor-pointer transition-opacity data-[disabled=true]:opacity-50 data-[disabled=true]:pointer-events-none"
-              data-testid="confirm-order-button"
-            >
-              {confirmButtonLabel}
-            </button>
-            <button
-              onClick={handleCancelOrder}
-              disabled={isDisabled}
-              data-disabled={isDisabled}
-              className="w-full border border-border text-muted-foreground font-semibold py-2 px-4 rounded-lg hover:bg-muted hover:text-foreground hover:cursor-pointer transition-colors data-[disabled=true]:opacity-50 data-[disabled=true]:pointer-events-none"
-              data-testid="cancel-order-button"
-            >
-              {t("cart.cancelOrder")}
-            </button>
-          </Drawer.Footer>
-        )}
-      </Drawer.Content>
-    </Drawer>
+        <Dialog.Header className="p-4 border-b border-border">
+          <Dialog.Title asChild>
+            {headerTitle}
+          </Dialog.Title>
+          <button
+            onClick={onClose}
+            aria-label={t("common.buttons.cancel")}
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted hover:cursor-pointer transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </Dialog.Header>
+        {bodyContent}
+        {footerContent}
+      </Dialog.Content>
+    </Dialog>
   );
 }
