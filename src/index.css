@@ -54,6 +54,15 @@
   --scrollbar-size: 0.25rem;
   --scrollbar-thumb: oklch(from var(--border) l c h / 0.5);
   --scrollbar-thumb-hover: oklch(from var(--border) l c h / 0.8);
+
+  --toast-bg: var(--card);
+  --toast-text: var(--card-foreground);
+  --toast-border: var(--border);
+  --toast-success: oklch(0.6 0.2 145);
+  --toast-error: var(--primary);
+  --toast-info: oklch(0.55 0.2 255);
+  --toast-warning: oklch(0.75 0.18 75);
+  --toast-progress-bg: oklch(from var(--muted-foreground) l c h / 0.2);
 }
 
 a {
@@ -152,6 +161,15 @@ button:focus-visible {
   --scrollbar-size: 0.25rem;
   --scrollbar-thumb: oklch(from var(--border) l c h / 0.5);
   --scrollbar-thumb-hover: oklch(from var(--border) l c h / 0.8);
+
+  --toast-bg: var(--card);
+  --toast-text: var(--card-foreground);
+  --toast-border: var(--border);
+  --toast-success: oklch(0.6 0.2 145);
+  --toast-error: var(--destructive);
+  --toast-info: oklch(0.55 0.2 255);
+  --toast-warning: oklch(0.75 0.18 75);
+  --toast-progress-bg: oklch(from var(--muted-foreground) l c h / 0.15);
 }
 
 @layer base {
@@ -188,6 +206,97 @@ button:focus-visible {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) transparent;
   }
+}
+
+:root {
+  --toastify-color-light: var(--toast-bg);
+  --toastify-text-color-light: var(--toast-text);
+  --toastify-color-dark: var(--toast-bg);
+  --toastify-text-color-dark: var(--toast-text);
+  --toastify-font-family: "Inter", sans-serif;
+  --toastify-z-index: 9999;
+  --toastify-toast-offset: 1rem;
+  --toastify-toast-shadow: 0 4px 24px oklch(0 0 0 / 0.08), 0 1px 4px oklch(0 0 0 / 0.04);
+  --toastify-toast-bd-radius: var(--radius);
+  --toastify-toast-min-height: auto;
+}
+
+.Toastify__toast {
+  border: 1px solid var(--toast-border);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  padding: 0.875rem 1rem;
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+.dark .Toastify__toast {
+  box-shadow: 0 4px 24px oklch(0 0 0 / 0.3), 0 1px 4px oklch(0 0 0 / 0.2);
+}
+
+.Toastify__toast-body {
+  padding: 0;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.Toastify__toast-icon {
+  width: 1.25rem;
+  margin-inline-end: 0.75rem;
+}
+
+.Toastify__close-button {
+  color: var(--toast-text);
+  opacity: 0.4;
+  align-self: center;
+  transition: opacity 0.15s ease;
+}
+
+.Toastify__close-button:hover {
+  opacity: 0.8;
+}
+
+.Toastify__progress-bar {
+  height: 3px;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.Toastify__toast--success .Toastify__progress-bar {
+  background: var(--toast-success);
+}
+
+.Toastify__toast--success .Toastify__toast-icon svg {
+  fill: var(--toast-success);
+}
+
+.Toastify__toast--error .Toastify__progress-bar {
+  background: var(--toast-error);
+}
+
+.Toastify__toast--error .Toastify__toast-icon svg {
+  fill: var(--toast-error);
+}
+
+.Toastify__toast--info .Toastify__progress-bar {
+  background: var(--toast-info);
+}
+
+.Toastify__toast--info .Toastify__toast-icon svg {
+  fill: var(--toast-info);
+}
+
+.Toastify__toast--warning .Toastify__progress-bar {
+  background: var(--toast-warning);
+}
+
+.Toastify__toast--warning .Toastify__toast-icon svg {
+  fill: var(--toast-warning);
+}
+
+.Toastify__toast-container--top-right {
+  top: 1rem;
+  right: 1rem;
 }
 
 @layer utilities {
