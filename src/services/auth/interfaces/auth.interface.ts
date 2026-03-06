@@ -33,3 +33,14 @@ export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface GetAuthMeResponse {
+  user: {
+    id: string;
+    name: string;
+    email: string | null;
+    role: string;
+  };
+  accessToken: string;
+  refreshToken: string;
+}

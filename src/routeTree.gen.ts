@@ -22,6 +22,8 @@ import { Route as DashboardCategoriesIndexRouteImport } from './routes/dashboard
 import { Route as DashboardBusinessSettingsRouteImport } from './routes/dashboard/business/settings'
 import { Route as DashboardBusinessLimitsRouteImport } from './routes/dashboard/business/limits'
 import { Route as DashboardBusinessInfoRouteImport } from './routes/dashboard/business/info'
+import { Route as AuthGoogleErrorRouteImport } from './routes/auth/google/error'
+import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google/callback'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -90,6 +92,16 @@ const DashboardBusinessInfoRoute = DashboardBusinessInfoRouteImport.update({
   path: '/business/info',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const AuthGoogleErrorRoute = AuthGoogleErrorRouteImport.update({
+  id: '/auth/google/error',
+  path: '/auth/google/error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthGoogleCallbackRoute = AuthGoogleCallbackRouteImport.update({
+  id: '/auth/google/callback',
+  path: '/auth/google/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -101,6 +113,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
+  '/auth/google/error': typeof AuthGoogleErrorRoute
   '/dashboard/business/info': typeof DashboardBusinessInfoRoute
   '/dashboard/business/limits': typeof DashboardBusinessLimitsRoute
   '/dashboard/business/settings': typeof DashboardBusinessSettingsRoute
@@ -115,6 +129,8 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
+  '/auth/google/error': typeof AuthGoogleErrorRoute
   '/dashboard/business/info': typeof DashboardBusinessInfoRoute
   '/dashboard/business/limits': typeof DashboardBusinessLimitsRoute
   '/dashboard/business/settings': typeof DashboardBusinessSettingsRoute
@@ -131,6 +147,8 @@ export interface FileRoutesById {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
+  '/auth/google/error': typeof AuthGoogleErrorRoute
   '/dashboard/business/info': typeof DashboardBusinessInfoRoute
   '/dashboard/business/limits': typeof DashboardBusinessLimitsRoute
   '/dashboard/business/settings': typeof DashboardBusinessSettingsRoute
@@ -148,6 +166,8 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/users'
     | '/dashboard/'
+    | '/auth/google/callback'
+    | '/auth/google/error'
     | '/dashboard/business/info'
     | '/dashboard/business/limits'
     | '/dashboard/business/settings'
@@ -162,6 +182,8 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/users'
     | '/dashboard'
+    | '/auth/google/callback'
+    | '/auth/google/error'
     | '/dashboard/business/info'
     | '/dashboard/business/limits'
     | '/dashboard/business/settings'
@@ -177,6 +199,8 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/users'
     | '/dashboard/'
+    | '/auth/google/callback'
+    | '/auth/google/error'
     | '/dashboard/business/info'
     | '/dashboard/business/limits'
     | '/dashboard/business/settings'
@@ -187,6 +211,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  AuthGoogleCallbackRoute: typeof AuthGoogleCallbackRoute
+  AuthGoogleErrorRoute: typeof AuthGoogleErrorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -282,6 +308,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBusinessInfoRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/auth/google/error': {
+      id: '/auth/google/error'
+      path: '/auth/google/error'
+      fullPath: '/auth/google/error'
+      preLoaderRoute: typeof AuthGoogleErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/google/callback': {
+      id: '/auth/google/callback'
+      path: '/auth/google/callback'
+      fullPath: '/auth/google/callback'
+      preLoaderRoute: typeof AuthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -319,6 +359,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   LoginRoute: LoginRoute,
+  AuthGoogleCallbackRoute: AuthGoogleCallbackRoute,
+  AuthGoogleErrorRoute: AuthGoogleErrorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -54,6 +54,14 @@
       "passwordRequired": "La contraseña es obligatoria",
       "submitButton": "Iniciar Sesión",
       "submittingButton": "Iniciando sesión..."
+    },
+    "google": {
+      "button": "Iniciar sesión con Google",
+      "divider": "o",
+      "authenticating": "Autenticando...",
+      "redirecting": "Redirigiendo...",
+      "callbackMissingTokens": "Tokens de autenticación no encontrados",
+      "unknownError": "Error desconocido al autenticar con Google"
     }
   },
   "foods": {

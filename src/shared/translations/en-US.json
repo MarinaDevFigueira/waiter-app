@@ -54,6 +54,14 @@
       "passwordRequired": "Password is required",
       "submitButton": "Sign in",
       "submittingButton": "Signing in..."
+    },
+    "google": {
+      "button": "Sign in with Google",
+      "divider": "or",
+      "authenticating": "Authenticating...",
+      "redirecting": "Redirecting...",
+      "callbackMissingTokens": "Authentication tokens not found",
+      "unknownError": "Unknown error while authenticating with Google"
     }
   },
   "foods": {
