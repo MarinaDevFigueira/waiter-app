@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
-import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
+import { useNavigate, useRouter, useLocation } from "@tanstack/react-router";
 import { UserCircleIcon, GoogleLogoIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
@@ -24,8 +24,8 @@ export function LoginForm() {
   const navigate = useNavigate();
   const router = useRouter();
   const { t } = useTranslation();
-  const searchParams = useSearch({ from: "/login" });
-  const urlBusinessId = searchParams.businessId;
+  const location = useLocation();
+  const urlBusinessId = new URLSearchParams(location.search).get("businessId") ?? undefined;
   const { selectedBusiness } = useBusiness({ urlBusinessId });
 
   const loginSchema = z.object({
