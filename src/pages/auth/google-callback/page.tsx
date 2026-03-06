@@ -45,9 +45,11 @@ export function GoogleCallbackPage() {
     handleTokens();
   }, [navigate, router, t]);
 
+  const authenticatingMessage = t("login.google.authenticating");
+
   return (
-    <div className="flex items-center justify-center min-h-screen w-screen bg-background">
-      <p className="text-muted-foreground">{t("login.google.authenticating")}</p>
+    <div data-testid="google-callback-page" className="flex items-center justify-center min-h-screen w-screen bg-background">
+      <p data-testid="google-callback-message" className="text-muted-foreground">{authenticatingMessage}</p>
     </div>
   );
 }

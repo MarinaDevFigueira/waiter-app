@@ -21,9 +21,11 @@ export function GoogleErrorPage() {
     navigate({ to: "/login" });
   }, [navigate, t]);
 
+  const redirectingMessage = t("login.google.redirecting");
+
   return (
-    <div className="flex items-center justify-center min-h-screen w-screen bg-background">
-      <p className="text-muted-foreground">{t("login.google.redirecting")}</p>
+    <div data-testid="google-error-page" className="flex items-center justify-center min-h-screen w-screen bg-background">
+      <p data-testid="google-error-message" className="text-muted-foreground">{redirectingMessage}</p>
     </div>
   );
 }
