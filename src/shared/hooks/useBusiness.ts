@@ -7,7 +7,13 @@ interface UseBusinessReturn {
   clearBusiness: () => void;
 }
 
-export function useBusiness(): UseBusinessReturn {
+interface UseBusinessOptions {
+  urlBusinessId?: string;
+}
+
+export function useBusiness(options?: UseBusinessOptions): UseBusinessReturn {
+  const urlBusinessId = options?.urlBusinessId;
+
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessData | null>(
     businessObservable.getValue()
   );
@@ -16,6 +22,13 @@ export function useBusiness(): UseBusinessReturn {
     const subscription = businessObservable.subscribe(setSelectedBusiness);
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const hasUrlBusinessId = Boolean(urlBusinessId);
+    if (hasUrlBusinessId) {
+      businessObservable.setBusiness({ id: urlBusinessId!, name: "" });
+    }
+  }, [urlBusinessId]);
 
   const setBusiness = (business: BusinessData): void => {
     businessObservable.setBusiness(business);
