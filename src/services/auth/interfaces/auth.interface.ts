@@ -35,8 +35,12 @@ export interface LoginResponse {
 }
 
 export interface GetAuthMeResponse {
-  id: string;
-  name: string;
-  email: string | null;
-  role: string;
+  user: {
+    id: string;
+    name: string;
+    email: string | null;
+    role: string;
+  };
+  accessToken: string;
+  refreshToken: string;
 }

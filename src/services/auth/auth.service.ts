@@ -164,7 +164,7 @@ class AuthService {
         return { error: userResult.error };
       }
 
-      const user = userResult.data;
+      const user = userResult.data.user;
       const profile = roleToProfile[user.role.toLowerCase()] ?? UserRoleEnum.ATTENDANT;
 
       const authData: AuthData = {
