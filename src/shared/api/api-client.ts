@@ -114,6 +114,12 @@ function buildHeaders(
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
 
+  const allCookies = document.cookie;
+  const hasCookies = allCookies.length > 0;
+  if (hasCookies) {
+    headers["Cookie"] = allCookies;
+  }
+
   const hasExtraHeaders = extraHeaders !== undefined;
   if (hasExtraHeaders) {
     Object.assign(headers, extraHeaders);
