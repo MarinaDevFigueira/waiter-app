@@ -152,8 +152,6 @@ class AuthService {
     refreshToken: string
   ): Promise<HandleOAuthTokensResult> {
     try {
-      cookies.safeClearAll();
-
       sessionStorage.setItem(StorageKeys.ACCESS_TOKEN, accessToken);
       sessionStorage.setItem(StorageKeys.REFRESH_TOKEN, refreshToken);
 
