@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { businessObservable, type BusinessData } from "@/shared/subjects/business.subject";
+import { businessService } from "@/services/business/business.service";
 
 interface UseBusinessReturn {
   selectedBusiness: BusinessData | null;
@@ -25,9 +26,19 @@ export function useBusiness(options?: UseBusinessOptions): UseBusinessReturn {
 
   useEffect(() => {
     const hasUrlBusinessId = Boolean(urlBusinessId);
-    if (hasUrlBusinessId) {
-      businessObservable.setBusiness({ id: urlBusinessId!, name: "" });
-    }
+    if (!hasUrlBusinessId) return;
+
+    const fetchAndSetBusiness = async () => {
+      const result = await businessService.getPublicById(urlBusinessId!);
+      const hasError = "error" in result;
+      if (hasError) {
+        businessObservable.clearBusiness();
+        return;
+      }
+      businessObservable.setBusiness({ id: result.data.id, name: result.data.name });
+    };
+
+    fetchAndSetBusiness();
   }, [urlBusinessId]);
 
   const setBusiness = (business: BusinessData): void => {

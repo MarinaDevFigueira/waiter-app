@@ -509,5 +509,11 @@
       "waiter": "Camarero",
       "system_manager": "Administrador del sistema"
     }
+  },
+  "cookieConsent": {
+    "title": "Usamos cookies",
+    "description": "Usamos cookies esenciales para la autenticación, selección de negocio y preferencias de idioma. Estas cookies son necesarias para el funcionamiento del sistema.",
+    "acceptButton": "Aceptar cookies",
+    "declineButton": "Rechazar"
   }
 }
