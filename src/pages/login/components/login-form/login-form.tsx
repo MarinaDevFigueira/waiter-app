@@ -19,6 +19,7 @@ import { logger } from "@/lib/logger";
 import { authService } from "@/services/auth/auth.service";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { useBusiness } from "@/shared/hooks/useBusiness";
+import { LoginFormSkeleton } from "./login-form-skeleton";
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export function LoginForm() {
   const { t } = useTranslation();
   const location = useLocation();
   const urlBusinessId = new URLSearchParams(location.search).get("businessId") ?? undefined;
-  const { selectedBusiness } = useBusiness({ urlBusinessId });
+  const { selectedBusiness, isLoading: isBusinessLoading, isBusinessInvalid } = useBusiness({ urlBusinessId });
 
   const loginSchema = z.object({
     username: z.string().min(1, { message: t("login.form.usernameRequired") }),
@@ -95,14 +96,15 @@ export function LoginForm() {
     </div>
   ) : null;
 
-  const isLoading = loginMutation.isPending;
-  const submitButtonText = isLoading
+  const isMutationLoading = loginMutation.isPending;
+  const isFormDisabled = isMutationLoading || isBusinessInvalid;
+  const submitButtonText = isMutationLoading
     ? t("login.form.submittingButton")
     : t("login.form.submitButton");
 
   const businessId = selectedBusiness?.id;
   const hasBusinessId = Boolean(businessId);
-  const isGoogleLoginDisabled = isLoading || !hasBusinessId;
+  const isGoogleLoginDisabled = isFormDisabled || !hasBusinessId;
 
   const handleGoogleLogin = useCallback(() => {
     const apiUrl = import.meta.env.VITE_API_URL;
@@ -110,6 +112,8 @@ export function LoginForm() {
     const googleAuthUrl = `${apiUrl}/auth/google?businessId=${currentBusinessId}`;
     window.location.href = googleAuthUrl;
   }, [selectedBusiness]);
+
+  if (isBusinessLoading) return <LoginFormSkeleton />;
 
   return (
     <Card className="w-full max-w-md">
@@ -140,7 +144,7 @@ export function LoginForm() {
               placeholder={t("login.form.usernamePlaceholder")}
               autoComplete="username"
               required
-              disabled={isLoading}
+              disabled={isFormDisabled}
               data-testid="login-username-input"
             />
             {usernameErrorElement}
@@ -156,7 +160,7 @@ export function LoginForm() {
               placeholder="••••••••"
               autoComplete="current-password"
               required
-              disabled={isLoading}
+              disabled={isFormDisabled}
               data-testid="login-password-input"
             />
             {passwordErrorElement}
@@ -166,7 +170,7 @@ export function LoginForm() {
             type="submit"
             className="w-full"
             size="lg"
-            disabled={isLoading}
+            disabled={isFormDisabled}
             data-testid="login-submit-button"
           >
             <UserCircleIcon />

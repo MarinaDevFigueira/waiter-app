@@ -6,6 +6,8 @@ interface UseBusinessReturn {
   selectedBusiness: BusinessData | null;
   setBusiness: (business: BusinessData) => void;
   clearBusiness: () => void;
+  isLoading: boolean;
+  isBusinessInvalid: boolean;
 }
 
 interface UseBusinessOptions {
@@ -18,6 +20,8 @@ export function useBusiness(options?: UseBusinessOptions): UseBusinessReturn {
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessData | null>(
     businessObservable.getValue()
   );
+  const [isLoading, setIsLoading] = useState(Boolean(urlBusinessId));
+  const [isBusinessInvalid, setIsBusinessInvalid] = useState(false);
 
   useEffect(() => {
     const subscription = businessObservable.subscribe(setSelectedBusiness);
@@ -28,14 +32,19 @@ export function useBusiness(options?: UseBusinessOptions): UseBusinessReturn {
     const hasUrlBusinessId = Boolean(urlBusinessId);
     if (!hasUrlBusinessId) return;
 
+    setIsLoading(true);
+    setIsBusinessInvalid(false);
+
     const fetchAndSetBusiness = async () => {
       const result = await businessService.getPublicById(urlBusinessId!);
       const hasError = "error" in result;
       if (hasError) {
         businessObservable.clearBusiness();
-        return;
+        setIsBusinessInvalid(true);
+      } else {
+        businessObservable.setBusiness({ id: result.data.id, name: result.data.name });
       }
-      businessObservable.setBusiness({ id: result.data.id, name: result.data.name });
+      setIsLoading(false);
     };
 
     fetchAndSetBusiness();
@@ -53,5 +62,7 @@ export function useBusiness(options?: UseBusinessOptions): UseBusinessReturn {
     selectedBusiness,
     setBusiness,
     clearBusiness,
+    isLoading,
+    isBusinessInvalid,
   };
 }
