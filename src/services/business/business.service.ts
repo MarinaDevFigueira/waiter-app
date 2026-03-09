@@ -8,6 +8,7 @@ import type {
   GetBusinessesRequestQuery,
   UpdateBusinessRequestBody,
   GetBusinessesResponse,
+  GetPublicBusinessResponse,
 } from "./interfaces/business.interface";
 
 function mapApiBusinessItemToBusiness(apiItem: GetBusinessItemResponse): Business {
@@ -111,6 +112,24 @@ export const businessService = {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar empresa do usuário";
+      logger.error(errorMessage, error instanceof Error ? error : null);
+      return { error: errorMessage };
+    }
+  },
+
+  async getPublicById(id: string): Promise<ServiceResult<GetPublicBusinessResponse>> {
+    try {
+      const result = await api.get<unknown>(`/public/business/${id}`);
+
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+
+      return { data: result.data as GetPublicBusinessResponse };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao buscar empresa pública";
       logger.error(errorMessage, error instanceof Error ? error : null);
       return { error: errorMessage };
     }

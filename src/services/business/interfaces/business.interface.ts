@@ -54,6 +54,12 @@ export interface GetBusinessDetailResponse {
   limits: GetBusinessLimitsResponse | null;
 }
 
+export interface GetPublicBusinessResponse {
+  id: string;
+  name: string;
+  logoUrl: string | null;
+}
+
 export interface GetBusinessesRequestQuery {
   page: number;
   size: number;
