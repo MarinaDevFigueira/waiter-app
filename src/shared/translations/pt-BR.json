@@ -514,6 +514,9 @@
     "title": "Utilizamos cookies",
     "description": "Utilizamos cookies essenciais para autenticação, seleção de negócio e preferências de idioma. Esses cookies são necessários para o funcionamento do sistema.",
     "acceptButton": "Aceitar cookies",
-    "declineButton": "Recusar"
+    "declineButton": "Recusar",
+    "declinedTitle": "Cookies necessários",
+    "declinedDescription": "Os cookies são necessários para o funcionamento do sistema. Sem aceitá-los, não é possível utilizar nenhuma funcionalidade do site.",
+    "reviewButton": "Revisar configurações"
   }
 }

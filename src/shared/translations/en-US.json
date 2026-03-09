@@ -514,6 +514,9 @@
     "title": "We use cookies",
     "description": "We use essential cookies for authentication, business selection and language preferences. These cookies are required for the system to work properly.",
     "acceptButton": "Accept cookies",
-    "declineButton": "Decline"
+    "declineButton": "Decline",
+    "declinedTitle": "Cookies required",
+    "declinedDescription": "Cookies are required for the system to work. Without accepting them, you cannot use any feature of this site.",
+    "reviewButton": "Review settings"
   }
 }

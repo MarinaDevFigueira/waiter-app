@@ -9,6 +9,7 @@ export const StorageKeys = Object.freeze({
   CART: "cart",
   BUSINESS_ID: "business_id",
   BUSINESS_NAME: "business_name",
+  COOKIE_CONSENT: "cookie_consent",
 });
 
 export type StorageKey = (typeof StorageKeys)[keyof typeof StorageKeys];

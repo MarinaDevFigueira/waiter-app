@@ -1,29 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { cookieConsentObservable, type CookieConsentStatus } from "@/shared/subjects/cookie-consent.subject";
 
-const CONSENT_KEY = "cookie_consent";
-
-export type CookieConsentStatus = "accepted" | "declined" | null;
-
-function getStoredConsent(): CookieConsentStatus {
-  const stored = localStorage.getItem(CONSENT_KEY);
-  if (stored === "accepted" || stored === "declined") return stored;
-  return null;
-}
+export type { CookieConsentStatus };
 
 export function useCookieConsent() {
-  const [consent, setConsent] = useState<CookieConsentStatus>(getStoredConsent);
+  const [consent, setConsent] = useState<CookieConsentStatus>(cookieConsentObservable.getValue);
 
-  const hasConsented = consent !== null;
+  useEffect(() => {
+    const subscription = cookieConsentObservable.subscribe(setConsent);
+    return () => subscription.unsubscribe();
+  }, []);
 
-  const accept = () => {
-    localStorage.setItem(CONSENT_KEY, "accepted");
-    setConsent("accepted");
+  const isAccepted = consent === "accepted";
+  const isDeclined = consent === "declined";
+  const isPending = consent === null;
+
+  return {
+    consent,
+    isAccepted,
+    isDeclined,
+    isPending,
+    accept: cookieConsentObservable.accept,
+    decline: cookieConsentObservable.decline,
+    reset: cookieConsentObservable.reset,
   };
-
-  const decline = () => {
-    localStorage.setItem(CONSENT_KEY, "declined");
-    setConsent("declined");
-  };
-
-  return { consent, hasConsented, accept, decline };
 }
