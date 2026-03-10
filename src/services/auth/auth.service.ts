@@ -1,7 +1,6 @@
 import { api } from "@/services/api";
-import { authObservable } from "@/shared/subjects/auth";
+import { authObservable, roleToProfile } from "@/shared/subjects/auth";
 import { permissionsObservable } from "@/shared/subjects/permissions.subject";
-import { StorageKeys } from "@/shared/constants/storage-keys";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { permissionsService } from "@/services/permissions/permissions.service";
 import { logger } from "@/lib/logger";
@@ -9,7 +8,7 @@ import { queryClient } from "@/lib/query-client";
 import { cookies } from "@/lib/cookies";
 import { PERMISSIONS_QUERY_KEY } from "@/shared/hooks/useUserPermissions";
 import type { AuthData } from "@/shared/subjects/auth";
-import type { GetAuthMeResponse } from "./interfaces/auth.interface";
+import type { GetAuthMeResponse, OAuthTokenResponse } from "./interfaces/auth.interface";
 
 type LoginSuccess = { data: AuthData };
 type LoginError = { error: string };
@@ -26,19 +25,7 @@ interface LoginApiResponse {
     email: string | null;
     role: string;
   };
-  accessToken: string;
-  refreshToken: string;
 }
-
-const roleToProfile: Record<string, UserRoleEnum> = {
-  admin: UserRoleEnum.ADMIN,
-  table: UserRoleEnum.TABLE,
-  kitchen: UserRoleEnum.KITCHEN,
-  customer: UserRoleEnum.CUSTOMER,
-  attendant: UserRoleEnum.ATTENDANT,
-  owner: UserRoleEnum.OWNER,
-  system_manager: UserRoleEnum.SYSTEM_MANAGER
-};
 
 type HandleOAuthTokensResult = { data: AuthData } | { error: string };
 
@@ -57,16 +44,14 @@ class AuthService {
         return { error: result.error };
       }
 
-      const { user, accessToken, refreshToken } = result.data;
-
-      sessionStorage.setItem(StorageKeys.ACCESS_TOKEN, accessToken);
-      sessionStorage.setItem(StorageKeys.REFRESH_TOKEN, refreshToken);
-
+      const { user } = result.data;
       const profile = roleToProfile[user.role.toLowerCase()] ?? UserRoleEnum.ATTENDANT;
 
       const authData: AuthData = {
+        userId: user.id,
         username: user.email ?? username,
         name: user.name,
+        email: user.email,
         profile,
       };
 
@@ -95,38 +80,39 @@ class AuthService {
     }
   }
 
-  async logout(): Promise<LogoutResult> {
+  async serverLogout(): Promise<{ data: void } | { error: string }> {
     try {
-      authObservable.clearAuth();
-      permissionsObservable.clear();
-      queryClient.removeQueries({ queryKey: PERMISSIONS_QUERY_KEY });
-      queryClient.clear();
-      sessionStorage.removeItem(StorageKeys.ACCESS_TOKEN);
-      sessionStorage.removeItem(StorageKeys.REFRESH_TOKEN);
-      cookies.safeClearAll();
-      return { data: { success: true } };
+      const result = await api.post<void>("/auth/logout", {});
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
+      }
+      return { data: undefined };
     } catch (error) {
-      authObservable.clearAuth();
-      permissionsObservable.clear();
-      queryClient.clear();
-      sessionStorage.removeItem(StorageKeys.ACCESS_TOKEN);
-      sessionStorage.removeItem(StorageKeys.REFRESH_TOKEN);
-      cookies.safeClearAll();
-      return { data: { success: true } };
+      const errorMessage = error instanceof Error ? error.message : "Erro ao fazer logout no servidor";
+      logger.error("[authService.serverLogout] Falha ao chamar endpoint de logout", error instanceof Error ? error : null);
+      return { error: errorMessage };
     }
   }
 
+  async logout(): Promise<LogoutResult> {
+    await this.serverLogout();
+
+    authObservable.clearAuth();
+    permissionsObservable.clear();
+    queryClient.removeQueries({ queryKey: PERMISSIONS_QUERY_KEY });
+    queryClient.clear();
+    cookies.safeClearAll();
+    return { data: { success: true } };
+  }
+
   getCurrentUser(): GetCurrentUserResult {
-    try {
-      const auth = sessionStorage.getItem(StorageKeys.AUTH);
-      const hasAuth = auth !== null;
-      if (hasAuth && auth) {
-        return { data: JSON.parse(auth) as AuthData };
-      }
-      return { error: "Usuário não autenticado" };
-    } catch (error) {
-      return { error: "Erro ao obter usuário atual" };
+    const auth = authObservable.getValue();
+    const hasAuth = auth !== null;
+    if (hasAuth) {
+      return { data: auth };
     }
+    return { error: "Usuário não autenticado" };
   }
 
   async getMe(): Promise<{ data: GetAuthMeResponse } | { error: string }> {
@@ -147,27 +133,23 @@ class AuthService {
     }
   }
 
-  async handleGoogleOAuthTokens(
-    accessToken: string,
-    refreshToken: string
-  ): Promise<HandleOAuthTokensResult> {
+  async handleGoogleOAuthTokens(oauthtoken: string): Promise<HandleOAuthTokensResult> {
     try {
-      sessionStorage.setItem(StorageKeys.ACCESS_TOKEN, accessToken);
-      sessionStorage.setItem(StorageKeys.REFRESH_TOKEN, refreshToken);
+      const result = await api.post<OAuthTokenResponse>("/auth/oauth/token", { oauthtoken });
 
-      const userResult = await this.getMe();
-
-      const hasUserError = "error" in userResult;
-      if (hasUserError) {
-        return { error: userResult.error };
+      const hasError = "error" in result;
+      if (hasError) {
+        return { error: result.error };
       }
 
-      const user = userResult.data.user;
+      const { user } = result.data;
       const profile = roleToProfile[user.role.toLowerCase()] ?? UserRoleEnum.ATTENDANT;
 
       const authData: AuthData = {
+        userId: user.id,
         username: user.email ?? user.name,
         name: user.name,
+        email: user.email,
         profile,
       };
 
