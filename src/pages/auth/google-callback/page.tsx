@@ -12,22 +12,18 @@ export function GoogleCallbackPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const accessToken = params.get("accessToken");
-    const refreshToken = params.get("refreshToken");
+    const oauthtoken = params.get("oauthtoken");
 
-    const hasTokens = accessToken !== null && refreshToken !== null;
+    const hasToken = oauthtoken !== null;
 
-    if (!hasTokens) {
+    if (!hasToken) {
       toast.error(t("login.google.callbackMissingTokens"));
       navigate({ to: "/login" });
       return;
     }
 
-    const handleTokens = async () => {
-      const result = await authService.handleGoogleOAuthTokens(
-        accessToken,
-        refreshToken,
-      );
+    const handleToken = async () => {
+      const result = await authService.handleGoogleOAuthTokens(oauthtoken);
 
       const hasError = "error" in result;
       if (hasError) {
@@ -42,7 +38,7 @@ export function GoogleCallbackPage() {
       navigate({ to: "/" });
     };
 
-    handleTokens();
+    handleToken();
   }, [navigate, router, t]);
 
   const authenticatingMessage = t("login.google.authenticating");

@@ -44,3 +44,12 @@ export interface GetAuthMeResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface OAuthTokenResponse {
+  user: {
+    id: string;
+    name: string;
+    email: string | null;
+    role: string;
+  };
+}

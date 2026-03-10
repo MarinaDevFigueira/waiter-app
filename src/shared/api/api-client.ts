@@ -1,6 +1,7 @@
 import { StorageKeys } from "@/shared/constants/storage-keys";
 import { authObservable } from "@/shared/subjects/auth";
 import { logger } from "@/lib/logger";
+import { cookies } from "@/lib/cookies";
 
 const API_URL = import.meta.env.VITE_API_URL as string;
 const FIVE_MINUTES_IN_SECONDS = 5 * 60;
@@ -43,7 +44,7 @@ let ongoingRefresh: Promise<boolean> | null = null;
 
 async function doRefresh(): Promise<boolean> {
   try {
-    const refreshToken = sessionStorage.getItem(StorageKeys.REFRESH_TOKEN);
+    const refreshToken = cookies.get(StorageKeys.REFRESH_TOKEN);
     const hasNoRefreshToken = !refreshToken;
     if (hasNoRefreshToken) {
       authObservable.clearAuth();
@@ -62,10 +63,6 @@ async function doRefresh(): Promise<boolean> {
       authObservable.clearAuth();
       return false;
     }
-
-    const json = await response.json() as { accessToken: string; refreshToken: string };
-    sessionStorage.setItem(StorageKeys.ACCESS_TOKEN, json.accessToken);
-    sessionStorage.setItem(StorageKeys.REFRESH_TOKEN, json.refreshToken);
 
     return true;
   } catch (error) {
@@ -87,7 +84,7 @@ async function refreshTokens(): Promise<boolean> {
 }
 
 async function ensureFreshToken(): Promise<void> {
-  const accessToken = sessionStorage.getItem(StorageKeys.ACCESS_TOKEN);
+  const accessToken = cookies.get(StorageKeys.ACCESS_TOKEN);
   const hasNoToken = !accessToken;
   if (hasNoToken) return;
 
@@ -135,7 +132,7 @@ async function request<T>(
   try {
     await ensureFreshToken();
 
-    const accessToken = sessionStorage.getItem(StorageKeys.ACCESS_TOKEN);
+    const accessToken = cookies.get(StorageKeys.ACCESS_TOKEN);
     const isFormData = options.body instanceof FormData;
 
     const headers = buildHeaders(accessToken, isFormData, options.headers as HeadersInit | undefined);
@@ -155,7 +152,7 @@ async function request<T>(
         return { error: "Sessão expirada. Faça login novamente." };
       }
 
-      const newToken = sessionStorage.getItem(StorageKeys.ACCESS_TOKEN);
+      const newToken = cookies.get(StorageKeys.ACCESS_TOKEN);
       const retryHeaders = buildHeaders(newToken, isFormData, options.headers as HeadersInit | undefined);
 
       const retryResponse = await fetch(`${API_URL}${path}`, {
