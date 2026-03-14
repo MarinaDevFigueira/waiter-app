@@ -1,0 +1,1 @@
+Commit format: `[BDM-XXX] feat: ...` or `[BDM-XXX] fix: ...`. Always ask which taskId to use when committing. If branch has taskId (e.g., dev-release/BDM-748), ask if should use that or another.

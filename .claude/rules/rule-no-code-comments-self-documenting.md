@@ -1,0 +1,1 @@
+Never add code comments (`//` or `/* */`). Code must be self-documenting through clear naming. Delete unused methods immediately instead of marking deprecated. Never comment out code — delete it.

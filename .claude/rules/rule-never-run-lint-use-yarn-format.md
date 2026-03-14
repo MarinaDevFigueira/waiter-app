@@ -1,0 +1,1 @@
+NEVER run lint. Use `yarn format` for code formatting. Never run `yarn lint`, `yarn lint:fix`, or any ESLint command. The lint configuration has known issues.

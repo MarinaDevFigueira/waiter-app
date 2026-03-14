@@ -1,0 +1,1 @@
+Branch naming: `prod-release/:taskId` created from `main-v*`. Example: `prod-release/BDM-748` from `main-v44`.
