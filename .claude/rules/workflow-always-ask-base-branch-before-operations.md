@@ -1,0 +1,1 @@
+Always ask base branch name and task ID before any branch/PR operation. If on main* or development*, ask the task ID (e.g., BDM-748) before creating branches. Confirm before any destructive operation.

@@ -1,0 +1,1 @@
+PR targets: `prod-release/BDM-XXX` → `main-v*`, `dev-release/BDM-XXX` → `development*`. Always create both PRs. PR title = literal branch name.

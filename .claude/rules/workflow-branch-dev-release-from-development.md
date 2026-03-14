@@ -1,0 +1,1 @@
+Branch naming: `dev-release/:taskId` created from `development*`. Example: `dev-release/BDM-748` from `development-v2`. Dev-release is recreated from scratch from origin/development* if already exists (delete and recreate).

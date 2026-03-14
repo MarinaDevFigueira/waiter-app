@@ -1,0 +1,1 @@
+PR title MUST be the literal branch name. dev-release branches → title exactly `dev-release/BDM-XXX`. prod-release branches → title exactly `prod-release/BDM-XXX`. Never use shortened or descriptive titles.
