@@ -13,7 +13,10 @@ export interface GetBusinessesApiResponse {
   items: GetBusinessItemResponse[];
   total: number;
   page: number;
-  limit: number;
+  size: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean
 }
 
 export interface GetBusinessSettingsResponse {

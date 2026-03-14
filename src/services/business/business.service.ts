@@ -35,7 +35,7 @@ export const businessService = {
 
       const params = new URLSearchParams();
       params.set("page", String(page));
-      params.set("limit", String(size));
+      params.set("size", String(size));
 
       const searchValue = filters.search;
       const hasSearch = searchValue !== undefined && searchValue !== "";
@@ -56,9 +56,9 @@ export const businessService = {
       }
 
       const apiData = result.data as GetBusinessesApiResponse;
-      const totalPages = Math.ceil(apiData.total / apiData.limit);
-      const hasNextPage = apiData.page < totalPages;
-      const hasPreviousPage = apiData.page > 1;
+      const totalPages = apiData.totalPages ?? Math.ceil(apiData.total / apiData.size);
+      const hasNextPage = apiData.hasNextPage ?? apiData.page < totalPages;
+      const hasPreviousPage = apiData.hasPreviousPage ?? apiData.page > 1;
 
       const mappedItems = apiData.items.map(mapApiBusinessItemToBusiness);
 
@@ -67,7 +67,7 @@ export const businessService = {
           items: mappedItems,
           total: apiData.total,
           page: apiData.page,
-          size: apiData.limit,
+          size: apiData.size,
           totalPages,
           hasNextPage,
           hasPreviousPage,
