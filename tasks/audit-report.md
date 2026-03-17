@@ -262,6 +262,18 @@ All en-US values are correct English translations (not Portuguese text).
 ## US-023 — Swiper Navigation Buttons — Flexbox and RxJS
 
 **Rule:** `rule-swiper-navigation-buttons.md`
-**Files scanned:** `src/pages/**` (swiper components)
-**Violations found:** TBD
-**Status:** pending
+**Files scanned:** `src/pages/foods/components/categories/categories.tsx`, `src/pages/foods/components/categories/observables/categories-swiper.subject.ts`
+**Violations found:**
+- `categories.tsx`: buttons were always rendered with `data-visible` CSS toggling instead of `{shouldShowPrevButton && <button />}` conditional rendering
+- `categories.tsx`: no `onInit` callback with `setTimeout` for initial state sync
+- `categories.tsx`: Navigation module used DOM class selectors instead of programmatic control via swiper ref
+
+**Fixed:**
+- Replaced Navigation module with programmatic `swiperRef` + `slidePrev()`/`slideNext()` handlers
+- Added `onSwiper` callback to capture swiper instance into ref
+- Added `onInit` callback with `setTimeout` to sync initial `{ isBeginning, isEnd }` state
+- Changed buttons to named variables (`prevButton`, `nextButton`) with `{shouldShowPrevButton && prevButton}` conditional rendering
+- Removed `swiper/css/navigation` import (no longer needed)
+- `categoriesSwiperObservable` was already correctly encapsulated (no changes needed)
+
+**Status:** fixed
