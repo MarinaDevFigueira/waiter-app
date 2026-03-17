@@ -253,9 +253,9 @@ All en-US values are correct English translations (not Portuguese text).
 ## US-022 — Foods Page — Responsive Grid and Category Separators
 
 **Rule:** `rule-foods-page.md`
-**Files scanned:** `src/pages/foods/**`
-**Violations found:** TBD
-**Status:** pending
+**Files scanned:** `src/pages/foods/components/foods.tsx`, `src/pages/foods/page.tsx`
+**Violations found:** None — grid layout `flex flex-col gap-3` on mobile → `sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6` already correct. Category separator `<div class="flex items-center gap-3"><div class="flex-1 h-px bg-border" /><h2>...</h2><div class="flex-1 h-px bg-border" /></div>` already correct. Applies to both Foods component and FoodsLoadingSkeleton.
+**Status:** fixed (no changes needed)
 
 ---
 
