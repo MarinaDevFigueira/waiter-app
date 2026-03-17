@@ -64,8 +64,7 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
   }, []);
 
   const sortedCategories = useMemo(() => {
-    const withName = categories.filter((c) => c.name.trim().length > 0);
-    const sorted = [...withName].sort((a, b) => a.sortOrder - b.sortOrder);
+    const sorted = [...categories].sort((a, b) => a.sortOrder - b.sortOrder);
     return sorted;
   }, [categories]);
 

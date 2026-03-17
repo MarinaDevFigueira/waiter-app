@@ -30,6 +30,7 @@ interface UseCategoriesReturn {
 interface UseCategoriesOptions {
   errorMessage?: string;
   initialSize?: number;
+  active?: boolean;
 }
 
 export function useCategories(options?: UseCategoriesOptions | string): UseCategoriesReturn {
@@ -37,6 +38,7 @@ export function useCategories(options?: UseCategoriesOptions | string): UseCateg
 
   const resolvedErrorMessage = typeof options === "string" ? options : options?.errorMessage;
   const resolvedInitialSize = typeof options === "string" ? 10 : (options?.initialSize ?? 10);
+  const resolvedActive = typeof options === "string" ? undefined : options?.active;
 
   const [queryParams, setQueryParams] = useState<GetCategoriesRequestQuery>({
     page: 1,
@@ -44,6 +46,7 @@ export function useCategories(options?: UseCategoriesOptions | string): UseCateg
     orderBy: CategoriesOrderByEnum.NAME,
     direction: SortDirection.ASC,
     search: undefined,
+    active: resolvedActive,
   });
 
   const { data, isLoading, error, isError } = useQuery<GetCategoriesResponse>({

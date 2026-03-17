@@ -4,7 +4,7 @@ import { cookieConsentObservable, type CookieConsentStatus } from "@/shared/subj
 export type { CookieConsentStatus };
 
 export function useCookieConsent() {
-  const [consent, setConsent] = useState<CookieConsentStatus>(cookieConsentObservable.getValue);
+  const [consent, setConsent] = useState<CookieConsentStatus>(cookieConsentObservable.getValue());
 
   useEffect(() => {
     const subscription = cookieConsentObservable.subscribe(setConsent);

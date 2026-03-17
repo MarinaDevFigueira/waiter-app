@@ -30,7 +30,7 @@ export const categoriesService = {
     queryParams: GetCategoriesRequestQuery
   ): Promise<ServiceResult<GetCategoriesResponse>> {
     try {
-      const { page, size, orderBy, direction, search } = queryParams;
+      const { page, size, orderBy, direction, search, active } = queryParams;
 
       const params = new URLSearchParams();
       params.set("page", String(page));
@@ -39,6 +39,7 @@ export const categoriesService = {
       params.set("direction", direction);
 
       if (search) params.set("search", search);
+      if (active !== undefined) params.set("active", String(active));
 
       const result = await api.get<unknown>(`/categories?${params.toString()}`);
 
@@ -137,7 +138,7 @@ export const categoriesService = {
 
   async delete(
     categoryId: string
-  ): Promise<ServiceResult<{ success: boolean; id: string }>> {
+  ): Promise<ServiceResult<void>> {
     try {
       const result = await api.delete<unknown>(`/categories/${categoryId}`);
 
@@ -146,7 +147,7 @@ export const categoriesService = {
         return { error: result.error };
       }
 
-      return { data: { success: true, id: categoryId } };
+      return { data: undefined };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao deletar categoria";

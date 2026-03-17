@@ -1,8 +1,9 @@
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "react-toastify";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog } from "@/components/ui/dialog/dialog";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
@@ -11,28 +12,48 @@ import { useTranslation } from "@/shared/hooks/useTranslation";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { usersService } from "@/services/users/users.service";
 import { logger } from "@/lib/logger";
-import type { UserFormDialogProps, UserFormValues } from "./user-form-dialog.interface";
+import { useLanguage } from "@/shared/hooks/useLanguage";
+import type {
+  UserFormDialogProps,
+  UserFormValues,
+} from "./user-form-dialog.interface";
 
-const USER_ROLE_VALUES = Object.values(UserRoleEnum) as [UserRoleEnum, ...UserRoleEnum[]];
+const USER_ROLE_VALUES = Object.values(UserRoleEnum) as [
+  UserRoleEnum,
+  ...UserRoleEnum[],
+];
 
 const createUserFormSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  username: z.string().min(3, "Usuário deve ter no mínimo 3 caracteres"),
-  email: z.string().email("Email inválido").or(z.literal("")),
-  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+  name: z.string().min(1, { error: "Nome é obrigatório" }),
+  username: z
+    .string()
+    .min(3, { error: "Usuário deve ter no mínimo 3 caracteres" }),
+  email: z.string().email({ error: "Email inválido" }).or(z.literal("")),
+  password: z
+    .string()
+    .min(6, { error: "Senha deve ter no mínimo 6 caracteres" }),
   role: z.enum(USER_ROLE_VALUES),
 });
 
 const editUserFormSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  username: z.string().min(3, "Usuário deve ter no mínimo 3 caracteres"),
-  email: z.string().email("Email inválido").or(z.literal("")),
+  name: z.string().min(1, { error: "Nome é obrigatório" }),
+  username: z
+    .string()
+    .min(3, { error: "Usuário deve ter no mínimo 3 caracteres" }),
+  email: z.string().email({ error: "Email inválido" }).or(z.literal("")),
   password: z.string(),
   role: z.enum(USER_ROLE_VALUES),
 });
 
-export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserFormDialogProps) {
+export function UserFormDialog({
+  open,
+  onOpenChange,
+  user,
+  onSuccess,
+}: UserFormDialogProps) {
   const { t } = useTranslation();
+  const { addLanguagePrefix } = useLanguage();
+  const queryClient = useQueryClient();
   const isEditMode = user !== undefined;
   const formSchema = isEditMode ? editUserFormSchema : createUserFormSchema;
 
@@ -76,50 +97,98 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
     }
   }, [user, form]);
 
-  const onSubmit = useCallback(async (data: UserFormValues) => {
-    if (isEditMode) {
-      const result = await usersService.update(user.id, {
+  const updateMutation = useMutation({
+    mutationFn: (data: UserFormValues) =>
+      usersService.update(user!.id, {
         name: data.name,
         username: data.username,
         email: data.email || undefined,
         role: data.role,
-      });
-
+      }),
+    onSuccess: (result) => {
       const hasError = "error" in result;
       if (hasError) {
-        logger.error("[UserFormDialog] Erro ao atualizar usuário", new Error(result.error));
+        logger.error(
+          "[UserFormDialog] Erro ao atualizar usuário",
+          new Error(result.error),
+        );
         toast.error(result.error);
         return;
       }
-
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("users") });
+      form.reset();
       toast.success(t("users.success.update"));
       onOpenChange(false);
       onSuccess?.();
-      return;
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : t("users.errors.update");
+      logger.error(
+        "[UserFormDialog] Erro ao atualizar usuário",
+        error instanceof Error ? error : null,
+      );
+      toast.error(message);
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: UserFormValues) => {
+      const roleValue = data.role as
+        | "table"
+        | "waiter"
+        | "kitchen"
+        | "attendant"
+        | "customer";
+      return usersService.create({
+        name: data.name,
+        username: data.username,
+        password: data.password,
+        email: data.email || undefined,
+        role: roleValue,
+      });
+    },
+    onSuccess: (result) => {
+      const hasError = "error" in result;
+      if (hasError) {
+        logger.error(
+          "[UserFormDialog] Erro ao criar usuário",
+          new Error(result.error),
+        );
+        toast.error(result.error);
+        return;
+      }
+      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("users") });
+      form.reset();
+      toast.success(t("users.success.create"));
+      onOpenChange(false);
+      onSuccess?.();
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : t("users.errors.create");
+      logger.error(
+        "[UserFormDialog] Erro ao criar usuário",
+        error instanceof Error ? error : null,
+      );
+      toast.error(message);
+    },
+  });
+
+  const activeMutation = isEditMode ? updateMutation : createMutation;
+  const isPending = activeMutation.isPending;
+
+  const onSubmit = form.handleSubmit((data) => {
+    if (isEditMode) {
+      updateMutation.mutate(data);
+    } else {
+      createMutation.mutate(data);
     }
+  });
 
-    const roleValue = data.role as "table" | "waiter" | "kitchen" | "attendant" | "customer";
-    const result = await usersService.create({
-      name: data.name,
-      username: data.username,
-      password: data.password,
-      email: data.email || undefined,
-      role: roleValue,
-    });
-
-    const hasError = "error" in result;
-    if (hasError) {
-      logger.error("[UserFormDialog] Erro ao criar usuário", new Error(result.error));
-      toast.error(result.error);
-      return;
-    }
-
-    toast.success(t("users.success.create"));
-    onOpenChange(false);
-    onSuccess?.();
-  }, [isEditMode, user, t, onOpenChange, onSuccess]);
-
-  const formTitle = isEditMode ? t("users.form.editTitle") : t("users.form.createTitle");
+  const formTitle = isEditMode
+    ? t("users.form.editTitle")
+    : t("users.form.createTitle");
   const hasNameError = Boolean(form.formState.errors.name);
   const hasUsernameError = Boolean(form.formState.errors.username);
   const hasEmailError = Boolean(form.formState.errors.email);
@@ -136,7 +205,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
           <Dialog.Close />
         </Dialog.Header>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-6">
+        <form onSubmit={onSubmit} className="space-y-6 p-6">
           <div className="space-y-3">
             <Label htmlFor="name" className="text-sm font-medium">
               {t("users.form.fields.name")}
@@ -146,9 +215,13 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               type="text"
               {...form.register("name")}
               placeholder="Ex: João Silva"
+              disabled={isPending}
+              data-testid="user-form-name-input"
             />
             {hasNameError && (
-              <p className="text-xs text-destructive">{form.formState.errors.name?.message}</p>
+              <p className="text-xs text-destructive">
+                {form.formState.errors.name?.message}
+              </p>
             )}
           </div>
 
@@ -161,9 +234,13 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               type="text"
               {...form.register("username")}
               placeholder="Ex: joaosilva"
+              disabled={isPending}
+              data-testid="user-form-username-input"
             />
             {hasUsernameError && (
-              <p className="text-xs text-destructive">{form.formState.errors.username?.message}</p>
+              <p className="text-xs text-destructive">
+                {form.formState.errors.username?.message}
+              </p>
             )}
           </div>
 
@@ -176,9 +253,13 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               type="email"
               {...form.register("email")}
               placeholder="Ex: joao@example.com"
+              disabled={isPending}
+              data-testid="user-form-email-input"
             />
             {hasEmailError && (
-              <p className="text-xs text-destructive">{form.formState.errors.email?.message}</p>
+              <p className="text-xs text-destructive">
+                {form.formState.errors.email?.message}
+              </p>
             )}
           </div>
 
@@ -186,7 +267,10 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
             <Label htmlFor="password" className="text-sm font-medium">
               {t("users.form.fields.password")}
               {isEditMode && (
-                <span className="text-muted-foreground font-normal"> ({t("users.form.fields.passwordOptional")})</span>
+                <span className="text-muted-foreground font-normal">
+                  {" "}
+                  ({t("users.form.fields.passwordOptional")})
+                </span>
               )}
             </Label>
             <Input
@@ -194,9 +278,13 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               type="password"
               {...form.register("password")}
               placeholder="••••••••"
+              disabled={isPending}
+              data-testid="user-form-password-input"
             />
             {hasPasswordError && (
-              <p className="text-xs text-destructive">{form.formState.errors.password?.message}</p>
+              <p className="text-xs text-destructive">
+                {form.formState.errors.password?.message}
+              </p>
             )}
           </div>
 
@@ -207,6 +295,8 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
             <select
               id="role"
               {...form.register("role")}
+              disabled={isPending}
+              data-testid="user-form-role-select"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {roleOptions.map((option) => (
@@ -216,16 +306,29 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
               ))}
             </select>
             {hasRoleError && (
-              <p className="text-xs text-destructive">{form.formState.errors.role?.message}</p>
+              <p className="text-xs text-destructive">
+                {form.formState.errors.role?.message}
+              </p>
             )}
           </div>
         </form>
 
         <Dialog.Footer>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+            data-testid="user-form-cancel-button"
+          >
             {t("users.form.cancel")}
           </Button>
-          <Button type="submit" onClick={form.handleSubmit(onSubmit)}>
+          <Button
+            type="submit"
+            onClick={onSubmit}
+            disabled={isPending}
+            data-testid="user-form-submit-button"
+          >
             {t("users.form.save")}
           </Button>
         </Dialog.Footer>

@@ -11,7 +11,7 @@ export const productImageSchema = z.object({
 
 export const productTranslationSchema = z.object({
   locale: z.enum(LOCALE_VALUES),
-  name: z.string().min(1, { message: "Nome é obrigatório" }),
+  name: z.string().min(1, { error: "Nome é obrigatório" }),
   description: z.string().optional(),
 });
 
@@ -19,9 +19,9 @@ export const productSchema = baseEntitySchema.extend({
   id: z.string(),
   name: z.string().optional().default(''),
   description: z.string().optional().default(''),
-  categoryId: z.string().min(1, { message: "Categoria é obrigatória" }),
-  price: z.number().positive({ message: "Preço deve ser positivo" }),
-  stock: z.number().int().nonnegative({ message: "Estoque deve ser não-negativo" }),
+  categoryId: z.string().min(1, { error: "Categoria é obrigatória" }),
+  price: z.number().positive({ error: "Preço deve ser positivo" }),
+  stock: z.number().int().nonnegative({ error: "Estoque deve ser não-negativo" }),
   unit: z.enum(["un", "kg", "g", "l", "ml"]),
   images: z.array(productImageSchema),
   active: z.boolean(),
@@ -30,10 +30,10 @@ export const productSchema = baseEntitySchema.extend({
 export const productFormSchema = z.object({
   translations: z
     .array(productTranslationSchema)
-    .min(1, { message: "Ao menos uma tradução é obrigatória" }),
-  categoryId: z.string().min(1, { message: "Categoria é obrigatória" }),
-  price: z.number().positive({ message: "Preço deve ser positivo" }),
-  stock: z.number().int().nonnegative({ message: "Estoque deve ser não-negativo" }),
+    .min(1, { error: "Ao menos uma tradução é obrigatória" }),
+  categoryId: z.string().min(1, { error: "Categoria é obrigatória" }),
+  price: z.number().positive({ error: "Preço deve ser positivo" }),
+  stock: z.number().int().nonnegative({ error: "Estoque deve ser não-negativo" }),
   unit: z.enum(["un", "kg", "g", "l", "ml"]),
   images: z.array(productImageSchema).optional(),
   active: z.boolean().optional(),

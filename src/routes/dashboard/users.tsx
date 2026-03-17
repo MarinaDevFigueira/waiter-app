@@ -4,7 +4,12 @@ import { USERS_PAGE_ALLOWED_PROFILES } from "@/shared/constants/users-page-acces
 import { UsersPage } from "@/pages/users/page";
 
 export const Route = createFileRoute("/dashboard/users")({
-  beforeLoad: () => {
+  beforeLoad: ({ location }) => {
+    const isAuthenticated = authObservable.isAuthenticated();
+    if (!isAuthenticated) {
+      throw redirect({ to: "/login", search: { redirect: location.href } });
+    }
+
     const auth = authObservable.getValue();
     const userProfile = auth?.profile;
     const allowedProfiles = USERS_PAGE_ALLOWED_PROFILES as readonly string[];

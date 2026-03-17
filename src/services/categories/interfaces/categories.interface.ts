@@ -24,6 +24,7 @@ export interface GetCategoriesRequestQuery {
   orderBy: CategoriesOrderByEnum;
   direction: SortDirection;
   search?: string;
+  active?: boolean;
 }
 
 export interface GetCategoriesResponse {

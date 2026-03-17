@@ -219,7 +219,7 @@ export const productsService = {
 
   async delete(
     productId: string
-  ): Promise<ServiceResult<{ success: boolean; id: string }>> {
+  ): Promise<ServiceResult<void>> {
     try {
       const result = await api.delete<unknown>(`/products/${productId}`);
 
@@ -228,7 +228,7 @@ export const productsService = {
         return { error: result.error };
       }
 
-      return { data: { success: true, id: productId } };
+      return { data: undefined };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao deletar produto";

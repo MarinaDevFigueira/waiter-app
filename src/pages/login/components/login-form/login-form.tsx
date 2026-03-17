@@ -30,8 +30,8 @@ export function LoginForm() {
   const { selectedBusiness, isLoading: isBusinessLoading, isBusinessInvalid } = useBusiness({ urlBusinessId });
 
   const loginSchema = z.object({
-    username: z.string().min(1, { message: t("login.form.usernameRequired") }),
-    password: z.string().min(1, { message: t("login.form.passwordRequired") }),
+    username: z.string().min(1, { error: t("login.form.usernameRequired") }),
+    password: z.string().min(1, { error: t("login.form.passwordRequired") }),
   });
 
   type LoginFormValues = z.infer<typeof loginSchema>;

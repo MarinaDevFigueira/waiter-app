@@ -1,4 +1,7 @@
 import type { Business } from "@/shared/schemas/business.schema";
+import type { GetBusinessSettingsResponse } from "@/services/business-settings/interfaces/business-settings.interface";
+
+export type { GetBusinessSettingsResponse };
 
 export interface GetBusinessItemResponse {
   id: string;
@@ -19,15 +22,7 @@ export interface GetBusinessesApiResponse {
   hasPreviousPage: boolean
 }
 
-export interface GetBusinessSettingsResponse {
-  id: string;
-  primaryColor: string;
-  secondaryColor: string;
-  enabledLanguages: string[];
-  businessId?: string | null;
-}
-
-export interface GetBusinessLimitsResponse {
+export interface GetBusinessDetailLimitsResponse {
   id: string | null;
   maxTableUsers: number;
   maxWaiterUsers: number;
@@ -54,7 +49,7 @@ export interface GetBusinessDetailResponse {
   createdAt: string;
   updatedAt: string;
   settings: GetBusinessSettingsResponse | null;
-  limits: GetBusinessLimitsResponse | null;
+  limits: GetBusinessDetailLimitsResponse | null;
 }
 
 export interface GetPublicBusinessResponse {

@@ -4,7 +4,12 @@ import { BusinessSettingsPage } from "@/pages/business-settings/page";
 import { USERS_PAGE_ALLOWED_PROFILES } from "@/shared/constants/users-page-access";
 
 export const Route = createFileRoute("/dashboard/business/settings")({
-  beforeLoad: () => {
+  beforeLoad: ({ location }) => {
+    const isAuthenticated = authObservable.isAuthenticated();
+    if (!isAuthenticated) {
+      throw redirect({ to: "/login", search: { redirect: location.href } });
+    }
+
     const auth = authObservable.getValue();
     const userProfile = auth?.profile;
     const allowedProfiles = USERS_PAGE_ALLOWED_PROFILES as readonly string[];

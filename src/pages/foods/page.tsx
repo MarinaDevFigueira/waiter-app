@@ -37,6 +37,7 @@ export const FoodsPage = () => {
 
   const { categories } = useCategories({
     initialSize: 100,
+    active: true,
   });
 
   const { products, isLoading: isProductsLoading, isFetching: isProductsFetching, setQueryParams } = useProducts();
@@ -53,13 +54,6 @@ export const FoodsPage = () => {
 
   const { addItem, itemCount, cart } = useCart();
 
-  const activeCategories = useMemo(() => {
-    const filtered = categories.filter((c) => {
-      const isActive = c.active;
-      return isActive;
-    });
-    return filtered;
-  }, [categories]);
 
   const handleCategoryChange = useCallback(
     (categoryId: string | null) => {
@@ -194,7 +188,7 @@ export const FoodsPage = () => {
   }, [t, navigate]);
 
   const sortedByCategory = useMemo(() => {
-    const categoryPairs = activeCategories.map((c) => {
+    const categoryPairs = categories.map((c) => {
       const categoryId = c.id;
       const sortOrder = c.sortOrder;
       const pair = [categoryId, sortOrder] as const;
@@ -212,7 +206,7 @@ export const FoodsPage = () => {
       return comparison;
     });
     return sorted;
-  }, [products, activeCategories]);
+  }, [products, categories]);
 
   const categoryIdExists = selectedCategoryId !== null;
   const hasSelectedCategory = categoryIdExists;
@@ -236,11 +230,11 @@ export const FoodsPage = () => {
       <Foods
         items={displayProducts}
         onProductClick={handleProductClick}
-        categories={activeCategories}
+        categories={categories}
         showCategoryHeaders={!hasSelectedCategory}
       />
     );
-  }, [isProductsLoading, isProductsFetching, displayProducts, handleProductClick, activeCategories, hasSelectedCategory]);
+  }, [isProductsLoading, isProductsFetching, displayProducts, handleProductClick, categories, hasSelectedCategory]);
 
   return (
     <div className="flex flex-col items-start justify-start w-full gap-4 animate-fade-in">
@@ -256,7 +250,7 @@ export const FoodsPage = () => {
         </div>
       </div>
       <Categories
-        categories={activeCategories}
+        categories={categories}
         selectedCategoryId={selectedCategoryId}
         onCategoryChange={handleCategoryChange}
       />
