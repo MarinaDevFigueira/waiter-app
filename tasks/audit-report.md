@@ -213,9 +213,16 @@ Date: 2026-03-16
 ## US-019 — i18n — Sync en-US Translation File
 
 **Rule:** `rule-i18n.md`
-**Files scanned:** `src/shared/translations/**`
-**Violations found:** TBD
-**Status:** pending
+**Files scanned:** `src/shared/translations/en-US.json`, `src/shared/translations/pt-BR.json`
+**Violations found:** None — en-US.json was updated together with pt-BR.json in US-018. Both files have identical key structure with all 8 new keys already present:
+- `common.errors.noData`
+- `cart.itemRemoved`, `cart.cleared`, `cart.errors.fetchSession`, `cart.errors.openSession`, `cart.errors.createOrder`
+- `users.actions.disableNotImplemented`
+- `orders.admin.table.orderLabel`
+
+All en-US values are correct English translations (not Portuguese text).
+**Files changed:** 0 (no changes needed — already in sync)
+**Status:** fixed (no changes needed)
 
 ---
 
