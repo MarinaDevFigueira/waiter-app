@@ -244,9 +244,9 @@ All en-US values are correct English translations (not Portuguese text).
 ## US-021 — Pagination — usePagination Hook and Layout
 
 **Rule:** `rule-pagination.md`
-**Files scanned:** `src/pages/**`, `src/components/**`
-**Violations found:** TBD
-**Status:** pending
+**Files scanned:** `src/pages/**`, `src/components/ui/pagination/`
+**Violations found:** None — all 5 paginated views (products, categories, users, admin-orders, kitchen-orders) already use `usePagination` hook and `<Pagination>` composite component with `.Info`, `.SizeSelect`, and `.Controls`. Table outer containers use `flex flex-col h-full`, inner containers use `flex-1 min-h-0`.
+**Status:** fixed (no changes needed)
 
 ---
 
