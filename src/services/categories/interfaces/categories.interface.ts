@@ -1,4 +1,7 @@
-import type { Category, CategoryTranslation } from "@/shared/schemas/category.schema";
+import type {
+  Category,
+  CategoryTranslation,
+} from "@/shared/schemas/category.schema";
 import type { CategoriesOrderByEnum } from "@/shared/enums/categories-order-by.enum";
 import type { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type { TranslationLanguage } from "@/shared/enums/translations.enum";
@@ -24,7 +27,6 @@ export interface GetCategoriesRequestQuery {
   orderBy: CategoriesOrderByEnum;
   direction: SortDirection;
   search?: string;
-  active?: boolean;
 }
 
 export interface GetCategoriesResponse {

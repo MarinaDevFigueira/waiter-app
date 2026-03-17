@@ -23,7 +23,10 @@ interface SortingConfig {
 interface CategoriesTableProps {
   categories: Category[];
   sorting: SortingConfig;
-  onSortingChange: (orderBy: CategoriesOrderByEnum, direction: SortDirection) => void;
+  onSortingChange: (
+    orderBy: CategoriesOrderByEnum,
+    direction: SortDirection,
+  ) => void;
   onEdit: (category: Category) => void;
 }
 
@@ -64,7 +67,12 @@ function SortIndicator({ isSorted }: { isSorted: "asc" | "desc" | false }) {
   return <SortIndicatorNone />;
 }
 
-export function CategoriesTable({ categories, sorting, onSortingChange, onEdit }: CategoriesTableProps) {
+export function CategoriesTable({
+  categories,
+  sorting,
+  onSortingChange,
+  onEdit,
+}: CategoriesTableProps) {
   const { t } = useTranslation();
 
   const hasSortingConfig = Boolean(sorting?.orderBy);
@@ -76,34 +84,42 @@ export function CategoriesTable({ categories, sorting, onSortingChange, onEdit }
     return [{ id: sorting.orderBy, desc: sortDescending }];
   }, [hasSortingConfig, sorting]);
 
-  const handleSortingChange = useCallback((updater: Updater<SortingState>) => {
-    const isUpdaterFunction = typeof updater === "function";
-    const newSorting = isUpdaterFunction ? updater(tableSorting) : updater;
+  const handleSortingChange = useCallback(
+    (updater: Updater<SortingState>) => {
+      const isUpdaterFunction = typeof updater === "function";
+      const newSorting = isUpdaterFunction ? updater(tableSorting) : updater;
 
-    const isClearingSorting = newSorting.length === 0;
+      const isClearingSorting = newSorting.length === 0;
 
-    if (isClearingSorting) {
-      onSortingChange(CategoriesOrderByEnum.NAME, SortDirection.ASC);
-      return;
-    }
+      if (isClearingSorting) {
+        onSortingChange(CategoriesOrderByEnum.NAME, SortDirection.ASC);
+        return;
+      }
 
-    const sortConfig = newSorting[0];
-    const sortField = sortConfig.id as CategoriesOrderByEnum;
-    const sortDirection = sortConfig.desc ? SortDirection.DESC : SortDirection.ASC;
+      const sortConfig = newSorting[0];
+      const sortField = sortConfig.id as CategoriesOrderByEnum;
+      const sortDirection = sortConfig.desc
+        ? SortDirection.DESC
+        : SortDirection.ASC;
 
-    onSortingChange(sortField, sortDirection);
-  }, [tableSorting, onSortingChange]);
+      onSortingChange(sortField, sortDirection);
+    },
+    [tableSorting, onSortingChange],
+  );
 
   const activeLabel = t("common.status.active");
   const inactiveLabel = t("common.status.inactive");
 
-  const getStatusBadge = useCallback((category: Category) => {
-    const isActive = category.active;
+  const getStatusBadge = useCallback(
+    (category: Category) => {
+      const isActive = category.active;
 
-    if (isActive) return <ActiveBadge label={activeLabel} />;
+      if (isActive) return <ActiveBadge label={activeLabel} />;
 
-    return <InactiveBadge label={inactiveLabel} />;
-  }, [activeLabel, inactiveLabel]);
+      return <InactiveBadge label={inactiveLabel} />;
+    },
+    [activeLabel, inactiveLabel],
+  );
 
   const columns = useMemo<ColumnDef<Category>[]>(
     () => [
@@ -125,9 +141,7 @@ export function CategoriesTable({ categories, sorting, onSortingChange, onEdit }
         cell: (info) => {
           const description = info.getValue() as string | undefined;
           return (
-            <span className="text-muted-foreground">
-              {description || "—"}
-            </span>
+            <span className="text-muted-foreground">{description || "—"}</span>
           );
         },
         enableSorting: false,
@@ -136,7 +150,9 @@ export function CategoriesTable({ categories, sorting, onSortingChange, onEdit }
         accessorKey: "sortOrder",
         header: t("categories.table.columns.sortOrder"),
         cell: (info) => (
-          <span className="text-muted-foreground">{info.getValue() as number}</span>
+          <span className="text-muted-foreground">
+            {info.getValue() as number}
+          </span>
         ),
       },
       {
@@ -193,7 +209,9 @@ export function CategoriesTable({ categories, sorting, onSortingChange, onEdit }
 
                   const columnSize = header.column.getSize();
                   const hasColumnSize = columnSize !== 150;
-                  const columnStyle = hasColumnSize ? { width: columnSize, minWidth: columnSize } : undefined;
+                  const columnStyle = hasColumnSize
+                    ? { width: columnSize, minWidth: columnSize }
+                    : undefined;
 
                   const nextSortOrder = header.column.getNextSortingOrder();
                   const isAscSort = nextSortOrder === "asc";
@@ -209,7 +227,14 @@ export function CategoriesTable({ categories, sorting, onSortingChange, onEdit }
                     return sortTitleRemove;
                   };
 
-                  const headerContent = flexRender(header.column.columnDef.header, header.getContext());
+                  const headerContent = flexRender(
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  );
+                  const headerLabel = isPlaceholder ? null : headerContent;
+                  const sortIndicator = canSort ? (
+                    <SortIndicator isSorted={isSorted} />
+                  ) : null;
 
                   return (
                     <th
@@ -221,8 +246,8 @@ export function CategoriesTable({ categories, sorting, onSortingChange, onEdit }
                       title={getSortTitle()}
                     >
                       <div className="flex items-center gap-2">
-                        {!isPlaceholder && headerContent}
-                        {canSort && <SortIndicator isSorted={isSorted} />}
+                        {headerLabel}
+                        {sortIndicator}
                       </div>
                     </th>
                   );
@@ -234,7 +259,10 @@ export function CategoriesTable({ categories, sorting, onSortingChange, onEdit }
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="hover:bg-muted/30 transition-colors">
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-4 py-3 text-sm text-foreground">
+                  <td
+                    key={cell.id}
+                    className="px-4 py-3 text-sm text-foreground"
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

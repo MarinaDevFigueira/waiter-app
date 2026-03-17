@@ -24,7 +24,12 @@ interface CategoriesProps {
   onCategoryChange: (categoryId: string | null) => void;
 }
 
-function CategoryTab({ label, categoryId, selected, onSelect }: CategoryTabProps) {
+function CategoryTab({
+  label,
+  categoryId,
+  selected,
+  onSelect,
+}: CategoryTabProps) {
   const handleSelect = useCallback(() => {
     onSelect(categoryId);
   }, [categoryId, onSelect]);
@@ -32,6 +37,7 @@ function CategoryTab({ label, categoryId, selected, onSelect }: CategoryTabProps
   return (
     <li
       data-selected={selected}
+      data-testid={`category-tab-${categoryId}`}
       onClick={handleSelect}
       className="flex flex-col select-none items-center justify-center gap-1 cursor-pointer hover:cursor-pointer shrink-0"
     >
@@ -50,9 +56,15 @@ const NAV_PREV_CLASS = "categories-swiper-prev";
 const NAV_NEXT_CLASS = "categories-swiper-next";
 const SPACE_BETWEEN = 4;
 
-const Categories = ({ categories, selectedCategoryId, onCategoryChange }: CategoriesProps) => {
+const Categories = ({
+  categories,
+  selectedCategoryId,
+  onCategoryChange,
+}: CategoriesProps) => {
   const { t } = useTranslation();
-  const [swiperState, setSwiperState] = useState(categoriesSwiperObservable.getValue());
+  const [swiperState, setSwiperState] = useState(
+    categoriesSwiperObservable.getValue(),
+  );
 
   useEffect(() => {
     const subscription = categoriesSwiperObservable.subscribe((newState) => {
@@ -68,10 +80,13 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
     return sorted;
   }, [categories]);
 
-  const handleSelect = useCallback((categoryId: string) => {
-    const isAll = categoryId === ALL_CATEGORY_ID;
-    onCategoryChange(isAll ? null : categoryId);
-  }, [onCategoryChange]);
+  const handleSelect = useCallback(
+    (categoryId: string) => {
+      const isAll = categoryId === ALL_CATEGORY_ID;
+      onCategoryChange(isAll ? null : categoryId);
+    },
+    [onCategoryChange],
+  );
 
   const handleProgress = useCallback((swiper: SwiperType) => {
     categoriesSwiperObservable.updateState({

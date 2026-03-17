@@ -25,7 +25,9 @@ import { useTranslation } from "@/shared/hooks/useTranslation";
 export const FoodsPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    null,
+  );
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isClosingSession, setIsClosingSession] = useState(false);
@@ -33,14 +35,20 @@ export const FoodsPage = () => {
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false);
   const [isCartAnimating, setIsCartAnimating] = useState(false);
   const [hasUnviewedOrder, setHasUnviewedOrder] = useState(false);
-  const cartAnimationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cartAnimationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const { categories } = useCategories({
     initialSize: 100,
-    active: true,
   });
 
-  const { products, isLoading: isProductsLoading, isFetching: isProductsFetching, setQueryParams } = useProducts();
+  const {
+    products,
+    isLoading: isProductsLoading,
+    isFetching: isProductsFetching,
+    setQueryParams,
+  } = useProducts();
 
   useEffect(() => {
     setQueryParams((prev) => ({
@@ -53,7 +61,6 @@ export const FoodsPage = () => {
   }, [setQueryParams]);
 
   const { addItem, itemCount, cart } = useCart();
-
 
   const handleCategoryChange = useCallback(
     (categoryId: string | null) => {
@@ -78,7 +85,7 @@ export const FoodsPage = () => {
         return newParams;
       });
     },
-    [setQueryParams]
+    [setQueryParams],
   );
 
   const handleProductClick = useCallback((product: Product) => {
@@ -107,7 +114,7 @@ export const FoodsPage = () => {
           productPrice,
           productImageUrl,
         },
-        quantity
+        quantity,
       );
 
       const hasExistingTimer = cartAnimationTimerRef.current !== null;
@@ -122,7 +129,7 @@ export const FoodsPage = () => {
         cartAnimationTimerRef.current = null;
       }, animationDuration);
     },
-    [addItem]
+    [addItem],
   );
 
   const handleOpenCart = useCallback(() => {
@@ -210,9 +217,7 @@ export const FoodsPage = () => {
 
   const categoryIdExists = selectedCategoryId !== null;
   const hasSelectedCategory = categoryIdExists;
-  const displayProducts = hasSelectedCategory
-    ? products
-    : sortedByCategory;
+  const displayProducts = hasSelectedCategory ? products : sortedByCategory;
   const sessionIdExists = !!cart.orderSessionId;
   const hasActiveSession = sessionIdExists;
   const hasSelectedProduct = selectedProduct !== null;
@@ -222,9 +227,7 @@ export const FoodsPage = () => {
     const shouldShowSkeleton = isLoadingProducts;
 
     if (shouldShowSkeleton) {
-      return (
-        <FoodsLoadingSkeleton />
-      );
+      return <FoodsLoadingSkeleton />;
     }
     return (
       <Foods
@@ -234,7 +237,14 @@ export const FoodsPage = () => {
         showCategoryHeaders={!hasSelectedCategory}
       />
     );
-  }, [isProductsLoading, isProductsFetching, displayProducts, handleProductClick, categories, hasSelectedCategory]);
+  }, [
+    isProductsLoading,
+    isProductsFetching,
+    displayProducts,
+    handleProductClick,
+    categories,
+    hasSelectedCategory,
+  ]);
 
   return (
     <div className="flex flex-col items-start justify-start w-full gap-4 animate-fade-in">
@@ -246,7 +256,11 @@ export const FoodsPage = () => {
             onClick={handleOpenSummary}
             hasUnviewedOrder={hasUnviewedOrder}
           />
-          <CartButton itemCount={itemCount} onClick={handleOpenCart} isAnimating={isCartAnimating} />
+          <CartButton
+            itemCount={itemCount}
+            onClick={handleOpenCart}
+            isAnimating={isCartAnimating}
+          />
         </div>
       </div>
       <Categories
@@ -255,7 +269,11 @@ export const FoodsPage = () => {
         onCategoryChange={handleCategoryChange}
       />
       {contentToRender}
-      <CartDrawer open={isCartOpen} onClose={handleCloseCart} onOrderConfirmed={handleOrderConfirmed} />
+      <CartDrawer
+        open={isCartOpen}
+        onClose={handleCloseCart}
+        onOrderConfirmed={handleOrderConfirmed}
+      />
       <OrderSessionSummaryModal
         open={isSummaryOpen}
         onClose={handleCloseSummaryModal}

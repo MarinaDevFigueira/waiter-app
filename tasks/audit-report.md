@@ -230,8 +230,14 @@ All en-US values are correct English translations (not Portuguese text).
 
 **Rule:** `rule-tanstack-table.md`
 **Files scanned:** `src/**/*.tsx` (table components)
-**Violations found:** TBD
-**Status:** pending
+**Violations found:**
+
+- `orders-table.tsx` — used `manualSorting: true` without `getSortedRowModel()` or TanStack `SortingState`. Custom `getSortTitle`/`onColumnSort` callbacks bypassed TanStack's sort mechanism entirely. (fixed: added `getSortedRowModel()`, `SortingState`, `Updater`, `tableSorting` derived from props, `handleSortingChange` callback, updated `Header` to use `getToggleSortingHandler()` and `getIsSorted()`)
+- `orders-table.interface.ts` — `OrdersTableHeaderProps` had custom sort props (`sortState`, `getSortTitle`, `onColumnSort`) (fixed: simplified to `{ headerGroups }` only)
+- `src/pages/foods/page.tsx` — passed `active: true` to `useCategories` after `active` was removed from `GetCategoriesRequestQuery` interface (fixed: removed `active` option)
+- All other tables (ProductsTable, CategoriesTable, UsersTable, OrdersTable) — compliant: columns defined with `useMemo`, headers/cells use `flexRender`, loading/empty in parent, skeletons with `animate-pulse`, source data length checked in parent
+
+**Status:** fixed
 
 ---
 

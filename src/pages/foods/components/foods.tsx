@@ -17,7 +17,11 @@ interface FoodsProps {
   showCategoryHeaders?: boolean;
 }
 
-export const FoodOption = ({ product, onProductClick, animationIndex = 0 }: FoodOptionProps) => {
+export const FoodOption = ({
+  product,
+  onProductClick,
+  animationIndex = 0,
+}: FoodOptionProps) => {
   const handleClick = useCallback(() => {
     onProductClick(product);
   }, [product, onProductClick]);
@@ -72,7 +76,12 @@ export const FoodOption = ({ product, onProductClick, animationIndex = 0 }: Food
   );
 };
 
-export const Foods = ({ items, onProductClick, categories, showCategoryHeaders = false }: FoodsProps) => {
+export const Foods = ({
+  items,
+  onProductClick,
+  categories,
+  showCategoryHeaders = false,
+}: FoodsProps) => {
   const { t } = useTranslation();
 
   const itemsExist = items.length > 0;
@@ -137,7 +146,7 @@ export const Foods = ({ items, onProductClick, categories, showCategoryHeaders =
       acc[categoryId].push(product);
       return acc;
     },
-    {} as Record<string, Product[]>
+    {} as Record<string, Product[]>,
   );
 
   const categoryIds = Object.keys(groupedByCategory);
@@ -154,9 +163,8 @@ export const Foods = ({ items, onProductClick, categories, showCategoryHeaders =
   return (
     <div className="w-full flex flex-col items-start justify-start gap-6">
       {sortedCategoryIds.map((categoryId, categoryIndex) => {
-        const defaultCategoryName = "Outros";
-        const categoryName =
-          categoryMap.get(categoryId) ?? defaultCategoryName;
+        const defaultCategoryName = t("foods.categories.other");
+        const categoryName = categoryMap.get(categoryId) ?? defaultCategoryName;
         const categoryProducts = groupedByCategory[categoryId];
         const categoryDelay = categoryIndex * 80;
         const categoryAnimationStyle = { animationDelay: `${categoryDelay}ms` };

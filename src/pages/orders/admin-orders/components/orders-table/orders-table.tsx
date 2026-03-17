@@ -4,10 +4,18 @@ import { ptBR } from "date-fns/locale";
 import {
   useReactTable,
   getCoreRowModel,
+  getSortedRowModel,
   flexRender,
   type ColumnDef,
+  type SortingState,
+  type Updater,
 } from "@tanstack/react-table";
-import { CaretDownIcon, ListBulletsIcon, GearIcon, PencilSimpleIcon } from "@phosphor-icons/react";
+import {
+  CaretDownIcon,
+  ListBulletsIcon,
+  GearIcon,
+  PencilSimpleIcon,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button/button";
 import {
   DropdownMenu,
@@ -17,7 +25,11 @@ import {
 } from "@/components/ui/dropdown-menu/dropdown-menu";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { multiply, add } from "@/lib/math";
-import type { Order, OrderItem, OrderStatus } from "@/shared/schemas/order.schema";
+import type {
+  Order,
+  OrderItem,
+  OrderStatus,
+} from "@/shared/schemas/order.schema";
 import { OrdersOrderByEnum } from "@/shared/enums/orders-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type {
@@ -36,12 +48,12 @@ const COLUMN_TO_ORDER_BY: Partial<Record<string, OrdersOrderByEnum>> = {
   updatedAt: OrdersOrderByEnum.UPDATED_AT,
 };
 
-const SORT_INDICATORS: Record<SortDirection, string> = {
-  [SortDirection.ASC]: "▲",
-  [SortDirection.DESC]: "▼",
+const ORDER_BY_TO_COLUMN: Partial<Record<OrdersOrderByEnum, string>> = {
+  [OrdersOrderByEnum.USER_ID]: "userName",
+  [OrdersOrderByEnum.STATUS]: "status",
+  [OrdersOrderByEnum.CREATED_AT]: "createdAt",
+  [OrdersOrderByEnum.UPDATED_AT]: "updatedAt",
 };
-
-const DEFAULT_SORT_INDICATOR = "⬍";
 
 const STATUS_CLASSES: Record<OrderStatus, string> = {
   pending: "bg-yellow-500/10 text-yellow-600",
@@ -54,13 +66,31 @@ const STATUS_CLASSES: Record<OrderStatus, string> = {
   canceled: "bg-red-500/10 text-red-600",
 };
 
-const CHANGEABLE_STATUSES: OrderStatus[] = ["preparing", "ready", "waiting_delivery_man", "in_delivery", "delivered", "finished", "canceled"];
+const CHANGEABLE_STATUSES: OrderStatus[] = [
+  "preparing",
+  "ready",
+  "waiting_delivery_man",
+  "in_delivery",
+  "delivered",
+  "finished",
+  "canceled",
+];
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
   }).format(value);
+}
+
+function SortIndicator({ isSorted }: { isSorted: "asc" | "desc" | false }) {
+  const isAsc = isSorted === "asc";
+  const isDesc = isSorted === "desc";
+
+  if (isAsc) return <span className="text-muted-foreground/70 text-xs">▲</span>;
+  if (isDesc)
+    return <span className="text-muted-foreground/70 text-xs">▼</span>;
+  return <span className="text-muted-foreground/70 text-xs">⬍</span>;
 }
 
 function Root({ children }: OrdersTableRootProps) {
@@ -73,18 +103,41 @@ function Root({ children }: OrdersTableRootProps) {
   );
 }
 
-function Header({ headerGroups, sortState, getSortTitle, onColumnSort }: OrdersTableHeaderProps) {
+function Header({ headerGroups }: OrdersTableHeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <thead className="bg-muted border-b border-border sticky top-0 z-10">
       {headerGroups.map((headerGroup) => (
         <tr key={headerGroup.id}>
           {headerGroup.headers.map((header) => {
             const canSort = header.column.getCanSort();
-            const columnId = header.column.id;
-            const isCurrentSortColumn = canSort && COLUMN_TO_ORDER_BY[columnId] === sortState.orderBy;
-            const sortIndicator = isCurrentSortColumn ? SORT_INDICATORS[sortState.direction] : DEFAULT_SORT_INDICATOR;
-            const sortTitle = getSortTitle(canSort, columnId);
-            const handleClick = canSort ? () => onColumnSort(columnId) : undefined;
+            const isSorted = header.column.getIsSorted();
+            const isPlaceholder = header.isPlaceholder;
+
+            const nextSortOrder = header.column.getNextSortingOrder();
+            const isAscSort = nextSortOrder === "asc";
+            const isDescSort = nextSortOrder === "desc";
+            const sortTitleAsc = t("common.sort.ascending");
+            const sortTitleDesc = t("common.sort.descending");
+            const sortTitleRemove = t("common.sort.removeSort");
+
+            const getSortTitle = (): string | undefined => {
+              if (!canSort) return undefined;
+              if (isAscSort) return sortTitleAsc;
+              if (isDescSort) return sortTitleDesc;
+              return sortTitleRemove;
+            };
+
+            const headerContent = flexRender(
+              header.column.columnDef.header,
+              header.getContext(),
+            );
+            const headerLabel = isPlaceholder ? null : headerContent;
+            const sortIndicatorEl = canSort ? (
+              <SortIndicator isSorted={isSorted} />
+            ) : null;
+
             const headerClassName = canSort
               ? "px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none"
               : "px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider";
@@ -93,16 +146,12 @@ function Header({ headerGroups, sortState, getSortTitle, onColumnSort }: OrdersT
               <th
                 key={header.id}
                 className={headerClassName}
-                onClick={handleClick}
-                title={sortTitle}
+                onClick={header.column.getToggleSortingHandler()}
+                title={getSortTitle()}
               >
                 <div className="flex items-center gap-2">
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                  {canSort ? (
-                    <span className="text-muted-foreground/70 text-xs">{sortIndicator}</span>
-                  ) : null}
+                  {headerLabel}
+                  {sortIndicatorEl}
                 </div>
               </th>
             );
@@ -113,7 +162,12 @@ function Header({ headerGroups, sortState, getSortTitle, onColumnSort }: OrdersT
   );
 }
 
-function OrderItemsDetails({ items, columnsCount, totalLabel, isExpanded }: OrderItemsDetailsProps) {
+function OrderItemsDetails({
+  items,
+  columnsCount,
+  totalLabel,
+  isExpanded,
+}: OrderItemsDetailsProps) {
   const total = items.reduce((acc, item) => {
     const itemTotal = multiply(item.quantity, item.preco);
     return add(acc, itemTotal);
@@ -127,47 +181,77 @@ function OrderItemsDetails({ items, columnsCount, totalLabel, isExpanded }: Orde
           data-expanded={isExpanded}
           className="grid transition-[grid-template-rows] duration-300 ease-in-out data-[expanded=true]:grid-rows-[1fr] data-[expanded=false]:grid-rows-[0fr]"
         >
-        <div className="overflow-hidden min-h-0">
-        <div className="bg-muted/40 border-t border-border px-6 py-4">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="pb-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-16">Qtd</th>
-                <th className="pb-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Item</th>
-                <th className="pb-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider w-28">Unitário</th>
-                <th className="pb-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider w-28">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item: OrderItem, index: number) => {
-                const unitPrice = formatCurrency(item.preco);
-                const subtotal = multiply(item.quantity, item.preco);
-                const formattedSubtotal = formatCurrency(subtotal);
-                const rowKey = `${item.name}-${index}`;
-
-                return (
-                  <tr key={rowKey} className="border-b border-border/50 last:border-0" data-testid="order-item-row">
-                    <td className="py-2 text-foreground">{item.quantity}x</td>
-                    <td className="py-2 text-foreground font-medium">{item.name}</td>
-                    <td className="py-2 text-right text-muted-foreground">{unitPrice}</td>
-                    <td className="py-2 text-right text-foreground">{formattedSubtotal}</td>
+          <div className="overflow-hidden min-h-0">
+            <div className="bg-muted/40 border-t border-border px-6 py-4">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="pb-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-16">
+                      Qtd
+                    </th>
+                    <th className="pb-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Item
+                    </th>
+                    <th className="pb-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider w-28">
+                      Unitário
+                    </th>
+                    <th className="pb-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider w-28">
+                      Subtotal
+                    </th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <div className="mt-3 pt-3 border-t border-border flex justify-end" data-testid="order-items-total">
-            <span className="text-sm font-semibold text-foreground">{totalLabel}: {formattedTotal}</span>
+                </thead>
+                <tbody>
+                  {items.map((item: OrderItem, index: number) => {
+                    const unitPrice = formatCurrency(item.preco);
+                    const subtotal = multiply(item.quantity, item.preco);
+                    const formattedSubtotal = formatCurrency(subtotal);
+                    const rowKey = `${item.name}-${index}`;
+
+                    return (
+                      <tr
+                        key={rowKey}
+                        className="border-b border-border/50 last:border-0"
+                        data-testid="order-item-row"
+                      >
+                        <td className="py-2 text-foreground">
+                          {item.quantity}x
+                        </td>
+                        <td className="py-2 text-foreground font-medium">
+                          {item.name}
+                        </td>
+                        <td className="py-2 text-right text-muted-foreground">
+                          {unitPrice}
+                        </td>
+                        <td className="py-2 text-right text-foreground">
+                          {formattedSubtotal}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <div
+                className="mt-3 pt-3 border-t border-border flex justify-end"
+                data-testid="order-items-total"
+              >
+                <span className="text-sm font-semibold text-foreground">
+                  {totalLabel}: {formattedTotal}
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-        </div>
         </div>
       </td>
     </tr>
   );
 }
 
-function Body({ rows, expandedRowId, onRowToggle, totalLabel }: OrdersTableBodyProps) {
+function Body({
+  rows,
+  expandedRowId,
+  onRowToggle,
+  totalLabel,
+}: OrdersTableBodyProps) {
   const columnsCount = rows.length > 0 ? rows[0].getVisibleCells().length : 0;
 
   return (
@@ -210,7 +294,9 @@ export function OrdersTable({
   showActionsColumn = false,
 }: OrdersTableProps) {
   const { t } = useTranslation();
-  const [expandedRowId, setExpandedRowId] = useState<string | undefined>(undefined);
+  const [expandedRowId, setExpandedRowId] = useState<string | undefined>(
+    undefined,
+  );
 
   const formatDate = useCallback((date: Date) => {
     return format(new Date(date), "dd/MM/yyyy HH:mm", { locale: ptBR });
@@ -221,39 +307,36 @@ export function OrdersTable({
     [t],
   );
 
-  const getSortTitle = useCallback(
-    (canSort: boolean, columnId: string): string | undefined => {
-      const isNotSortable = !canSort;
-      if (isNotSortable) return undefined;
+  const tableSorting: SortingState = useMemo(() => {
+    const columnId = ORDER_BY_TO_COLUMN[sortState.orderBy];
+    if (!columnId) return [];
+    const isSortDescending = sortState.direction === SortDirection.DESC;
+    return [{ id: columnId, desc: isSortDescending }];
+  }, [sortState]);
 
-      const orderBy = COLUMN_TO_ORDER_BY[columnId];
-      const hasNoOrderBy = !orderBy;
-      if (hasNoOrderBy) return undefined;
+  const handleSortingChange = useCallback(
+    (updater: Updater<SortingState>) => {
+      const isUpdaterFunction = typeof updater === "function";
+      const newSorting = isUpdaterFunction ? updater(tableSorting) : updater;
 
-      const isActive = orderBy === sortState.orderBy;
-      if (!isActive) return t("common.sort.ascending");
-      return sortState.direction === SortDirection.ASC
-        ? t("common.sort.descending")
-        : t("common.sort.ascending");
-    },
-    [t, sortState],
-  );
+      const isClearingSorting = newSorting.length === 0;
+      if (isClearingSorting) {
+        onSortChange({
+          orderBy: OrdersOrderByEnum.CREATED_AT,
+          direction: SortDirection.DESC,
+        });
+        return;
+      }
 
-  const onColumnSort = useCallback(
-    (columnId: string) => {
-      const orderBy = COLUMN_TO_ORDER_BY[columnId];
-      const hasNoOrderBy = !orderBy;
-      if (hasNoOrderBy) return;
-
-      const isActive = orderBy === sortState.orderBy;
-      const nextDirection = isActive && sortState.direction === SortDirection.ASC
+      const sortConfig = newSorting[0];
+      const orderBy = COLUMN_TO_ORDER_BY[sortConfig.id];
+      if (!orderBy) return;
+      const direction = sortConfig.desc
         ? SortDirection.DESC
         : SortDirection.ASC;
-
-      const nextSort: OrdersTableSortState = { orderBy, direction: nextDirection };
-      onSortChange(nextSort);
+      onSortChange({ orderBy, direction });
     },
-    [sortState, onSortChange],
+    [tableSorting, onSortChange],
   );
 
   const onRowToggle = useCallback((rowId: string) => {
@@ -270,7 +353,7 @@ export function OrdersTable({
         onEditClosedBy(orderSessionId);
       }
     },
-    [onEditClosedBy]
+    [onEditClosedBy],
   );
 
   const dataColumns = useMemo<ColumnDef<Order>[]>(
@@ -280,7 +363,9 @@ export function OrdersTable({
         header: t("orders.admin.table.columns.userName"),
         cell: (info) => {
           const userName = info.getValue() as string;
-          return <span className="font-medium text-foreground">{userName}</span>;
+          return (
+            <span className="font-medium text-foreground">{userName}</span>
+          );
         },
       },
       {
@@ -303,25 +388,29 @@ export function OrdersTable({
                     <CaretDownIcon size={12} />
                   </button>
                 </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                {CHANGEABLE_STATUSES.map((changeableStatus) => {
-                  const isCurrentStatus = changeableStatus === status;
-                  const itemClassName = STATUS_CLASSES[changeableStatus];
-                  return (
-                    <DropdownMenuItem
-                      key={changeableStatus}
-                      onClick={() => onStatusChange(orderId, changeableStatus)}
-                      disabled={isCurrentStatus}
-                      data-current={isCurrentStatus}
-                      className="data-[current=true]:opacity-50"
-                    >
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${itemClassName}`}>
-                        {getStatusLabel(changeableStatus)}
-                      </span>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
+                <DropdownMenuContent align="start">
+                  {CHANGEABLE_STATUSES.map((changeableStatus) => {
+                    const isCurrentStatus = changeableStatus === status;
+                    const itemClassName = STATUS_CLASSES[changeableStatus];
+                    return (
+                      <DropdownMenuItem
+                        key={changeableStatus}
+                        onClick={() =>
+                          onStatusChange(orderId, changeableStatus)
+                        }
+                        disabled={isCurrentStatus}
+                        data-current={isCurrentStatus}
+                        className="data-[current=true]:opacity-50"
+                      >
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${itemClassName}`}
+                        >
+                          {getStatusLabel(changeableStatus)}
+                        </span>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
               </DropdownMenu>
             </div>
           );
@@ -334,7 +423,10 @@ export function OrdersTable({
         cell: (info) => {
           const rowId = info.row.id;
           const order = info.row.original;
-          const itemsCount = order.items.reduce((acc, item) => acc + item.quantity, 0);
+          const itemsCount = order.items.reduce(
+            (acc, item) => acc + item.quantity,
+            0,
+          );
           const itemsLabel = t("orders.admin.table.itemsTotal");
           const isRowExpanded = rowId === expandedRowId;
           const caretClassName = isRowExpanded
@@ -385,7 +477,9 @@ export function OrdersTable({
           return (
             <div className="min-w-[156px]">
               <div>{formattedDate}</div>
-              <div className="text-xs text-muted-foreground">por {createdBy}</div>
+              <div className="text-xs text-muted-foreground">
+                por {createdBy}
+              </div>
             </div>
           );
         },
@@ -404,7 +498,9 @@ export function OrdersTable({
           return (
             <div className="min-w-[156px]">
               <div>{formattedDate}</div>
-              <div className="text-xs text-muted-foreground">por {updatedBy}</div>
+              <div className="text-xs text-muted-foreground">
+                por {updatedBy}
+              </div>
             </div>
           );
         },
@@ -418,17 +514,28 @@ export function OrdersTable({
           const closedBy = order.closedBy;
           const orderSessionId = order.orderSessionId;
           const hasClosedBy = closedBy !== null && closedBy !== undefined;
-          const hasNoOrderSession = orderSessionId === null || orderSessionId === undefined;
+          const hasNoOrderSession =
+            orderSessionId === null || orderSessionId === undefined;
 
           if (hasNoOrderSession) {
-            return <span className="text-muted-foreground min-w-[130px]">{t("orders.admin.table.closedBySystem")}</span>;
+            return (
+              <span className="text-muted-foreground min-w-[130px]">
+                {t("orders.admin.table.closedBySystem")}
+              </span>
+            );
           }
 
           if (!hasClosedBy) {
-            return <span className="text-muted-foreground min-w-[130px]">-</span>;
+            return (
+              <span className="text-muted-foreground min-w-[130px]">-</span>
+            );
           }
 
-          return <span className="text-foreground min-w-[130px]">{closedBy.name}</span>;
+          return (
+            <span className="text-foreground min-w-[130px]">
+              {closedBy.name}
+            </span>
+          );
         },
         enableSorting: false,
       },
@@ -472,7 +579,7 @@ export function OrdersTable({
       },
       enableSorting: false,
     }),
-    [t, handleEditClosedBy]
+    [t, handleEditClosedBy],
   );
 
   const columns = useMemo<ColumnDef<Order>[]>(() => {
@@ -486,7 +593,12 @@ export function OrdersTable({
     data: orders,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: handleSortingChange,
     manualSorting: true,
+    state: {
+      sorting: tableSorting,
+    },
     getRowId: (row) => row.id,
   });
 
@@ -496,12 +608,7 @@ export function OrdersTable({
 
   return (
     <Root>
-      <Header
-        headerGroups={headerGroups}
-        sortState={sortState}
-        getSortTitle={getSortTitle}
-        onColumnSort={onColumnSort}
-      />
+      <Header headerGroups={headerGroups} />
       <Body
         rows={rows}
         expandedRowId={expandedRowId}

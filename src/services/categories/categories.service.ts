@@ -27,10 +27,10 @@ function mapApiCategoryToCategory(raw: GetCategoryResponse): Category {
 
 export const categoriesService = {
   async getAll(
-    queryParams: GetCategoriesRequestQuery
+    queryParams: GetCategoriesRequestQuery,
   ): Promise<ServiceResult<GetCategoriesResponse>> {
     try {
-      const { page, size, orderBy, direction, search, active } = queryParams;
+      const { page, size, orderBy, direction, search } = queryParams;
 
       const params = new URLSearchParams();
       params.set("page", String(page));
@@ -39,7 +39,6 @@ export const categoriesService = {
       params.set("direction", direction);
 
       if (search) params.set("search", search);
-      if (active !== undefined) params.set("active", String(active));
 
       const result = await api.get<unknown>(`/categories?${params.toString()}`);
 
@@ -88,7 +87,9 @@ export const categoriesService = {
         return { error: result.error };
       }
 
-      return { data: mapApiCategoryToCategory(result.data as GetCategoryResponse) };
+      return {
+        data: mapApiCategoryToCategory(result.data as GetCategoryResponse),
+      };
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao buscar categoria";
@@ -117,10 +118,13 @@ export const categoriesService = {
 
   async update(
     categoryId: string,
-    data: CategoryForm
+    data: CategoryForm,
   ): Promise<ServiceResult<void>> {
     try {
-      const result = await api.patch<unknown>(`/categories/${categoryId}`, data);
+      const result = await api.patch<unknown>(
+        `/categories/${categoryId}`,
+        data,
+      );
 
       const hasError = "error" in result;
       if (hasError) {
@@ -136,9 +140,7 @@ export const categoriesService = {
     }
   },
 
-  async delete(
-    categoryId: string
-  ): Promise<ServiceResult<void>> {
+  async delete(categoryId: string): Promise<ServiceResult<void>> {
     try {
       const result = await api.delete<unknown>(`/categories/${categoryId}`);
 
@@ -157,10 +159,12 @@ export const categoriesService = {
   },
 
   async getTranslations(
-    categoryId: string
+    categoryId: string,
   ): Promise<ServiceResult<GetCategoryTranslationsResponse>> {
     try {
-      const result = await api.get<unknown>(`/categories/${categoryId}/translations`);
+      const result = await api.get<unknown>(
+        `/categories/${categoryId}/translations`,
+      );
 
       const hasError = "error" in result;
       if (hasError) {
