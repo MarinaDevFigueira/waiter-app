@@ -13,6 +13,11 @@
       "saving": "Salvando...",
       "new": "Novo"
     },
+    "errors": {
+      "loadError": "Erro ao carregar",
+      "notFound": "Não encontrado",
+      "noData": "Nenhum dado retornado"
+    },
     "status": {
       "active": "Ativo",
       "inactive": "Inativo",
@@ -34,10 +39,6 @@
     "validation": {
       "required": "Campo obrigatório",
       "searchRequired": "Digite algo para buscar"
-    },
-    "errors": {
-      "loadError": "Erro ao carregar",
-      "notFound": "Não encontrado"
     },
     "placeholders": {
       "search": "Buscar..."
@@ -73,7 +74,8 @@
       "promotions": "Promoções",
       "all": "Todos",
       "scrollLeft": "Rolar categorias para a esquerda",
-      "scrollRight": "Rolar categorias para a direita"
+      "scrollRight": "Rolar categorias para a direita",
+      "other": "Outros"
     },
     "actions": {
       "addToOrder": "Adicionar {{name}} ao pedido"
@@ -100,7 +102,14 @@
     "itemCount": "{{count}} item",
     "itemCountPlural": "{{count}} itens",
     "orderConfirmed": "Pedido confirmado!",
-    "orderCancelled": "Pedido cancelado"
+    "orderCancelled": "Pedido cancelado",
+    "itemRemoved": "Item removido do carrinho",
+    "cleared": "Carrinho limpo",
+    "errors": {
+      "fetchSession": "Erro ao buscar sessão ativa",
+      "openSession": "Erro ao abrir sessão",
+      "createOrder": "Erro ao criar pedido"
+    }
   },
   "products": {
     "pageTitle": "Produtos",
@@ -213,7 +222,8 @@
         },
         "itemsTotal": "itens",
         "total": "Total",
-        "closedBySystem": "Sistema"
+        "closedBySystem": "Sistema",
+        "orderLabel": "Pedido #{{id}}"
       },
       "updateStatus": {
         "success": "Status do pedido atualizado com sucesso"
@@ -482,7 +492,8 @@
     "actions": {
       "create": "Novo usuário",
       "edit": "Editar",
-      "disable": "Desabilitar"
+      "disable": "Desabilitar",
+      "disableNotImplemented": "Funcionalidade de desabilitar usuário ainda não implementada"
     },
     "confirmDisable": {
       "title": "Desabilitar Usuário",

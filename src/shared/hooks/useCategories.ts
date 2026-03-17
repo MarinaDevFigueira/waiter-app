@@ -6,8 +6,12 @@ import { categoriesService } from "@/services/categories/categories.service";
 import { CategoriesOrderByEnum } from "@/shared/enums/categories-order-by.enum";
 import { SortDirection } from "@/shared/enums/sort-direction.enum";
 import type { Category } from "@/shared/schemas/category.schema";
-import type { GetCategoriesResponse, GetCategoriesRequestQuery } from "@/services/categories/interfaces/categories.interface";
+import type {
+  GetCategoriesResponse,
+  GetCategoriesRequestQuery,
+} from "@/services/categories/interfaces/categories.interface";
 import { useLanguage } from "@/shared/hooks/useLanguage";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 interface UseCategoriesReturn {
   categories: Category[];
@@ -21,24 +25,32 @@ interface UseCategoriesReturn {
   isError: boolean;
   error: Error | null;
   queryParams: GetCategoriesRequestQuery;
-  setQueryParams: React.Dispatch<React.SetStateAction<GetCategoriesRequestQuery>>;
+  setQueryParams: React.Dispatch<
+    React.SetStateAction<GetCategoriesRequestQuery>
+  >;
   updateSearch: (search: string) => void;
-  updateSorting: (orderBy: CategoriesOrderByEnum, direction: SortDirection) => void;
+  updateSorting: (
+    orderBy: CategoriesOrderByEnum,
+    direction: SortDirection,
+  ) => void;
   updatePagination: (page: number, size: number) => void;
 }
 
 interface UseCategoriesOptions {
   errorMessage?: string;
   initialSize?: number;
-  active?: boolean;
 }
 
-export function useCategories(options?: UseCategoriesOptions | string): UseCategoriesReturn {
+export function useCategories(
+  options?: UseCategoriesOptions | string,
+): UseCategoriesReturn {
   const { addLanguagePrefix } = useLanguage();
+  const { t } = useTranslation();
 
-  const resolvedErrorMessage = typeof options === "string" ? options : options?.errorMessage;
-  const resolvedInitialSize = typeof options === "string" ? 10 : (options?.initialSize ?? 10);
-  const resolvedActive = typeof options === "string" ? undefined : options?.active;
+  const resolvedErrorMessage =
+    typeof options === "string" ? options : options?.errorMessage;
+  const resolvedInitialSize =
+    typeof options === "string" ? 10 : (options?.initialSize ?? 10);
 
   const [queryParams, setQueryParams] = useState<GetCategoriesRequestQuery>({
     page: 1,
@@ -46,20 +58,22 @@ export function useCategories(options?: UseCategoriesOptions | string): UseCateg
     orderBy: CategoriesOrderByEnum.NAME,
     direction: SortDirection.ASC,
     search: undefined,
-    active: resolvedActive,
   });
 
   const { data, isLoading, error, isError } = useQuery<GetCategoriesResponse>({
     queryKey: addLanguagePrefix("categories", queryParams),
     queryFn: async () => {
-      const result = await categoriesService.getAll(queryParams) as { data?: GetCategoriesResponse; error?: string };
+      const result = (await categoriesService.getAll(queryParams)) as {
+        data?: GetCategoriesResponse;
+        error?: string;
+      };
 
       if ("error" in result) {
         throw new Error(result.error);
       }
 
       if (!result.data) {
-        throw new Error("Nenhum dado retornado");
+        throw new Error(t("common.errors.noData"));
       }
 
       return result.data;
@@ -70,7 +84,10 @@ export function useCategories(options?: UseCategoriesOptions | string): UseCateg
 
   useEffect(() => {
     if (isError && error) {
-      const message = resolvedErrorMessage ?? error.message ?? "Erro ao buscar categorias";
+      const message =
+        resolvedErrorMessage ??
+        error.message ??
+        t("categories.errors.loadCategories");
       toast.error(message);
       logger.error("Erro ao buscar categorias", error);
     }
@@ -84,7 +101,10 @@ export function useCategories(options?: UseCategoriesOptions | string): UseCateg
     }));
   };
 
-  const updateSorting = (orderBy: CategoriesOrderByEnum, direction: SortDirection): void => {
+  const updateSorting = (
+    orderBy: CategoriesOrderByEnum,
+    direction: SortDirection,
+  ): void => {
     setQueryParams((prev) => ({
       ...prev,
       orderBy,

@@ -42,7 +42,9 @@ export function UsersPage() {
   const canEditUser = hasPermissionTo(PermissionEnum.EDIT_USERS);
   const canDeleteUser = hasPermissionTo(PermissionEnum.DELETE_USERS);
   const [confirmDisableOpen, setConfirmDisableOpen] = useState(false);
-  const [userToDisable, setUserToDisable] = useState<User | undefined>(undefined);
+  const [userToDisable, setUserToDisable] = useState<User | undefined>(
+    undefined,
+  );
 
   const handleCreateUser = useCallback(() => {
     setSelectedUser(undefined);
@@ -62,7 +64,7 @@ export function UsersPage() {
   const handleConfirmDisable = useCallback(() => {
     if (!userToDisable) return;
 
-    toast.info("Funcionalidade de desabilitar usuário ainda não implementada");
+    toast.info(t("users.actions.disableNotImplemented"));
     logger.info(`Disable user: ${userToDisable.id}`);
     setConfirmDisableOpen(false);
     setUserToDisable(undefined);
@@ -91,9 +93,7 @@ export function UsersPage() {
         <h1 className="text-3xl font-bold tracking-tight">
           {t("users.pageTitle")}
         </h1>
-        <p className="text-muted-foreground">
-          {t("users.pageSubtitle")}
-        </p>
+        <p className="text-muted-foreground">{t("users.pageSubtitle")}</p>
       </div>
       {createButton}
     </div>
@@ -114,9 +114,7 @@ export function UsersPage() {
 
   const emptyContent = (
     <div className="rounded-lg border border-border bg-card p-8 text-center">
-      <p className="text-muted-foreground">
-        {t("users.emptyState")}
-      </p>
+      <p className="text-muted-foreground">{t("users.emptyState")}</p>
     </div>
   );
 
@@ -134,17 +132,60 @@ export function UsersPage() {
   const disableConfirmLabel = t("users.confirmDisable.confirm");
   const cancelLabel = t("common.buttons.cancel");
 
+  const errorSection = hasError ? errorContent : null;
+  const skeletonSection = showSkeleton ? <UsersTableSkeleton /> : null;
+  const emptySection = showEmpty ? emptyContent : null;
+  const tableSection = showTable ? (
+    <div className="flex-1 min-h-0 flex flex-col gap-3">
+      <div className="flex-1 min-h-0">
+        <UsersTable
+          users={users}
+          sorting={sortingState}
+          onSortingChange={updateSorting}
+          onEdit={handleEditUser}
+          onDisable={handleDisableUser}
+          canEdit={canEditUser}
+          canDisable={canDeleteUser}
+        />
+      </div>
+
+      <Pagination>
+        <div className="flex items-center gap-4">
+          <Pagination.Info
+            startItem={pagination.startItem}
+            endItem={pagination.endItem}
+            total={pagination.total}
+          />
+          <Pagination.SizeSelect
+            size={pagination.size}
+            setPageSize={pagination.setPageSize}
+          />
+        </div>
+        <Pagination.Controls
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          hasNextPage={pagination.hasNextPage}
+          hasPreviousPage={pagination.hasPreviousPage}
+          pageRange={pagination.pageRange}
+          nextPage={pagination.nextPage}
+          prevPage={pagination.prevPage}
+          goToPage={pagination.goToPage}
+        />
+      </Pagination>
+    </div>
+  ) : null;
+
   return (
     <div className="flex flex-col h-full gap-6">
       {pageHeader}
 
       <UsersFilters />
 
-      {hasError && errorContent}
+      {errorSection}
 
-      {showSkeleton && <UsersTableSkeleton />}
+      {skeletonSection}
 
-      {showEmpty && emptyContent}
+      {emptySection}
 
       <UserFormDialog
         open={formOpen}
@@ -164,45 +205,7 @@ export function UsersPage() {
         variant="destructive"
       />
 
-      {showTable && (
-        <div className="flex-1 min-h-0 flex flex-col gap-3">
-          <div className="flex-1 min-h-0">
-            <UsersTable
-              users={users}
-              sorting={sortingState}
-              onSortingChange={updateSorting}
-              onEdit={handleEditUser}
-              onDisable={handleDisableUser}
-              canEdit={canEditUser}
-              canDisable={canDeleteUser}
-            />
-          </div>
-
-          <Pagination>
-            <div className="flex items-center gap-4">
-              <Pagination.Info
-                startItem={pagination.startItem}
-                endItem={pagination.endItem}
-                total={pagination.total}
-              />
-              <Pagination.SizeSelect
-                size={pagination.size}
-                setPageSize={pagination.setPageSize}
-              />
-            </div>
-            <Pagination.Controls
-              page={pagination.page}
-              totalPages={pagination.totalPages}
-              hasNextPage={pagination.hasNextPage}
-              hasPreviousPage={pagination.hasPreviousPage}
-              pageRange={pagination.pageRange}
-              nextPage={pagination.nextPage}
-              prevPage={pagination.prevPage}
-              goToPage={pagination.goToPage}
-            />
-          </Pagination>
-        </div>
-      )}
+      {tableSection}
     </div>
   );
 }

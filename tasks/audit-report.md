@@ -186,9 +186,27 @@ Date: 2026-03-16
 ## US-018 — i18n — Audit and Fix pt-BR Hardcoded Strings
 
 **Rule:** `rule-i18n.md`
-**Files scanned:** `src/pages/**`, `src/components/**`
-**Violations found:** TBD
-**Status:** pending
+**Files scanned:** `src/pages/**`, `src/components/**`, `src/shared/hooks/**`
+**Violations found:**
+
+- `src/pages/users/page.tsx:65` — `toast.info("Funcionalidade de desabilitar usuário ainda não implementada")` → `t("users.actions.disableNotImplemented")`
+- `src/pages/orders/components/staff-session-summary-modal/staff-session-summary-modal.tsx:211` — `"Pedido #${shortId}"` → `t("orders.admin.table.orderLabel", { id: shortId })`
+- `src/shared/hooks/useCart.ts:137` — `toast.success("Item removido do carrinho")` → `t("cart.itemRemoved")`
+- `src/shared/hooks/useCart.ts:172` — `toast.success("Carrinho limpo")` → `t("cart.cleared")`
+- `src/shared/hooks/useCart.ts:82` — fallback `"Erro ao buscar sessão ativa"` → `t("cart.errors.fetchSession")`
+- `src/shared/hooks/useCart.ts:98` — fallback `"Erro ao abrir sessão"` → `t("cart.errors.openSession")`
+- `src/shared/hooks/useCart.ts:198` — fallback `"Erro ao criar pedido"` → `t("cart.errors.createOrder")`
+- `src/shared/hooks/useCategories.ts:59` — `throw new Error("Nenhum dado retornado")` → `t("common.errors.noData")`
+- `src/shared/hooks/useCategories.ts:70` — fallback `"Erro ao buscar categorias"` → `t("categories.errors.loadCategories")`
+
+**New translation keys added to pt-BR.json and en-US.json:**
+- `common.errors.noData`
+- `cart.itemRemoved`, `cart.cleared`, `cart.errors.fetchSession`, `cart.errors.openSession`, `cart.errors.createOrder`
+- `users.actions.disableNotImplemented`
+- `orders.admin.table.orderLabel`
+
+**Files changed:** 6 (useCart.ts, useCategories.ts, users/page.tsx, staff-session-summary-modal.tsx, pt-BR.json, en-US.json)
+**Status:** fixed
 
 ---
 
