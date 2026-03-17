@@ -12,7 +12,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
   const { t } = useTranslation();
 
   const searchSchema = z.object({
-    query: z.string().min(1, { message: t("common.validation.searchRequired") }),
+    query: z.string().min(1, { error: t("common.validation.searchRequired") }),
   });
 
   type SearchFormValues = z.infer<typeof searchSchema>;

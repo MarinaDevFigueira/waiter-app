@@ -1,14 +1,13 @@
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, FreeMode } from "swiper/modules";
+import { FreeMode } from "swiper/modules";
 import { useTranslation } from "@/shared/hooks/useTranslation";
 import { categoriesSwiperObservable } from "./observables/categories-swiper.subject";
 import type { Category } from "@/shared/schemas/category.schema";
 import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
-import "swiper/css/navigation";
 import "swiper/css/free-mode";
 
 interface CategoryTabProps {
@@ -24,7 +23,12 @@ interface CategoriesProps {
   onCategoryChange: (categoryId: string | null) => void;
 }
 
-function CategoryTab({ label, categoryId, selected, onSelect }: CategoryTabProps) {
+function CategoryTab({
+  label,
+  categoryId,
+  selected,
+  onSelect,
+}: CategoryTabProps) {
   const handleSelect = useCallback(() => {
     onSelect(categoryId);
   }, [categoryId, onSelect]);
@@ -32,6 +36,7 @@ function CategoryTab({ label, categoryId, selected, onSelect }: CategoryTabProps
   return (
     <li
       data-selected={selected}
+      data-testid={`category-tab-${categoryId}`}
       onClick={handleSelect}
       className="flex flex-col select-none items-center justify-center gap-1 cursor-pointer hover:cursor-pointer shrink-0"
     >
@@ -46,13 +51,18 @@ function CategoryTab({ label, categoryId, selected, onSelect }: CategoryTabProps
 }
 
 const ALL_CATEGORY_ID = "__all__";
-const NAV_PREV_CLASS = "categories-swiper-prev";
-const NAV_NEXT_CLASS = "categories-swiper-next";
 const SPACE_BETWEEN = 4;
 
-const Categories = ({ categories, selectedCategoryId, onCategoryChange }: CategoriesProps) => {
+const Categories = ({
+  categories,
+  selectedCategoryId,
+  onCategoryChange,
+}: CategoriesProps) => {
   const { t } = useTranslation();
-  const [swiperState, setSwiperState] = useState(categoriesSwiperObservable.getValue());
+  const swiperRef = useRef<SwiperType | null>(null);
+  const [swiperState, setSwiperState] = useState(
+    categoriesSwiperObservable.getValue(),
+  );
 
   useEffect(() => {
     const subscription = categoriesSwiperObservable.subscribe((newState) => {
@@ -64,21 +74,44 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
   }, []);
 
   const sortedCategories = useMemo(() => {
-    const withName = categories.filter((c) => c.name.trim().length > 0);
-    const sorted = [...withName].sort((a, b) => a.sortOrder - b.sortOrder);
+    const sorted = [...categories].sort((a, b) => a.sortOrder - b.sortOrder);
     return sorted;
   }, [categories]);
 
-  const handleSelect = useCallback((categoryId: string) => {
-    const isAll = categoryId === ALL_CATEGORY_ID;
-    onCategoryChange(isAll ? null : categoryId);
-  }, [onCategoryChange]);
+  const handleSelect = useCallback(
+    (categoryId: string) => {
+      const isAll = categoryId === ALL_CATEGORY_ID;
+      onCategoryChange(isAll ? null : categoryId);
+    },
+    [onCategoryChange],
+  );
+
+  const handleSwiperRef = useCallback((swiper: SwiperType) => {
+    swiperRef.current = swiper;
+  }, []);
+
+  const handleInit = useCallback((swiper: SwiperType) => {
+    setTimeout(() => {
+      categoriesSwiperObservable.updateState({
+        isBeginning: swiper.isBeginning,
+        isEnd: swiper.isEnd,
+      });
+    }, 0);
+  }, []);
 
   const handleProgress = useCallback((swiper: SwiperType) => {
     categoriesSwiperObservable.updateState({
       isBeginning: swiper.isBeginning,
       isEnd: swiper.isEnd,
     });
+  }, []);
+
+  const handlePrevClick = useCallback(() => {
+    swiperRef.current?.slidePrev();
+  }, []);
+
+  const handleNextClick = useCallback(() => {
+    swiperRef.current?.slideNext();
   }, []);
 
   const allSelected = selectedCategoryId === null;
@@ -90,11 +123,6 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
   const shouldShowPrevButton = !isBeginning;
   const shouldShowNextButton = !isEnd;
 
-  const navigationConfig = {
-    prevEl: `.${NAV_PREV_CLASS}`,
-    nextEl: `.${NAV_NEXT_CLASS}`,
-  };
-
   const freeModeConfig = {
     enabled: true,
     momentum: true,
@@ -102,24 +130,39 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
     momentumBounce: false,
   };
 
+  const prevButton = (
+    <button
+      aria-label={scrollLeftLabel}
+      onClick={handlePrevClick}
+      className="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-background/90 border border-border shadow-sm text-foreground hover:cursor-pointer hover:bg-muted active:scale-95 transition-all"
+    >
+      <CaretLeftIcon size={iconSize} weight="bold" />
+    </button>
+  );
+
+  const nextButton = (
+    <button
+      aria-label={scrollRightLabel}
+      onClick={handleNextClick}
+      className="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-background/90 border border-border shadow-sm text-foreground hover:cursor-pointer hover:bg-muted active:scale-95 transition-all"
+    >
+      <CaretRightIcon size={iconSize} weight="bold" />
+    </button>
+  );
+
   return (
     <div className="w-full flex items-center gap-2">
-      <button
-        aria-label={scrollLeftLabel}
-        data-visible={shouldShowPrevButton}
-        className={`${NAV_PREV_CLASS} shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-background/90 border border-border shadow-sm text-foreground hover:cursor-pointer hover:bg-muted active:scale-95 transition-all data-[visible=false]:hidden data-[visible=false]:pointer-events-none data-[visible=false]:invisible`}
-      >
-        <CaretLeftIcon size={iconSize} weight="bold" />
-      </button>
+      {shouldShowPrevButton && prevButton}
 
       <div className="flex-1 min-w-0">
         <Swiper
-          modules={[Navigation, FreeMode]}
-          navigation={navigationConfig}
+          modules={[FreeMode]}
           freeMode={freeModeConfig}
           slidesPerView="auto"
           spaceBetween={SPACE_BETWEEN}
           grabCursor
+          onSwiper={handleSwiperRef}
+          onInit={handleInit}
           onProgress={handleProgress}
           className="w-full"
         >
@@ -148,13 +191,7 @@ const Categories = ({ categories, selectedCategoryId, onCategoryChange }: Catego
         </Swiper>
       </div>
 
-      <button
-        aria-label={scrollRightLabel}
-        data-visible={shouldShowNextButton}
-        className={`${NAV_NEXT_CLASS} shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-background/90 border border-border shadow-sm text-foreground hover:cursor-pointer hover:bg-muted active:scale-95 transition-all data-[visible=false]:hidden data-[visible=false]:pointer-events-none data-[visible=false]:invisible`}
-      >
-        <CaretRightIcon size={iconSize} weight="bold" />
-      </button>
+      {shouldShowNextButton && nextButton}
     </div>
   );
 };

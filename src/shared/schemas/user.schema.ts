@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { baseEntitySchema } from "@/shared/schemas/base-entity.schema";
 
 const ROLE_VALUES = Object.values(UserRoleEnum) as [string, ...string[]];
 
-export const userSchema = z.object({
+export const userSchema = baseEntitySchema.extend({
   id: z.string(),
   name: z.string(),
   username: z.string(),
@@ -13,9 +14,10 @@ export const userSchema = z.object({
   documentType: z.enum(["cpf", "rg"]).nullable(),
   birthDate: z.string().nullable(),
   businessId: z.string().nullable(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  createdBy: z.string().optional(),
+  updatedBy: z.string().optional(),
   deletedAt: z.coerce.date().optional(),
+  deletedBy: z.string().nullable().optional(),
   permissions: z.array(z.string()).optional(),
 });
 

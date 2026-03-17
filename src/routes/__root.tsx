@@ -10,12 +10,13 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const { isAccepted } = useCookieConsent();
+  const appContent = isAccepted ? <Outlet /> : null;
 
   return (
     <React.Fragment>
       <SplashScreen />
       <CookieConsentModal />
-      {isAccepted && <Outlet />}
+      {appContent}
     </React.Fragment>
   );
 }

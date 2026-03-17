@@ -37,7 +37,8 @@
     },
     "errors": {
       "loadError": "Error loading",
-      "notFound": "Not found"
+      "notFound": "Not found",
+      "noData": "No data returned"
     },
     "placeholders": {
       "search": "Search..."
@@ -73,7 +74,8 @@
       "promotions": "Promotions",
       "all": "All",
       "scrollLeft": "Scroll categories left",
-      "scrollRight": "Scroll categories right"
+      "scrollRight": "Scroll categories right",
+      "other": "Others"
     },
     "actions": {
       "addToOrder": "Add {{name}} to order"
@@ -100,7 +102,14 @@
     "itemCount": "{{count}} item",
     "itemCountPlural": "{{count}} items",
     "orderConfirmed": "Order confirmed!",
-    "orderCancelled": "Order cancelled"
+    "orderCancelled": "Order cancelled",
+    "itemRemoved": "Item removed from cart",
+    "cleared": "Cart cleared",
+    "errors": {
+      "fetchSession": "Error fetching active session",
+      "openSession": "Error opening session",
+      "createOrder": "Error creating order"
+    }
   },
   "products": {
     "pageTitle": "Products",
@@ -213,7 +222,8 @@
         },
         "itemsTotal": "items",
         "total": "Total",
-        "closedBySystem": "System"
+        "closedBySystem": "System",
+        "orderLabel": "Order #{{id}}"
       },
       "updateStatus": {
         "success": "Order status updated successfully"
@@ -482,7 +492,8 @@
     "actions": {
       "create": "New user",
       "edit": "Edit",
-      "disable": "Disable"
+      "disable": "Disable",
+      "disableNotImplemented": "Disable user feature not yet implemented"
     },
     "confirmDisable": {
       "title": "Disable User",

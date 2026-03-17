@@ -19,6 +19,8 @@ function mapApiBusinessItemToBusiness(apiItem: GetBusinessItemResponse): Busines
     city: apiItem.city ?? undefined,
     state: apiItem.state ?? undefined,
     createdAt: new Date(apiItem.createdAt),
+    updatedAt: new Date(apiItem.createdAt),
+    deletedAt: null,
   };
 }
 

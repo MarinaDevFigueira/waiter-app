@@ -62,7 +62,7 @@ export function UsersTable({ users, sorting, onSortingChange, onEdit, onDisable,
     };
 
     const badgeColor = roleColors[role] || "bg-muted text-muted-foreground";
-    const roleLabel = t(`users.roles.${role}` as any) || role;
+    const roleLabel = t(`users.roles.${role}`) || role;
 
     return (
       <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${badgeColor}`}>

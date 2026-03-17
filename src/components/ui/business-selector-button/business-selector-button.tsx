@@ -24,16 +24,22 @@ export function BusinessSelectorButton({
 
   const handleBusinessChange = useCallback(
     (business: BusinessSelection) => {
-      setBusiness(business);
+      setBusiness({ ...business, address: null });
       setOpen(false);
 
       queryClient.invalidateQueries({ queryKey: addLanguagePrefix("orders") });
-      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("products") });
-      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("categories") });
+      queryClient.invalidateQueries({
+        queryKey: addLanguagePrefix("products"),
+      });
+      queryClient.invalidateQueries({
+        queryKey: addLanguagePrefix("categories"),
+      });
       queryClient.invalidateQueries({ queryKey: addLanguagePrefix("users") });
-      queryClient.invalidateQueries({ queryKey: addLanguagePrefix("order-sessions") });
+      queryClient.invalidateQueries({
+        queryKey: addLanguagePrefix("order-sessions"),
+      });
     },
-    [setBusiness, queryClient, addLanguagePrefix]
+    [setBusiness, queryClient, addLanguagePrefix],
   );
 
   const hasSelectedBusiness = selectedBusiness !== null;
@@ -55,6 +61,7 @@ export function BusinessSelectorButton({
       variant="ghost"
       onClick={() => setOpen(true)}
       className="flex items-center gap-2"
+      data-testid="business-selector-trigger-button"
     >
       <BuildingsIcon className="size-5" />
       <span className="text-sm font-medium">{displayName}</span>
@@ -73,7 +80,10 @@ export function BusinessSelectorButton({
 
   if (isMobile) {
     return (
-      <div data-device="mobile" className="data-[device=mobile]:block data-[device=mobile]:md:hidden">
+      <div
+        data-device="mobile"
+        className="data-[device=mobile]:block data-[device=mobile]:md:hidden"
+      >
         {triggerButton}
 
         <Drawer open={open} onOpenChange={setOpen}>
@@ -91,7 +101,10 @@ export function BusinessSelectorButton({
   }
 
   return (
-    <div data-device="desktop" className="data-[device=desktop]:hidden data-[device=desktop]:md:block">
+    <div
+      data-device="desktop"
+      className="data-[device=desktop]:hidden data-[device=desktop]:md:block"
+    >
       {triggerButton}
 
       <Dialog open={open} onOpenChange={setOpen}>

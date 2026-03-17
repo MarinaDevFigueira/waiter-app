@@ -1,17 +1,25 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
-import { cartObservable, type CartData, type CartItem } from "@/shared/subjects/cart.subject";
+import {
+  cartObservable,
+  type CartData,
+  type CartItem,
+} from "@/shared/subjects/cart.subject";
 import { orderSessionsService } from "@/services/order-sessions/order-sessions.service";
 import { ordersService } from "@/services/orders/orders.service";
 import { useRoles } from "@/shared/hooks/useRoles";
 import { logger } from "@/lib/logger";
 import { useLanguage } from "@/shared/hooks/useLanguage";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 
 interface UseCartReturn {
   cart: CartData;
   itemCount: number;
-  addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => Promise<void>;
+  addItem: (
+    item: Omit<CartItem, "quantity">,
+    quantity?: number,
+  ) => Promise<void>;
   removeItem: (productId: string) => Promise<void>;
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -24,6 +32,7 @@ export function useCart(): UseCartReturn {
   const [isLoading, setIsLoading] = useState(false);
   const { isTable } = useRoles();
   const { addLanguagePrefix } = useLanguage();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -51,12 +60,14 @@ export function useCart(): UseCartReturn {
           }
 
           const activeSession = result.data;
-          const hasActiveSession = activeSession !== null && activeSession !== undefined;
+          const hasActiveSession =
+            activeSession !== null && activeSession !== undefined;
           if (hasActiveSession) {
             cartObservable.setOrderSession(activeSession.id);
           }
         } catch (error) {
-          const sessionError = error instanceof Error ? error : new Error(String(error));
+          const sessionError =
+            error instanceof Error ? error : new Error(String(error));
           logger.error("Erro ao inicializar sessão", sessionError);
         } finally {
           setIsLoading(false);
@@ -79,14 +90,14 @@ export function useCart(): UseCartReturn {
       const hasError = "error" in result;
       if (hasError) {
         const sessionError = new Error(result.error);
-        console.error("[useCart] Erro ao buscar sessão ativa:", sessionError);
-        toast.error(result.error ?? "Erro ao buscar sessão ativa");
+        toast.error(result.error ?? t("cart.errors.fetchSession"));
         logger.error("Erro ao buscar sessão ativa", sessionError);
         return false;
       }
 
       const activeSessionData = result.data;
-      const hasActiveSession = activeSessionData !== null && activeSessionData !== undefined;
+      const hasActiveSession =
+        activeSessionData !== null && activeSessionData !== undefined;
       if (hasActiveSession) {
         cartObservable.setOrderSession(activeSessionData.id);
         return true;
@@ -96,7 +107,7 @@ export function useCart(): UseCartReturn {
       const openHasError = "error" in openResult;
       if (openHasError) {
         const openError = new Error(openResult.error);
-        toast.error(openResult.error ?? "Erro ao abrir sessão");
+        toast.error(openResult.error ?? t("cart.errors.openSession"));
         logger.error("Erro ao abrir sessão", openError);
         return false;
       }
@@ -104,7 +115,8 @@ export function useCart(): UseCartReturn {
       cartObservable.setOrderSession(openResult.data.id);
       return true;
     } catch (error) {
-      const sessionError = error instanceof Error ? error : new Error(String(error));
+      const sessionError =
+        error instanceof Error ? error : new Error(String(error));
       logger.error("Erro ao criar sessão", sessionError);
       return false;
     }
@@ -112,7 +124,7 @@ export function useCart(): UseCartReturn {
 
   const addItem = async (
     item: Omit<CartItem, "quantity">,
-    quantity = 1
+    quantity = 1,
   ): Promise<void> => {
     setIsLoading(true);
     try {
@@ -135,13 +147,16 @@ export function useCart(): UseCartReturn {
       if (isEmpty) {
         cartObservable.setOrderSession(null);
       }
-      toast.success("Item removido do carrinho");
+      toast.success(t("cart.itemRemoved"));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const updateQuantity = async (productId: string, quantity: number): Promise<void> => {
+  const updateQuantity = async (
+    productId: string,
+    quantity: number,
+  ): Promise<void> => {
     setIsLoading(true);
     try {
       cartObservable.updateQuantity(productId, quantity);
@@ -162,7 +177,9 @@ export function useCart(): UseCartReturn {
       const hasSessionId = Boolean(currentCart.orderSessionId);
 
       if (hasSessionId && isTable) {
-        const result = await orderSessionsService.close(currentCart.orderSessionId as string);
+        const result = await orderSessionsService.close(
+          currentCart.orderSessionId as string,
+        );
         const hasError = "error" in result;
         if (hasError) {
           logger.error("Erro ao fechar sessão", new Error(result.error));
@@ -170,7 +187,7 @@ export function useCart(): UseCartReturn {
       }
 
       cartObservable.clearCart();
-      toast.success("Carrinho limpo");
+      toast.success(t("cart.cleared"));
     } finally {
       setIsLoading(false);
     }
@@ -188,15 +205,19 @@ export function useCart(): UseCartReturn {
       }));
 
       const hasSessionId = Boolean(currentCart.orderSessionId);
-      const orderSessionId = hasSessionId && isTable
-        ? (currentCart.orderSessionId as string)
-        : undefined;
+      const orderSessionId =
+        hasSessionId && isTable
+          ? (currentCart.orderSessionId as string)
+          : undefined;
 
-      const result = await ordersService.create({ items: orderItems, orderSessionId });
+      const result = await ordersService.create({
+        items: orderItems,
+        orderSessionId,
+      });
       const hasError = "error" in result;
       if (hasError) {
         const orderError = new Error(result.error);
-        toast.error(result.error ?? "Erro ao criar pedido");
+        toast.error(result.error ?? t("cart.errors.createOrder"));
         logger.error("Erro ao criar pedido", orderError);
         return false;
       }

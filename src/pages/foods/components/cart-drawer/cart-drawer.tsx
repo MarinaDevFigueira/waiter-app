@@ -48,7 +48,9 @@ function CartItemRow({ item, onRemove, onUpdateQuantity }: CartItemRowProps) {
         className="w-14 h-14 rounded-md object-cover shrink-0 bg-muted"
       />
       <div className="flex-1 flex flex-col gap-1 min-w-0">
-        <span className="text-sm font-semibold truncate">{item.productName}</span>
+        <span className="text-sm font-semibold truncate">
+          {item.productName}
+        </span>
         <span className="text-xs text-muted-foreground">{unitPrice}</span>
         <div className="flex items-center mt-1">
           <div className="flex items-center gap-2">
@@ -56,14 +58,18 @@ function CartItemRow({ item, onRemove, onUpdateQuantity }: CartItemRowProps) {
               onClick={handleDecrease}
               className="w-6 h-6 rounded-full border border-border flex items-center justify-center hover:bg-muted hover:cursor-pointer transition-colors"
               aria-label="Diminuir quantidade"
+              data-testid={`decrease-quantity-${item.productId}`}
             >
               <Minus className="w-3 h-3" />
             </button>
-            <span className="text-sm font-semibold w-5 text-center">{item.quantity}</span>
+            <span className="text-sm font-semibold w-5 text-center">
+              {item.quantity}
+            </span>
             <button
               onClick={handleIncrease}
               className="w-6 h-6 rounded-full border border-border flex items-center justify-center hover:bg-muted hover:cursor-pointer transition-colors"
               aria-label="Aumentar quantidade"
+              data-testid={`increase-quantity-${item.productId}`}
             >
               <Plus className="w-3 h-3" />
             </button>
@@ -74,6 +80,7 @@ function CartItemRow({ item, onRemove, onUpdateQuantity }: CartItemRowProps) {
         onClick={handleRemove}
         className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:cursor-pointer transition-colors"
         aria-label={t("cart.removeItem")}
+        data-testid={`remove-cart-item-${item.productId}`}
       >
         <Trash2 className="w-4 h-4" />
       </button>
@@ -87,11 +94,23 @@ interface CartDrawerProps {
   onOrderConfirmed?: () => void;
 }
 
-export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps) {
+export function CartDrawer({
+  open,
+  onClose,
+  onOrderConfirmed,
+}: CartDrawerProps) {
   const { t } = useTranslation();
   const { isTable } = useRoles();
   const isMobile = useIsMobile();
-  const { cart, itemCount, removeItem, updateQuantity, clearCart, confirmOrder, isLoading } = useCart();
+  const {
+    cart,
+    itemCount,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    confirmOrder,
+    isLoading,
+  } = useCart();
   const [isConfirming, setIsConfirming] = useState(false);
 
   const formattedTotal = useMemo(() => formatPrice(cart.total), [cart.total]);
@@ -113,7 +132,7 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
         onClose();
       }
     },
-    [onClose]
+    [onClose],
   );
 
   const handleConfirmOrder = useCallback(async () => {
@@ -140,9 +159,13 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
   const headerTitle = (
     <div className="flex items-center gap-2">
       <ShoppingBag className="w-5 h-5 text-primary" />
-      <span className="text-lg font-semibold leading-none tracking-tight">{t("cart.title")}</span>
+      <span className="text-lg font-semibold leading-none tracking-tight">
+        {t("cart.title")}
+      </span>
       {hasItems && (
-        <span className="text-sm text-muted-foreground">({itemCountLabel})</span>
+        <span className="text-sm text-muted-foreground">
+          ({itemCountLabel})
+        </span>
       )}
     </div>
   );
@@ -166,16 +189,18 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
         <ShoppingBag className="w-12 h-12 text-muted-foreground/30" />
-        <span className="text-base font-semibold text-muted-foreground">{t("cart.empty")}</span>
-        <span className="text-sm text-muted-foreground">{t("cart.emptyDescription")}</span>
+        <span className="text-base font-semibold text-muted-foreground">
+          {t("cart.empty")}
+        </span>
+        <span className="text-sm text-muted-foreground">
+          {t("cart.emptyDescription")}
+        </span>
       </div>
     );
   }, [hasItems, cart.items, removeItem, updateQuantity, t]);
 
   const bodyContent = (
-    <div className="flex-1 overflow-y-auto px-4 min-h-0">
-      {itemsContent}
-    </div>
+    <div className="flex-1 overflow-y-auto px-4 min-h-0">{itemsContent}</div>
   );
 
   const footerContent = useMemo(() => {
@@ -185,7 +210,9 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
       <div className="border-t border-border p-4 flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <span className="text-base font-semibold">{t("cart.total")}</span>
-          <span className="text-xl font-bold text-primary">{formattedTotal}</span>
+          <span className="text-xl font-bold text-primary">
+            {formattedTotal}
+          </span>
         </div>
         <button
           onClick={handleConfirmOrder}
@@ -207,7 +234,15 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
         </button>
       </div>
     );
-  }, [hasItems, t, formattedTotal, handleConfirmOrder, handleCancelOrder, isDisabled, confirmButtonLabel]);
+  }, [
+    hasItems,
+    t,
+    formattedTotal,
+    handleConfirmOrder,
+    handleCancelOrder,
+    isDisabled,
+    confirmButtonLabel,
+  ]);
 
   if (isMobile) {
     return (
@@ -234,13 +269,12 @@ export function CartDrawer({ open, onClose, onOrderConfirmed }: CartDrawerProps)
         data-testid="cart-drawer"
       >
         <Dialog.Header className="p-4 border-b border-border">
-          <Dialog.Title asChild>
-            {headerTitle}
-          </Dialog.Title>
+          <Dialog.Title asChild>{headerTitle}</Dialog.Title>
           <button
             onClick={onClose}
             aria-label={t("common.buttons.cancel")}
             className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted hover:cursor-pointer transition-colors"
+            data-testid="cart-close-button"
           >
             <X className="w-5 h-5" />
           </button>

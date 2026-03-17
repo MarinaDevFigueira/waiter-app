@@ -42,7 +42,7 @@ export function useBusiness(options?: UseBusinessOptions): UseBusinessReturn {
         businessObservable.clearBusiness();
         setIsBusinessInvalid(true);
       } else {
-        businessObservable.setBusiness({ id: result.data.id, name: result.data.name });
+        businessObservable.setBusiness({ id: result.data.id, name: result.data.name, address: null });
       }
       setIsLoading(false);
     };

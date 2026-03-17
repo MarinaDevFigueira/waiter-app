@@ -30,7 +30,9 @@ export function ProductsPage() {
   const { categories } = useCategories({ initialSize: 100 });
   const { t } = useTranslation();
   const [formOpen, setFormOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
+  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(
+    undefined,
+  );
 
   const handleNewProduct = useCallback(() => {
     setSelectedProduct(undefined);
@@ -58,9 +60,7 @@ export function ProductsPage() {
         <h1 className="text-3xl font-bold tracking-tight">
           {t("products.pageTitle")}
         </h1>
-        <p className="text-muted-foreground">
-          {t("products.pageSubtitle")}
-        </p>
+        <p className="text-muted-foreground">{t("products.pageSubtitle")}</p>
       </div>
       <Button onClick={handleNewProduct} data-testid="new-product-button">
         {t("common.buttons.new")} {t("products.pageTitle")}
@@ -83,9 +83,7 @@ export function ProductsPage() {
 
   const emptyContent = (
     <div className="rounded-lg border border-border bg-card p-8 text-center">
-      <p className="text-muted-foreground">
-        {t("products.emptyState.title")}
-      </p>
+      <p className="text-muted-foreground">{t("products.emptyState.title")}</p>
     </div>
   );
 
@@ -98,17 +96,58 @@ export function ProductsPage() {
   const showSkeleton = !hasError && isLoadingData;
   const showEmpty = !hasError && !isLoadingData && hasNoProducts;
 
+  const errorSection = hasError ? errorContent : null;
+  const skeletonSection = showSkeleton ? <ProductsTableSkeleton /> : null;
+  const emptySection = showEmpty ? emptyContent : null;
+  const tableSection = showTable ? (
+    <div className="flex-1 min-h-0 flex flex-col gap-3">
+      <div className="flex-1 min-h-0">
+        <ProductsTable
+          products={products}
+          categories={categories}
+          sorting={sortingState}
+          onSortingChange={updateSorting}
+          onEdit={handleEditProduct}
+        />
+      </div>
+
+      <Pagination>
+        <div className="flex items-center gap-4">
+          <Pagination.Info
+            startItem={pagination.startItem}
+            endItem={pagination.endItem}
+            total={pagination.total}
+          />
+          <Pagination.SizeSelect
+            size={pagination.size}
+            setPageSize={pagination.setPageSize}
+          />
+        </div>
+        <Pagination.Controls
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          hasNextPage={pagination.hasNextPage}
+          hasPreviousPage={pagination.hasPreviousPage}
+          pageRange={pagination.pageRange}
+          nextPage={pagination.nextPage}
+          prevPage={pagination.prevPage}
+          goToPage={pagination.goToPage}
+        />
+      </Pagination>
+    </div>
+  ) : null;
+
   return (
     <div className="flex flex-col h-full gap-6">
       {pageHeader}
 
       <ProductsFilters />
 
-      {hasError && errorContent}
+      {errorSection}
 
-      {showSkeleton && <ProductsTableSkeleton />}
+      {skeletonSection}
 
-      {showEmpty && emptyContent}
+      {emptySection}
 
       <ProductFormDialog
         open={formOpen}
@@ -116,43 +155,7 @@ export function ProductsPage() {
         product={selectedProduct}
       />
 
-      {showTable && (
-        <div className="flex-1 min-h-0 flex flex-col gap-3">
-          <div className="flex-1 min-h-0">
-            <ProductsTable
-              products={products}
-              categories={categories}
-              sorting={sortingState}
-              onSortingChange={updateSorting}
-              onEdit={handleEditProduct}
-            />
-          </div>
-
-          <Pagination>
-            <div className="flex items-center gap-4">
-              <Pagination.Info
-                startItem={pagination.startItem}
-                endItem={pagination.endItem}
-                total={pagination.total}
-              />
-              <Pagination.SizeSelect
-                size={pagination.size}
-                setPageSize={pagination.setPageSize}
-              />
-            </div>
-            <Pagination.Controls
-              page={pagination.page}
-              totalPages={pagination.totalPages}
-              hasNextPage={pagination.hasNextPage}
-              hasPreviousPage={pagination.hasPreviousPage}
-              pageRange={pagination.pageRange}
-              nextPage={pagination.nextPage}
-              prevPage={pagination.prevPage}
-              goToPage={pagination.goToPage}
-            />
-          </Pagination>
-        </div>
-      )}
+      {tableSection}
     </div>
   );
 }

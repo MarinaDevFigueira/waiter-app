@@ -19,12 +19,24 @@ import { orderStatusUpdateObservable } from "./observables/order-status-update.o
 import { multiply, add } from "@/lib/math";
 import { logger } from "@/lib/logger";
 import type { OrderStatus } from "@/shared/schemas/order.schema";
-import type { OrderSessionSummary, OrderSessionSummaryOrder, OrderSessionSummaryItem } from "@/services/order-sessions/interfaces/order-sessions.interface";
+import type {
+  OrderSessionSummary,
+  OrderSessionSummaryOrder,
+  OrderSessionSummaryItem,
+} from "@/services/order-sessions/interfaces/order-sessions.interface";
 import type { StaffSessionSummaryModalProps } from "./staff-session-summary-modal.interface";
 
 const CLOSEABLE_STATUSES: OrderStatus[] = ["delivered", "finished", "canceled"];
 
-const CHANGEABLE_STATUSES: OrderStatus[] = ["preparing", "ready", "waiting_delivery_man", "in_delivery", "delivered", "finished", "canceled"];
+const CHANGEABLE_STATUSES: OrderStatus[] = [
+  "preparing",
+  "ready",
+  "waiting_delivery_man",
+  "in_delivery",
+  "delivered",
+  "finished",
+  "canceled",
+];
 
 const STATUS_CLASSES: Record<OrderStatus, string> = {
   pending: "bg-yellow-500/10 text-yellow-600",
@@ -44,7 +56,11 @@ const formatPrice = (price: number): string => {
   }).format(price);
 };
 
-export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSessionSummaryModalProps) {
+export function StaffSessionSummaryModal({
+  open,
+  onClose,
+  sessionId,
+}: StaffSessionSummaryModalProps) {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [summary, setSummary] = useState<OrderSessionSummary | null>(null);
@@ -75,7 +91,10 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
       const hasError = "error" in result;
 
       if (hasError) {
-        logger.error("[StaffSessionSummaryModal] Erro ao buscar resumo", new Error(result.error));
+        logger.error(
+          "[StaffSessionSummaryModal] Erro ao buscar resumo",
+          new Error(result.error),
+        );
         setError(result.error);
         setIsLoading(false);
         return;
@@ -88,34 +107,40 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
     fetchSummary();
   }, [sessionId, open]);
 
-  const handleStatusChange = useCallback(async (orderId: string, newStatus: OrderStatus) => {
-    orderStatusUpdateObservable.setUpdating(orderId);
+  const handleStatusChange = useCallback(
+    async (orderId: string, newStatus: OrderStatus) => {
+      orderStatusUpdateObservable.setUpdating(orderId);
 
-    const result = await ordersService.updateStatus(orderId, newStatus);
-    const hasError = "error" in result;
+      const result = await ordersService.updateStatus(orderId, newStatus);
+      const hasError = "error" in result;
 
-    if (hasError) {
-      logger.error("[StaffSessionSummaryModal] Erro ao atualizar status", new Error(result.error));
-      toast.error(result.error);
-      orderStatusUpdateObservable.reset();
-      return;
-    }
+      if (hasError) {
+        logger.error(
+          "[StaffSessionSummaryModal] Erro ao atualizar status",
+          new Error(result.error),
+        );
+        toast.error(result.error);
+        orderStatusUpdateObservable.reset();
+        return;
+      }
 
-    setSummary((prev) => {
-      if (!prev) return prev;
-      const updatedOrders = prev.orders.map((order) => {
-        const isTargetOrder = order.id === orderId;
-        if (isTargetOrder) {
-          return { ...order, status: newStatus };
-        }
-        return order;
+      setSummary((prev) => {
+        if (!prev) return prev;
+        const updatedOrders = prev.orders.map((order) => {
+          const isTargetOrder = order.id === orderId;
+          if (isTargetOrder) {
+            return { ...order, status: newStatus };
+          }
+          return order;
+        });
+        return { ...prev, orders: updatedOrders };
       });
-      return { ...prev, orders: updatedOrders };
-    });
 
-    orderStatusUpdateObservable.reset();
-    toast.success(t("orders.admin.updateStatus.success"));
-  }, [t]);
+      orderStatusUpdateObservable.reset();
+      toast.success(t("orders.admin.updateStatus.success"));
+    },
+    [t],
+  );
 
   const allOrdersCloseable = useMemo(() => {
     const hasNoSummary = !summary;
@@ -124,7 +149,9 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
     const hasNoOrders = summary.orders.length === 0;
     if (hasNoOrders) return false;
 
-    return summary.orders.every((order) => CLOSEABLE_STATUSES.includes(order.status as OrderStatus));
+    return summary.orders.every((order) =>
+      CLOSEABLE_STATUSES.includes(order.status as OrderStatus),
+    );
   }, [summary]);
 
   const handleCloseSession = useCallback(async () => {
@@ -143,7 +170,10 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
     const hasError = "error" in result;
 
     if (hasError) {
-      logger.error("[StaffSessionSummaryModal] Erro ao fechar sessão", new Error(result.error));
+      logger.error(
+        "[StaffSessionSummaryModal] Erro ao fechar sessão",
+        new Error(result.error),
+      );
       toast.error(result.error);
       setIsClosing(false);
       return;
@@ -164,7 +194,10 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
     [onClose],
   );
 
-  const getStatusLabel = useCallback((status: string) => t(`common.status.${status}`), [t]);
+  const getStatusLabel = useCallback(
+    (status: string) => t(`common.status.${status}`),
+    [t],
+  );
 
   if (!open) return null;
 
@@ -176,18 +209,24 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
 
   const errorState = (
     <div className="flex flex-col items-center justify-center py-8 gap-4">
-      <p className="text-destructive text-sm">{t("orderSession.scanner.notFound")}</p>
+      <p className="text-destructive text-sm">
+        {t("orderSession.scanner.notFound")}
+      </p>
       <p className="text-muted-foreground text-xs">{error}</p>
     </div>
   );
 
-  const totalAmount = summary?.orders.reduce((sum: number, order: OrderSessionSummaryOrder) => {
-    const orderTotal = order.items.reduce((itemSum: number, item: OrderSessionSummaryItem) => {
-      const itemTotal = multiply(item.price, item.quantity);
-      return add(itemSum, itemTotal);
-    }, 0);
-    return add(sum, orderTotal);
-  }, 0) ?? 0;
+  const totalAmount =
+    summary?.orders.reduce((sum: number, order: OrderSessionSummaryOrder) => {
+      const orderTotal = order.items.reduce(
+        (itemSum: number, item: OrderSessionSummaryItem) => {
+          const itemTotal = multiply(item.price, item.quantity);
+          return add(itemSum, itemTotal);
+        },
+        0,
+      );
+      return add(sum, orderTotal);
+    }, 0) ?? 0;
 
   const formattedTotal = formatPrice(totalAmount);
 
@@ -195,25 +234,32 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
     const shortId = order.id.slice(0, 8);
     const status = order.status as OrderStatus;
     const statusLabel = getStatusLabel(status);
-    const statusClassName = STATUS_CLASSES[status] || "bg-gray-500/10 text-gray-600";
+    const statusClassName =
+      STATUS_CLASSES[status] || "bg-gray-500/10 text-gray-600";
     const isCloseable = CLOSEABLE_STATUSES.includes(status);
     const isUpdating = updatingOrderId === order.id;
+    const shouldShowSpinner = isUpdating;
+    const shouldShowCaret = !isUpdating;
+    const spinnerIcon = shouldShowSpinner ? (
+      <div className="h-3 w-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
+    ) : null;
+    const caretIcon = shouldShowCaret ? <CaretDownIcon size={12} /> : null;
 
     return (
       <div key={order.id} className="border border-border rounded-lg p-4">
         <div className="flex justify-between items-center mb-3">
-          <span className="font-medium text-sm">Pedido #{shortId}</span>
+          <span className="font-medium text-sm">
+            {t("orders.admin.table.orderLabel", { id: shortId })}
+          </span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild disabled={isUpdating}>
               <button
                 className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium cursor-pointer border-0 outline-none focus:ring-1 focus:ring-ring ${statusClassName}`}
                 disabled={isUpdating}
               >
-                {isUpdating && (
-                  <div className="h-3 w-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
-                )}
+                {spinnerIcon}
                 {statusLabel}
-                {!isUpdating && <CaretDownIcon size={12} />}
+                {caretIcon}
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -223,12 +269,16 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
                 return (
                   <DropdownMenuItem
                     key={changeableStatus}
-                    onClick={() => handleStatusChange(order.id, changeableStatus)}
+                    onClick={() =>
+                      handleStatusChange(order.id, changeableStatus)
+                    }
                     disabled={isCurrentStatus}
                     data-current={isCurrentStatus}
                     className="data-[current=true]:opacity-50"
                   >
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${itemClassName}`}>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${itemClassName}`}
+                    >
                       {getStatusLabel(changeableStatus)}
                     </span>
                   </DropdownMenuItem>
@@ -238,7 +288,9 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
           </DropdownMenu>
         </div>
         {!isCloseable && (
-          <p className="text-xs text-amber-600 mb-2">{t("orderSession.staffSummary.mustChangeStatus")}</p>
+          <p className="text-xs text-amber-600 mb-2">
+            {t("orderSession.staffSummary.mustChangeStatus")}
+          </p>
         )}
         <ul className="space-y-2">
           {order.items.map((item: OrderSessionSummaryItem, index: number) => {
@@ -246,7 +298,9 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
             const itemTotal = formatPrice(itemTotalValue);
             return (
               <li key={index} className="flex justify-between text-sm">
-                <span>{item.quantity}x {item.name}</span>
+                <span>
+                  {item.quantity}x {item.name}
+                </span>
                 <span className="font-medium">{itemTotal}</span>
               </li>
             );
@@ -256,11 +310,7 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
     );
   });
 
-  const summaryContent = (
-    <div className="space-y-4">
-      {ordersList}
-    </div>
-  );
+  const summaryContent = <div className="space-y-4">{ordersList}</div>;
 
   const hasNoOrders = summary !== null && summary.orders.length === 0;
   const emptyState = (
@@ -272,7 +322,8 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
   const shouldShowLoading = isLoading;
   const shouldShowError = !isLoading && error !== null;
   const shouldShowEmpty = !isLoading && error === null && hasNoOrders;
-  const shouldShowSummary = !isLoading && error === null && summary !== null && !hasNoOrders;
+  const shouldShowSummary =
+    !isLoading && error === null && summary !== null && !hasNoOrders;
 
   const bodyContent = (
     <div className="p-4 space-y-4 overflow-y-auto flex-1">
@@ -283,7 +334,8 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
     </div>
   );
 
-  const canCloseSession = allOrdersCloseable && !isClosing && !isLoading && error === null;
+  const canCloseSession =
+    allOrdersCloseable && !isClosing && !isLoading && error === null;
 
   const footer = (
     <div className="border-t border-border p-4 space-y-3">
@@ -298,7 +350,9 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
         size="lg"
         data-testid="staff-close-session-button"
       >
-        {isClosing ? t("orderSession.staffSummary.closing") : t("orderSession.staffSummary.closeAndConfirm")}
+        {isClosing
+          ? t("orderSession.staffSummary.closing")
+          : t("orderSession.staffSummary.closeAndConfirm")}
       </Button>
     </div>
   );
@@ -306,7 +360,10 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={handleOpenChange}>
-        <Drawer.Content className="max-h-[85vh] flex flex-col" data-testid="staff-session-summary-modal">
+        <Drawer.Content
+          className="max-h-[85vh] flex flex-col"
+          data-testid="staff-session-summary-modal"
+        >
           <Drawer.Header className="flex-row items-center justify-between">
             <Drawer.Title>{t("orderSession.staffSummary.title")}</Drawer.Title>
           </Drawer.Header>
@@ -319,9 +376,14 @@ export function StaffSessionSummaryModal({ open, onClose, sessionId }: StaffSess
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <Dialog.Content className="max-w-2xl p-0 max-h-[80vh] flex flex-col" data-testid="staff-session-summary-modal">
+      <Dialog.Content
+        className="max-w-2xl p-0 max-h-[80vh] flex flex-col"
+        data-testid="staff-session-summary-modal"
+      >
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <Dialog.Title className="text-lg font-semibold">{t("orderSession.staffSummary.title")}</Dialog.Title>
+          <Dialog.Title className="text-lg font-semibold">
+            {t("orderSession.staffSummary.title")}
+          </Dialog.Title>
           <button
             onClick={onClose}
             aria-label={t("common.buttons.cancel")}
